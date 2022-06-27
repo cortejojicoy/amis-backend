@@ -40,7 +40,6 @@ class GoogleController extends Controller
             if($finduser){
      
                 Auth::login($finduser);
-                $finduser->assignRole('faculty');
                 $token = $finduser->createToken('sample-token-name')->plainTextToken;
                 return redirect( env('SANCTUM_STATEFUL_DOMAINS').'/auth/callback?token='.$token);
      
