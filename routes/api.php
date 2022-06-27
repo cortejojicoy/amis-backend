@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\GoogleController;
-
+use App\Http\Controllers\faculty\AdviserController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -25,6 +25,13 @@ Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallb
 Route::post('/auth/login', [GoogleController::class, 'login']);
 Route::middleware('auth:sanctum')->get('/auth/user', [GoogleController::class, 'user']);
 Route::middleware('auth:sanctum')->post('/auth/logout', [GoogleController::class, 'logout']);
+
+//faculty
+Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculty'], function () {
+    Route::apiResource('advisees', AdviserController::class);
+    Route::apiResource('mentor-assignments', AdviserController::class);
+});
+
 
 //List users
 Route::get('/users', [UserController::class, 'index']);

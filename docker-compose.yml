@@ -26,7 +26,7 @@ services:
             - pgsql
             - redis
     pgsql:
-        image: 'postgres:14'
+        image: 'postgres:13'
         ports:
             - '${FORWARD_DB_PORT:-5432}:5432'
         environment:
@@ -36,9 +36,12 @@ services:
             POSTGRES_PASSWORD: '${DB_PASSWORD:-secret}'
         volumes:
             - 'sailpgsql:/var/lib/postgresql/data'
-            - './vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
         networks:
             - sail
+        healthcheck:
+            test: ["CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}"]
+            retries: 3
+            timeout: 5s
 
     redis:
         image: 'redis:alpine'

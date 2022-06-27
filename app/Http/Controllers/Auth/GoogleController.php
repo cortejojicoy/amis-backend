@@ -8,6 +8,9 @@ use Exception;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\DB;
 
 class GoogleController extends Controller
 {
@@ -32,26 +35,25 @@ class GoogleController extends Controller
     
             $user = Socialite::driver('google')->stateless()->user();
      
-            $finduser = User::where('google_id', $user->id)->first();
+            $finduser = User::where('email', $user->email)->first();
      
             if($finduser){
      
                 Auth::login($finduser);
+                $finduser->assignRole('faculty');
                 $token = $finduser->createToken('sample-token-name')->plainTextToken;
-                
-                return redirect( env('FRONTEND_URL').'/auth/callback?token='.$token);
+                return redirect( env('SANCTUM_STATEFUL_DOMAINS').'/auth/callback?token='.$token);
      
             }else{
-                $newUser = User::create([
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'google_id'=> $user->id,
-                    'password' => 'dummy12345'
-                ]);
+                // $newUser = User::create([
+                //     'name' => $user->name,
+                //     'email' => $user->email,
+                //     'google_id'=> $user->id,
+                //     'password' => 'dummy12345'
+                // ]);
     
-                Auth::login($newUser);
-     
-                // return redirect('/home');
+                // Auth::login($newUser);
+                return redirect( env('SANCTUM_STATEFUL_DOMAINS').'/auth/callback?error=nf');
             }
     
         } catch (Exception $e) {
@@ -59,9 +61,11 @@ class GoogleController extends Controller
         }
     }
     public function user(){
+        // return Auth::user()->email;
+        $user = User::where('email',Auth::user()->email)->with('roles')->first();
         return response()->json(
             [
-             'user' => Auth::user(),
+             'user' => $user,
             ], 200
          );
     }
@@ -76,7 +80,6 @@ class GoogleController extends Controller
 
     public function logout(Request $request)
     { 
-        // $request->user()->currentAccessToken()->delete();
         auth()->user()->tokens()->delete();
         return response()->json([
             'message' => 'Successfully logged out'
