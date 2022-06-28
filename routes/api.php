@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\faculty\AdviserController;
+use App\Http\Controllers\Student\SaveMentorController;
+use App\Http\Controllers\Student\Program;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,6 +34,10 @@ Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculty
     Route::apiResource('mentor-assignments', AdviserController::class);
 });
 
+Route::group(['middleware' => ['auth:sanctum','role:student'],'prefix'=>'student'], function () {
+    Route::apiResource('{saisid}/nominated-mentors', SaveMentorController::class);
+    Route::apiResource('programs', Program::class);
+});
 
 //List users
 Route::get('/users', [UserController::class, 'index']);
