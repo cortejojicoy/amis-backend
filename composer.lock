@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "504789b4751e06293a75b4c4da745a1b",
+    "content-hash": "acff928979ec5536952621f2b127936c",
     "packages": [
         {
             "name": "brick/math",
@@ -892,6 +892,48 @@
                 }
             ],
             "time": "2022-06-20T21:43:11+00:00"
+        },
+        {
+            "name": "kesmenenver/servicelayer",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/EnverKESMEN/l5-service-layer.git",
+                "reference": "1f73f6f597bc55626b3008f53b98ff95c86e7acd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/EnverKESMEN/l5-service-layer/zipball/1f73f6f597bc55626b3008f53b98ff95c86e7acd",
+                "reference": "1f73f6f597bc55626b3008f53b98ff95c86e7acd",
+                "shasum": ""
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "KesmenEnver\\ServiceLayer\\ServiceLayerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "KesmenEnver\\ServiceLayer\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Enver KESMEN",
+                    "email": "kesmenenver@gmail.com"
+                }
+            ],
+            "description": "The Service Layer is a design pattern that will help you to abstract your logic when you need to use different front-end on your application, for your domain logic",
+            "support": {
+                "issues": "https://github.com/EnverKESMEN/l5-service-layer/issues",
+                "source": "https://github.com/EnverKESMEN/l5-service-layer/tree/master"
+            },
+            "time": "2018-06-05T11:59:21+00:00"
         },
         {
             "name": "laravel/framework",
@@ -7986,7 +8028,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "kesmenenver/servicelayer": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

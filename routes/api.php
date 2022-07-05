@@ -4,9 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\GoogleController;
-use App\Http\Controllers\faculty\AdviserController;
+use App\Http\Controllers\Faculty\AdviserController;
 use App\Http\Controllers\Student\SaveMentorController;
 use App\Http\Controllers\Student\Program;
+use App\Http\Controllers\Faculty\BasicInfoController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -29,12 +30,16 @@ Route::middleware('auth:sanctum')->get('/auth/user', [GoogleController::class, '
 Route::middleware('auth:sanctum')->post('/auth/logout', [GoogleController::class, 'logout']);
 
 //faculty
-Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculty'], function () {
+Route::apiResource('faculties', BasicInfoController::class);
+Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'faculties'], function () {
     Route::apiResource('advisees', AdviserController::class);
     Route::apiResource('mentor-assignments', AdviserController::class);
+    
 });
 
-Route::group(['middleware' => ['auth:sanctum','role:student'],'prefix'=>'student'], function () {
+
+Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'students'], function () {
+    Route::post('{saisid}/nominated-mentors/collection', [SaveMentorController::class, 'bulkUpdate']);
     Route::apiResource('{saisid}/nominated-mentors', SaveMentorController::class);
     Route::apiResource('programs', Program::class);
 });

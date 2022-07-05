@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\SaveMentor;
+use App\Services\BulkUpdateSaveMentor;
+use App\Http\Requests\BulkUpdateSaveMentorRequest;
 
 class SaveMentorController extends Controller
 {
@@ -17,10 +19,7 @@ class SaveMentorController extends Controller
      */
     public function index(Request $request)
     {
-        $save_mentors =  SaveMentor::get();
-        if($request->has('saisid')){
-            $save_mentors = $save_mentors->where('saisid',$request->saisid);
-        }
+        $save_mentors =  SaveMentor::where('saisid','12345687')->get();
         if($request->has('mentor_name')){
             $save_mentors = $save_mentors->where('mentor_name',$request->mentor_name);
         }
@@ -76,5 +75,16 @@ class SaveMentorController extends Controller
         Article::find($id)->delete();
 
         return 204;
+    }
+
+    /**
+     * Add/Delete bulk resources from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function bulkUpdate(BulkUpdateSaveMentorRequest $request, BulkUpdateSaveMentor $bulkUpdateSaveMentor)
+    {
+        return $bulkUpdateSaveMentor->insertDeleteSaveMentor($request);
     }
 }

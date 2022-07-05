@@ -44,14 +44,6 @@ class GoogleController extends Controller
                 return redirect( env('SANCTUM_STATEFUL_DOMAINS').'/auth/callback?token='.$token);
      
             }else{
-                // $newUser = User::create([
-                //     'name' => $user->name,
-                //     'email' => $user->email,
-                //     'google_id'=> $user->id,
-                //     'password' => 'dummy12345'
-                // ]);
-    
-                // Auth::login($newUser);
                 return redirect( env('SANCTUM_STATEFUL_DOMAINS').'/auth/callback?error=nf');
             }
     
