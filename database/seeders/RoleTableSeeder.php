@@ -15,14 +15,16 @@ class RoleTableSeeder extends Seeder
     public function run()
     {
         $roles = [
-            'Admin',
-            'Faculty',
-            'Student',
-            'REPS'
+            ['id' => 1, 'name' => 'student', 'guard_name' => 'web'],
+            ['id' => 2, 'name' => 'faculty', 'guard_name' => 'web'],
+            ['id' => 3, 'name' => 'reps', 'guard_name' => 'web'],
+            ['id' => 4, 'name' => 'admin', 'guard_name' => 'web']
          ];
       
          foreach ($roles as $role) {
-              Role::create(['name' => $role]);
+              Role::updateOrCreate(['id' => $role['id']], $role);
          }
+
+        $this->command->info('Roles Table Seeded!');
     }
 }
