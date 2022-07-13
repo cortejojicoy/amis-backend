@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->integer('uuid');
-            $table->integer('sais_id')->primary()->index('users_saisid');
+            $table->integer('saisid')->primary()->index('users_sais_id');
             $table->string('last_name', 255);
             $table->string('first_name', 255);
             $table->string('middle_name', 255)->nullable();
