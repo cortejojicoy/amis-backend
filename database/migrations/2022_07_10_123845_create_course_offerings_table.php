@@ -32,7 +32,7 @@ return new class extends Migration
             $table->string('times', 20);
             $table->string('days', 10);
             $table->string('facil_id', 10);
-            $table->integer('total_enrl');
+            $table->integer('tot_enrl');
             $table->integer('cap_enrl');
             $table->integer('class_nbr');
             $table->string('mtg_start', 20);

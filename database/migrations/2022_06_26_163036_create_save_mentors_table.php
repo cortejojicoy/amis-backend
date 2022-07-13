@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('actions', 20);
             $table->string('mentor_name', 255);
             $table->string('mentor_role', 255);
-            $table->string('field_represented', 50);
-            $table->date('effectivity_start');
-            $table->date('effectivity_end');
+            $table->string('field_represented', 50)->nullable();
+            $table->date('effectivity_start')->nullable();
+            $table->date('effectivity_end')->nullable();
             $table->integer('sais_id');
             $table->integer('mentor_id');
             $table->string('actions_status', 11);

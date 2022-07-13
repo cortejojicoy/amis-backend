@@ -15,8 +15,28 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $path = base_path('database/seeders/amis-database-limited.sql');
-        DB::unprepared(file_get_contents($path));
-        $this->command->info('Table for mentor assignment transaction!');
+        $this->call([
+            AdminTableSeeder::class,
+            ClassFacultyInChargeTableSeeder::class,
+            ClassTableSeeder::class,
+            CourseOfferingTableSeeder::class,
+            CourseTableSeeder::class,
+            FacultyTableSeeder::class,
+            MentorAssignmentTxnTableSeeder::class,
+            MentorTableSeeder::class,
+            PermissionTableSeeder::class,
+            RoleTableSeeder::class,
+            ModelHasPermissionTableSeeder::class,
+            ModelHasRoleTableSeeder::class,
+            SavedMentorTableSeeder::class,
+            StudentCourseCatalogTableSeeder::class,
+            StudentCourseOfferTableSeeder::class,
+            StudentCurriculumTableSeeder::class,
+            StudentGradeTableSeeder::class,
+            StudentProgramRecordTableSeeder::class,
+            StudentTableSeeder::class,
+            StudentTermTableSeeder::class,
+            UserTableSeeder::class
+        ]);
     }
 }
