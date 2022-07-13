@@ -15,15 +15,15 @@ return new class extends Migration
     public function up()
     {
         Schema::create('mentors', function (Blueprint $table) {
-            $table->integer('mentor_id')->primary();
+            $table->integer('mentor_id')->autoIncrement();
             $table->integer('faculty_id')->index('mentors_faculty_id');
             $table->integer('student_program_record_id');
             $table->integer('student_sais_id')->index('mentors_student_saisid');
             $table->string('mentor_role', 29);
-            $table->string('field_represented', 29);
-            $table->string('status', 20);
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->string('field_represented', 29)->nullable();
+            $table->string('status', 20)->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
         });
     }
 
