@@ -1,0 +1,18 @@
+INSERT INTO "users" ("uuid", "saisid", "last_name", "first_name", "middle_name", "email", "user_roles") VALUES
+(0,	10055543,	'BOLAÑOS',	'LESLIE',	'GUEMO',	'lgbolanos@up.edu.ph',	''),
+(0,	12345686,	'CARANDANG',	'MONINA',	'B',	'mbcarandang2@up.edu.ph',	''),
+(0,	12345687,	'ABRERA',	'RONALD',	'A',	'raabrera@up.edu.ph',	''),
+(0,	10066367,	'SAULO',	'MARC ENRICO',	'CLAUDIO',	'mcsaulo@up.edu.ph',	''),
+(0,	12345685,	'SAULO',	'MARC ENRICO',	'CLAUDIO',	'saulomarc1@gmail.com',	''),
+(0,	12345678,	'CORTEJO',	'JOHN JERCAI',	'V',	'jicoy.cortejo@gmail.com',	''),
+(0,	321321321,	'CORTEJO',	'JOHN JERCAI',	'V',	'johnjercai.cortejo@lspu.edu.ph',	''),
+(0,	12345679,	'DELA CUEVA',	'ERIKA',	'A',	'madelacueva1@up.edu.ph',	''),
+(0,	12345680,	'TANEDO',	'JERVIS',	'',	'jtanedo@up.edu.ph',	''),
+(0,	321321222,	'LORIDA',	'JOHN RAELE',	'',	'jllorida@up.edu.ph',	''),
+(0,	12345682,	'PAMULAKLAKIN',	'JENELYN',	'',	'jpamulaklakin@up.edu.ph',	''),
+(0,	10091160,	'CAUMBAN',	'JOYCE ANN',	'VALLESTERO',	'jvcaumban@up.edu.ph',	''),
+(0,	10091987,	'LEONOR',	'JAIRUS MATTHEW',	'D',	'jdleonor2@up.edu.ph',	''),
+(0,	10081819,	'SEVERINO',	'SIEGFRED',	'RAYMUNDO',	'srseverino@up.edu.ph',	''),
+(0,	10081099,	'GUNDAYAO',	'ARIANNE RICHEL',	'SALVALEON',	'asgundayao@up.edu.ph',	''),
+(0,	12345683,	'RAMILLANO',	'ARON RESTY',	'B',	'abramillano@up.edu.ph',	''),
+(0,	12345684,	'OLIVAR',	'MARK GIO',	'J',	'mjolivar@up.edu.ph',	'');
