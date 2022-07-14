@@ -1,4 +1,4 @@
-INSERT INTO "users" ("uuid", "saisid", "last_name", "first_name", "middle_name", "email", "user_roles") VALUES
+INSERT INTO "users" ("uuid", "sais_id", "last_name", "first_name", "middle_name", "email", "user_roles") VALUES
 (0,	10055543,	'BOLAÑOS',	'LESLIE',	'GUEMO',	'lgbolanos@up.edu.ph',	''),
 (0,	12345686,	'CARANDANG',	'MONINA',	'B',	'mbcarandang2@up.edu.ph',	''),
 (0,	12345687,	'ABRERA',	'RONALD',	'A',	'raabrera@up.edu.ph',	''),
