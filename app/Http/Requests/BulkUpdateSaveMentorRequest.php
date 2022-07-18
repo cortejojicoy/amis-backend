@@ -13,7 +13,7 @@ class BulkUpdateSaveMentorRequest extends FormRequest
      */
     public function authorize()
     {
-        if(Auth::user()->saisid == $this->route('saisid')){
+        if(Auth::user()->sais_id == $this->route('sais_id')){
             return true;
         }else{
             return false;
@@ -29,10 +29,10 @@ class BulkUpdateSaveMentorRequest extends FormRequest
     {
         return [
             "*.actions" => 'required',
-            "*.saisid" => 'required',
+            "*.sais_id" => 'required',
             "*.mentor_id" => [
                             'required',
-                            'exists:faculties,saisid'
+                            'exists:faculties,sais_id'
                           ],
         ];
     }
