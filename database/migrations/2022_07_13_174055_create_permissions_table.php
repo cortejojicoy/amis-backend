@@ -13,11 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('students', function (Blueprint $table) {
-            $table->integer('uuid')->index('students_uuid');
-            $table->integer('sais_id');
-            $table->string('campus_id', 10);
+        Schema::create('permissions', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 255);
+            $table->string('guard_name', 255);
             $table->timestamps();
+            $table->unique(['name', 'guard_name'], 'permissions_name_guard_name_unique');
+
         });
     }
 
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('students');
+        Schema::dropIfExists('permissions');
     }
 };

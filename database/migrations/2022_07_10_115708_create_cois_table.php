@@ -11,12 +11,16 @@ return new class extends Migration
      *
      * @return void
      */
+
     public function up()
     {
-        Schema::create('students', function (Blueprint $table) {
-            $table->integer('uuid')->index('students_uuid');
-            $table->integer('sais_id');
-            $table->string('campus_id', 10);
+        Schema::create('cois', function (Blueprint $table) {
+            $table->string('coi_id', 15)->primary();
+            $table->integer('class_id');
+            $table->string('status', 20);
+            $table->string('student_id',10);
+            $table->text('comment');
+            $table->dateTime('submitted_to_sais');
             $table->timestamps();
         });
     }
@@ -28,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('students');
+        Schema::dropIfExists('cois');
     }
 };

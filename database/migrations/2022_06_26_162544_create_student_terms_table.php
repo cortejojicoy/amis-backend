@@ -14,7 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('student_terms', function (Blueprint $table) {
-            $table->id();
+            $table->integer('term_id');
+            $table->string('term', 50);
+            $table->string('ay', 11);
             $table->timestamps();
         });
     }

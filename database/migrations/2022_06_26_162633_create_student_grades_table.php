@@ -15,7 +15,14 @@ return new class extends Migration
     {
         Schema::create('student_grades', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
+            $table->integer('student_saisid');
+            $table->integer('campus_id');
+            $table->integer('term');
+            $table->string('section', 11);
+            $table->integer('unit_taken');
+            $table->integer('course_id');
+            $table->string('grade', 5);
+            $table->string('college', 5);
         });
     }
 
