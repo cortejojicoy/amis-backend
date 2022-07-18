@@ -22,7 +22,7 @@ class Faculty extends Model
     */
     public function user()
     {
-        return $this->belongsTo(User::class,'saisid','saisid');
+        return $this->belongsTo(User::class,'sais_id','sais_id');
     }
 
         /**
@@ -33,6 +33,6 @@ class Faculty extends Model
      */
     public function scopeBasicInfo($query)
     {
-        $query->join('users', 'users.saisid','=','faculties.saisid');
+        $query->join('users', 'users.sais_id','=','faculties.sais_id');
     }
 }

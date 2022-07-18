@@ -40,10 +40,10 @@ class Program extends Controller
     public function show($id)
     {
         $program = DB::table('users As u')
-        ->select(DB::raw("CONCAT(u.last_name,' ',u.first_name) AS NAME, spr.academic_program_id AS program, u.saisid, spr.status"))
-        ->leftJoin('students AS s', 's.saisid', '=', 'u.saisid')
+        ->select(DB::raw("CONCAT(u.last_name,' ',u.first_name) AS NAME, spr.academic_program_id AS program, u.sais_id, spr.status"))
+        ->leftJoin('students AS s', 's.sais_id', '=', 'u.sais_id')
         ->leftJoin('student_program_records AS spr', 'spr.campus_id', '=', 's.campus_id')
-        ->where('u.saisid', Auth::user()->saisid)
+        ->where('u.sais_id', Auth::user()->sais_id)
         ->first();
         return response()->json(
             [

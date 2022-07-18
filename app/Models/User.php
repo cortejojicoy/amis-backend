@@ -13,7 +13,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable,  HasRoles;
-    protected $primaryKey = 'saisid';
+    protected $primaryKey = 'sais_id';
     /**
      * The attributes that are mass assignable.
      *

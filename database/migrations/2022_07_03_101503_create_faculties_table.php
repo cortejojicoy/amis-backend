@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('faculties', function (Blueprint $table) {
             $table->id();
             $table->integer("uuid");
-            $table->integer("saisid");
+            $table->integer("sais_id");
             $table->timestamps();
         });
     }

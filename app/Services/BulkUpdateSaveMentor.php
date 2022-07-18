@@ -7,7 +7,7 @@ class BulkUpdateSaveMentor {
     function insertDeleteSaveMentor($request){
         DB::beginTransaction();
         try {
-            SaveMentor::where('saisid',$request->saisid)->delete();
+            SaveMentor::where('sais_id',$request->sais_id)->delete();
             SaveMentor::insert($request->input());
             DB::commit();
             return response()->json(['message' => 'Successfully updated.'], 200);
