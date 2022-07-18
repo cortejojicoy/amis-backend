@@ -10,6 +10,6 @@ class Mentor extends Model
     use HasFactory;
 
     public $timestamps = false;
-    protected $primaryKey = 'saisid';
+    protected $primaryKey = 'sais_id';
 
 }
