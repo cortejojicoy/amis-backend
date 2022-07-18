@@ -19,7 +19,7 @@ class SaveMentorController extends Controller
      */
     public function index(Request $request)
     {
-        $save_mentors =  SaveMentor::where('saisid',Auth::user()->saisid)->get();
+        $save_mentors =  SaveMentor::where('saisid',Auth::user()->saisid)->where('actions_status', 'saved')->get();
         if($request->has('mentor_name')){
             $save_mentors = $save_mentors->where('mentor_name',$request->mentor_name);
         }

@@ -10,4 +10,9 @@ class SaveMentor extends Model
     use HasFactory;
     public $timestamps = false;
     protected $primaryKey = 'mentor_id';
+
+    public function scopeSubmitMentors($query)
+    {
+        
+    }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Faculty\AdviserController;
 use App\Http\Controllers\Student\SaveMentorController;
 use App\Http\Controllers\Student\Program;
 use App\Http\Controllers\Faculty\BasicInfoController;
+use App\Http\Controllers\Faculty\MentorAssignmentController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,7 +35,7 @@ Route::apiResource('faculties', BasicInfoController::class);
 Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'faculties'], function () {
     Route::apiResource('advisees', AdviserController::class);
     Route::apiResource('mentor-assignments', AdviserController::class);
-    
+    Route::apiResource('{saisid}/active-mentors', MentorAssignmentController::class);
 });
 
 

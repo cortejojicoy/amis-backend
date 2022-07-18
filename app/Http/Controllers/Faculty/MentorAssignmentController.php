@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Models\Mentor;
 
 class MentorAssignmentController extends Controller
 {
@@ -14,7 +16,12 @@ class MentorAssignmentController extends Controller
      */
     public function index()
     {
-        //
+        $activeMentors = Mentor::activeMentor()->get();
+        return response()->json(
+            [
+             'active_mentors' => $activeMentors,
+            ], 200
+         );
     }
 
     /**
