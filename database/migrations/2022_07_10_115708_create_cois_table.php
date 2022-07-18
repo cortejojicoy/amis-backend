@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('status', 20);
             $table->string('student_id',10);
             $table->text('comment');
-            $table->dateTime('submitted_to_sais');
+            $table->dateTime('submitted_to_sais')->nullable();
             $table->timestamps();
         });
     }

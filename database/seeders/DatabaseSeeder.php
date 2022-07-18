@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             ClassFacultyInChargeTableSeeder::class,
             ClassTableSeeder::class,
             CourseOfferingTableSeeder::class,
+            COISeeder::class,
+            COITxnSeeder::class,
             CourseTableSeeder::class,
             FacultyTableSeeder::class,
             MentorAssignmentTxnTableSeeder::class,
