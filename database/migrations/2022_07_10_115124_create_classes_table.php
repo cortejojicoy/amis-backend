@@ -11,18 +11,19 @@ return new class extends Migration
      *
      * @return void
      */
+
     public function up()
     {
-        Schema::create('student_grades', function (Blueprint $table) {
-            $table->id();
-            $table->integer('student_sais_id');
-            $table->integer('campus_id');
-            $table->integer('term');
-            $table->string('section', 11);
-            $table->integer('unit_taken');
+        Schema::create('classes', function (Blueprint $table) {
+            $table->bigIncrements('class_id');
             $table->integer('course_id');
-            $table->string('grade', 5);
-            $table->string('college', 5);
+            $table->integer('term_id');
+            $table->integer('parent_class_id')->nullable();
+            $table->string('type', 5);
+            $table->string('section', 5);
+            $table->string('date', 20);
+            $table->string('time', 20);
+            $table->timestamps();
         });
     }
 
@@ -33,6 +34,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('student_grades');
+        Schema::dropIfExists('classes');
     }
 };

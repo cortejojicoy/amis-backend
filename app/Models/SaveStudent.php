@@ -9,5 +9,5 @@ class SaveStudent extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'saisid';
+    protected $primaryKey = 'sais_id';
 }

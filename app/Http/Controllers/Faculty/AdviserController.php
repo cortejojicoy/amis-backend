@@ -17,9 +17,9 @@ class AdviserController extends Controller
     public function index()
     {
         $advisees = DB::table('users As u')
-        ->select(DB::raw("CONCAT(u.last_name,' ',u.first_name) AS NAME, spr.academic_program_id AS program, u.saisid, spr.status"))
+        ->select(DB::raw("CONCAT(u.last_name,' ',u.first_name) AS NAME, spr.academic_program_id AS program, u.sais_id, spr.status"))
         ->distinct()
-        ->leftJoin('students AS s', 's.saisid', '=', 'u.saisid')
+        ->leftJoin('students AS s', 's.sais_id', '=', 'u.sais_id')
         ->leftJoin('student_program_records AS spr', 'spr.campus_id', '=', 's.campus_id')
         ->leftJoin('mentors AS m', 'm.student_program_record_id', '=', 'spr.student_program_record_id')
         ->leftJoin('faculties AS f', 'f.id', '=', 'm.faculty_id')
