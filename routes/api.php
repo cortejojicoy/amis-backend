@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\CoiController;
 use App\Http\Controllers\CoiTxnController;
 use App\Http\Controllers\CourseOfferingController;
 use App\Http\Controllers\Faculty\AdviserController;
@@ -40,8 +41,8 @@ Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'faculties'], function 
 });
 
 Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'students'], function () {
-    Route::post('{saisid}/nominated-mentors/collection', [SaveMentorController::class, 'bulkUpdate']);
-    Route::apiResource('{saisid}/nominated-mentors', SaveMentorController::class);
+    Route::post('{sais_id}/nominated-mentors/collection', [SaveMentorController::class, 'bulkUpdate']);
+    Route::apiResource('{sais_id}/nominated-mentors', SaveMentorController::class);
     Route::apiResource('programs', Program::class);
 });
 
@@ -49,6 +50,7 @@ Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'students'], function (
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('course-offerings/get-sections', [CourseOfferingController::class, 'getSections']);
     Route::apiResource('course-offerings', CourseOfferingController::class);
+    Route::apiResource('consent-of-instructor', CoiController::class);
 });
 
 //txn history resources

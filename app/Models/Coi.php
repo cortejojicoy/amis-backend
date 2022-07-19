@@ -9,6 +9,18 @@ class Coi extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'coi_id';
+
+    protected $fillable = [
+        'coi_id',
+        'class_id',
+        'status',
+        'student_id',
+        'comment',
+        'submitted_to_sais',
+        'created_at',
+    ];
+
     public function coitxns()
     {
         return $this->hasMany(CoiTxn::class);
