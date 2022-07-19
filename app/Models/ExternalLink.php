@@ -10,4 +10,12 @@ class ExternalLink extends Model
     use HasFactory;
 
     public $timestamps = false;
+
+    protected $fillable = [
+        'id',
+        'token',
+        'model_type',
+        'model_id',
+        'action'
+    ];
 }
