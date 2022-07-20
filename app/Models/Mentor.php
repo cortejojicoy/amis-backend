@@ -19,7 +19,7 @@ class Mentor extends Model
     {
         $query->distinct()
               ->leftJoin('faculties', 'faculties.id', '=', 'mentors.faculty_id')
-              ->leftJoin('users', 'users.saisid', '=', 'faculties.saisid')
-              ->where('mentors.student_saisid', Auth::user()->saisid);
+              ->leftJoin('users', 'users.sais_id', '=', 'faculties.sais_id')
+              ->where('mentors.student_sais_id', Auth::user()->sais_id);
     }
 }

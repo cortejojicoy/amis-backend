@@ -8,7 +8,9 @@ use App\Http\Controllers\Faculty\AdviserController;
 use App\Http\Controllers\Student\SaveMentorController;
 use App\Http\Controllers\Student\Program;
 use App\Http\Controllers\Faculty\BasicInfoController;
-use App\Http\Controllers\Faculty\MentorAssignmentController;
+use App\Http\Controllers\Faculty\ActiveMentorController;
+use App\Http\Controllers\MATxnController;
+use App\Http\Controllers\MAController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,16 +36,31 @@ Route::middleware('auth:sanctum')->post('/auth/logout', [GoogleController::class
 Route::apiResource('faculties', BasicInfoController::class);
 Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'faculties'], function () {
     Route::apiResource('advisees', AdviserController::class);
-    Route::apiResource('mentor-assignments', AdviserController::class);
-    Route::apiResource('{saisid}/active-mentors', MentorAssignmentController::class);
+    Route::apiResource('{sais_id}/mentor-assignments', AdviserController::class);
+    Route::apiResource('{sais_id}/active-mentors', ActiveMentorController::class);
 });
 
 
 Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'students'], function () {
-    Route::post('{saisid}/nominated-mentors/collection', [SaveMentorController::class, 'bulkUpdate']);
-    Route::apiResource('{saisid}/nominated-mentors', SaveMentorController::class);
+    Route::post('{sais_id}/nominated-mentors/collection', [SaveMentorController::class, 'bulkUpdate']);
+    Route::apiResource('{sais_id}/nominated-mentors', SaveMentorController::class);
     Route::apiResource('programs', Program::class);
 });
+
+//routes open for all roles but needs auth
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('course-offerings/get-sections', [CourseOfferingController::class, 'getSections']);
+    Route::apiResource('course-offerings', CourseOfferingController::class);
+    Route::apiResource('consent-of-instructor', CoiController::class);
+    Route::apiResource('mentor-assignment', MAController::class);
+});
+
+//txn history resources
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::apiResource('coitxn', CoiTxnController::class);
+    Route::apiResource('mastxn', MATxnController::class);
+});
+
 
 //List users
 Route::get('/users', [UserController::class, 'index']);

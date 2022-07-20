@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Mentor;
+use Illuminate\Support\Facades\DB;
 
-class MentorAssignmentController extends Controller
+class ActiveMentorController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -32,7 +33,7 @@ class MentorAssignmentController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
@@ -43,7 +44,7 @@ class MentorAssignmentController extends Controller
      */
     public function show($id)
     {
-        //
+        
     }
 
     /**
