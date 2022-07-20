@@ -4,6 +4,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\CoiController;
+use App\Http\Controllers\CoiTxnController;
+use App\Http\Controllers\CourseOfferingController;
 use App\Http\Controllers\Faculty\AdviserController;
 use App\Http\Controllers\Student\SaveMentorController;
 use App\Http\Controllers\Student\Program;
@@ -39,7 +42,6 @@ Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'faculties'], function 
     Route::apiResource('{sais_id}/mentor-assignments', AdviserController::class);
     Route::apiResource('{sais_id}/active-mentors', ActiveMentorController::class);
 });
-
 
 Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'students'], function () {
     Route::post('{sais_id}/nominated-mentors/collection', [SaveMentorController::class, 'bulkUpdate']);
