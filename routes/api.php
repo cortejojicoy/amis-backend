@@ -12,8 +12,8 @@ use App\Http\Controllers\Student\SaveMentorController;
 use App\Http\Controllers\Student\Program;
 use App\Http\Controllers\Faculty\BasicInfoController;
 use App\Http\Controllers\Faculty\ActiveMentorController;
-use App\Http\Controllers\MATxnController;
-use App\Http\Controllers\MAController;
+use App\Http\Controllers\MaTxnController;
+use App\Http\Controllers\MaController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -54,13 +54,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('course-offerings/get-sections', [CourseOfferingController::class, 'getSections']);
     Route::apiResource('course-offerings', CourseOfferingController::class);
     Route::apiResource('consent-of-instructor', CoiController::class);
-    Route::apiResource('mentor-assignment', MAController::class);
+    Route::apiResource('mentor-assignment', MaController::class);
 });
 
 //txn history resources
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('coitxn', CoiTxnController::class);
-    Route::apiResource('mastxn', MATxnController::class);
+    Route::apiResource('mastxn', MaTxnController::class);
 });
 
 

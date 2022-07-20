@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\MentorAssignmentTransaction;
 use App\Http\Requests\MentorAssignmentPostRequest;
 
-class MAController extends Controller
+class MaController extends Controller
 {
     /**
      * Display a listing of the resource.
