@@ -1,46 +1,19 @@
 <?php
-
-namespace App\Http\Controllers;
+namespace App\Services;
 
 use App\Models\Coi;
 use App\Models\CoiTxn;
 use App\Models\CourseOffering;
 use App\Models\ExternalLink;
 use App\Models\Student;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class CoiController extends Controller
-{
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //generate transaction ID
-        $uniqueId = $this->generateTxnID("COI");
-
-        //get student instance
-        $student = Student::where('sais_id', Auth::user()->sais_id)->first();
-
+class ApplyConsentOfInstructor{
+    function createCoi($request, $coi_id, $external_link_token){
         //check if student has already applied for the same class
         $existingCOI = Coi::where('class_id', $request->class_id)
-            ->where('student_id', $student->campus_id)
+            ->where('sais_id', Auth::user()->sais_id)
             ->where(function($query) {
                 $query->orWhere('status', 'Requested')
                     ->orWhere('status', 'Approved');
@@ -60,8 +33,7 @@ class CoiController extends Controller
                 return response()->json(
                     [
                         'message' => 'No Faculty-in-Charge assigned in this class. Contact the unit offering the course so they can enter the FIC in SAIS',
-                        'status' => 'Error'
-                    ], 200
+                    ], 400
                 );
             } else { // if there is faculty assigned
                 //begins transaction but won't commit it to DB first
@@ -69,31 +41,28 @@ class CoiController extends Controller
                 try {
                     //Create COI
                     Coi::create([
-                        "coi_id" => $uniqueId,
+                        "coi_id" => $coi_id,
                         "class_id" => $request->class_id,
-                        "student_id" => $student->campus_id,
+                        "sais_id" => Auth::user()->sais_id,
                         "status" => "Requested",
                         "comment" => "",
-                        "created_at" => Carbon::now()
+                        "created_at" => now()
                     ]);
                     
                     //Create COI TXN
                     CoiTxn::create([
-                        "coi_id" => $uniqueId,
+                        "coi_id" => $coi_id,
                         "action" => "Requested",
                         "committed_by" => Auth::user()->sais_id,
-                        "note" => $request->justification,
-                        "created_at" => Carbon::now()
+                        "note" => $request->justification ? $request->justification : 'None',
+                        "created_at" => now()
                     ]);
-                    
-                    //generate random alpha numeric characters for external links
-                    $randomAlphaNum = $this->generateRandomAlphaNum(50, 1);
                     
                     //create external link
                     ExternalLink::create([
-                        "token" => $randomAlphaNum,
+                        "token" => $external_link_token,
                         "model_type" => 'App\Models\Coi',
-                        "model_id" => $uniqueId
+                        "model_id" => $coi_id
                     ]);
         
                     // add emailing
@@ -126,43 +95,58 @@ class CoiController extends Controller
             return response()->json(
                 [
                     'message' => 'You have already applied COI to this class with status: ' . $existingCOI->status,
-                    'status' => 'Error'
-                ], 200
+                ], 400
             );
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+    function updateCoi($request, $id) { 
+        $coi = Coi::find($id);
+        if($request->status == 'approve') {
+            $status = 'Approved';
+        } else {
+            $status = 'Disapproved';
+        } 
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        if($coi) {
+            DB::beginTransaction();
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+            try {
+                $coi->status = $status;
+                $coi->save();
+
+                CoiTxn::create([
+                    "coi_id" => $coi->coi_id,
+                    "action" => $status,
+                    "committed_by" => Auth::user()->sais_id,
+                    "note" => $request->justification ? $request->justification : "None",
+                    "created_at" => now()
+                ]);
+
+                ExternalLink::where('model_id', $coi->coi_id)
+                    ->where('model_type', 'App\Model\Coi')
+                    ->update(['action' => $status]);
+
+                DB::commit();
+
+                return response()->json(
+                    [
+                        'message' => 'COI Successfully ' . $status,
+                        'status' => 'Ok'
+                    ], 200
+                );
+
+            } catch (\Exception $ex) {
+                //if there is an error, rollback to previous state of db before beginTransaction
+                DB::rollback();
+    
+                //return error
+                return response()->json(
+                    [
+                        'message' => $ex->getMessage()
+                    ], 500
+                );
+            }
+        }
     }
 }

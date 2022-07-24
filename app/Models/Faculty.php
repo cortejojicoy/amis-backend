@@ -20,6 +20,11 @@ class Faculty extends Model
         /**
      * Get the post that owns the comment.
     */
+    public function courseOfferings()
+    {
+        return $this->hasMany(CourseOffering::class, 'id', 'sais_id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class,'sais_id','sais_id');

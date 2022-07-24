@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('coi_id', 15)->primary();
             $table->integer('class_id');
             $table->string('status', 20);
-            $table->string('student_id',10);
+            $table->integer('sais_id');
             $table->text('comment');
             $table->dateTime('submitted_to_sais')->nullable();
             $table->timestamps();

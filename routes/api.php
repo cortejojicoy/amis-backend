@@ -4,13 +4,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\GoogleController;
-use App\Http\Controllers\CoiController;
-use App\Http\Controllers\CoiTxnController;
 use App\Http\Controllers\CourseOfferingController;
 use App\Http\Controllers\Faculty\AdviserController;
 use App\Http\Controllers\Student\SaveMentorController;
 use App\Http\Controllers\Student\Program;
 use App\Http\Controllers\Faculty\BasicInfoController;
+use App\Http\Controllers\Faculty\FacultyCoiController;
+use App\Http\Controllers\Faculty\FacultyCoiTxnController;
+use App\Http\Controllers\Student\StudentCoiController;
+use App\Http\Controllers\Student\StudentCoiTxnController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -33,29 +36,29 @@ Route::middleware('auth:sanctum')->get('/auth/user', [GoogleController::class, '
 Route::middleware('auth:sanctum')->post('/auth/logout', [GoogleController::class, 'logout']);
 
 //faculty
-Route::apiResource('faculties', BasicInfoController::class);
-Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'faculties'], function () {
+// Route::apiResource('faculties', BasicInfoController::class);
+Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculties'], function () {
     Route::apiResource('advisees', AdviserController::class);
     Route::apiResource('mentor-assignments', AdviserController::class);
-    
+    Route::apiResource('coitxn', FacultyCoiTxnController::class);
+    Route::apiResource('consent-of-instructor', FacultyCoiController::class);
 });
 
-Route::group(['middleware' => ['auth:sanctum'],'prefix'=>'students'], function () {
+Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'students'], function () {
     Route::post('{sais_id}/nominated-mentors/collection', [SaveMentorController::class, 'bulkUpdate']);
     Route::apiResource('{sais_id}/nominated-mentors', SaveMentorController::class);
     Route::apiResource('programs', Program::class);
+    Route::apiResource('consent-of-instructor', StudentCoiController::class);
+    Route::apiResource('coitxn', StudentCoiTxnController::class);
 });
 
 //routes open for all roles but needs auth
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('course-offerings/get-sections', [CourseOfferingController::class, 'getSections']);
     Route::apiResource('course-offerings', CourseOfferingController::class);
-    Route::apiResource('consent-of-instructor', CoiController::class);
 });
 
 //txn history resources
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::apiResource('coitxn', CoiTxnController::class);
 });
 
 
