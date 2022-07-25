@@ -1,11 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Faculty;
 
-use App\Models\CourseOffering;
+use App\Http\Controllers\Controller;
+use App\Models\Coi;
+use App\Services\ApplyConsentOfInstructor;
 use Illuminate\Http\Request;
 
-class CourseOfferingController extends Controller
+
+class FacultyCoiController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,11 +17,17 @@ class CourseOfferingController extends Controller
      */
     public function index(Request $request)
     {
-        $courses = CourseOffering::filter($request)->get();
+        $cois = Coi::filter($request, 'faculties');
 
+        if($request->has('items')) {
+            $cois = $cois->paginate($request->items);
+        } else {
+            $cois = $cois->get();
+        }
+        
         return response()->json(
             [
-             'courses' => $courses
+             'cois' => $cois,
             ], 200
          );
     }
@@ -52,9 +61,9 @@ class CourseOfferingController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, ApplyConsentOfInstructor $applyConsentOfInstructor)
     {
-        //
+        return $applyConsentOfInstructor->updateCoi($request, $id);
     }
 
     /**

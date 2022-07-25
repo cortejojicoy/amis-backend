@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('token', 50);
             $table->string('model_type', 255);
             $table->string('model_id', 15);
-            $table->string('action', 10)->nullable();
+            $table->string('action', 15)->nullable();
         });
     }
 

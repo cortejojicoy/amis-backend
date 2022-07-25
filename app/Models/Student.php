@@ -9,6 +9,7 @@ class Student extends Model
 {
     use HasFactory;
     protected $primaryKey = 'campus_id';
+    protected $keyType = 'string';
 
     public function cois()
     {

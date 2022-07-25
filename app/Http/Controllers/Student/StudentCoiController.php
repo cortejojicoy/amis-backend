@@ -1,26 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Student;
 
-use App\Models\CourseOffering;
+use App\Http\Controllers\Controller;
+use App\Services\ApplyConsentOfInstructor;
 use Illuminate\Http\Request;
 
-class CourseOfferingController extends Controller
+
+class StudentCoiController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $courses = CourseOffering::filter($request)->get();
-
-        return response()->json(
-            [
-             'courses' => $courses
-            ], 200
-         );
+        //
     }
 
     /**
@@ -29,9 +25,12 @@ class CourseOfferingController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, ApplyConsentOfInstructor $applyConsentOfInstructor)
     {
-        //
+        $coi_id = $this->generateTxnID("COI");
+        $external_link_token = $this->generateRandomAlphaNum(50, 1);
+        
+        return $applyConsentOfInstructor->createCoi($request, $coi_id, $external_link_token);
     }
 
     /**
