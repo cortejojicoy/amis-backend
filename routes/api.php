@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\CourseOfferingController;
+use App\Http\Controllers\ExternalLinkController;
 use App\Http\Controllers\Faculty\AdviserController;
 use App\Http\Controllers\Student\SaveMentorController;
 use App\Http\Controllers\Student\Program;
@@ -57,10 +58,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('course-offerings', CourseOfferingController::class);
 });
 
-//txn history resources
-Route::group(['middleware' => ['auth:sanctum']], function () {
-});
-
+Route::apiResource('external_link/{action}/{token}', ExternalLinkController::class);
 
 //List users
 Route::get('/users', [UserController::class, 'index']);

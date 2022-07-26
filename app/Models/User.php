@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use App\Traits\Uuids;
+
+use Attribute;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -44,4 +46,12 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function student() {
+        return $this->hasOne(Student::class, 'sais_id', 'sais_id');
+    }
+
+    public function getFullNameAttribute() {
+        return $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name;
+    }
 }

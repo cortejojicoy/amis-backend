@@ -5,7 +5,9 @@ use App\Models\Coi;
 use App\Models\CoiTxn;
 use App\Models\CourseOffering;
 use App\Models\ExternalLink;
+use App\Models\MailWorker;
 use App\Models\Student;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -64,8 +66,31 @@ class ApplyConsentOfInstructor{
                         "model_type" => 'App\Models\Coi',
                         "model_id" => $coi_id
                     ]);
-        
-                    // add emailing
+
+                    //Get user instance
+                    $user = User::find(Auth::user()->sais_id);
+
+                    //initialize mail data which will be used in the email template
+                    $mailData = [
+                        "status" => 'requested', 
+                        "token" => $external_link_token,
+                        "class" => $co,
+                        "student" => [
+                            'name' => $user->full_name,
+                            'email' => Auth::user()->email,
+                            'justification' =>  $request->justification,
+                            'campus_id' => $user->student->campus_id
+                        ]
+                    ];
+                    
+                    //Create the mailing entry
+                    MailWorker::create([
+                        "subject" => $co['course'] . ' ' . $co['section'] . ' COI Application',
+                        "recipient" => $co['email'],
+                        "blade" => 'coi_mail',
+                        "data" => json_encode($mailData),
+                        "queued_at" => now()
+                    ]);
 
                     //Commit the changes to db if there is no error
                     DB::commit();
@@ -126,6 +151,21 @@ class ApplyConsentOfInstructor{
                 ExternalLink::where('model_id', $coi->coi_id)
                     ->where('model_type', 'App\Model\Coi')
                     ->update(['action' => $status]);
+
+                $mailData = [
+                    "status" => $status == 'Approved' ? 'approved' : 'disapproved',
+                    "reason" => $request->justification,
+                    "class" => $coi->course_offering,
+                ];
+                
+                //Create the mailing entry
+                MailWorker::create([
+                    "subject" => $coi->course_offering->course . ' ' . $coi->course_offering->section . ' COI Application',
+                    "recipient" => $coi->user->email,
+                    "blade" => 'coi_mail',
+                    "data" => json_encode($mailData),
+                    "queued_at" => now()
+                ]);
 
                 DB::commit();
 

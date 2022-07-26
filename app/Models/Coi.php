@@ -39,9 +39,9 @@ class Coi extends Model
         return $this->hasOneThrough(User::class, Student::class, 'sais_id', 'sais_id', 'sais_id', 'sais_id');
     }
 
-    public function course_offerings()
+    public function course_offering()
     {
-        return $this->belongsTo(CourseOffering::class, 'class_nbr', 'class_id');
+        return $this->belongsTo(CourseOffering::class, 'class_id', 'class_nbr');
     }
 
     public function scopeFilter($query, $filters, $role) {
