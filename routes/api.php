@@ -73,7 +73,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('course-offerings', CourseOfferingController::class);
 });
 
-Route::apiResource('external_link/{action}/{token}', ExternalLinkController::class);
+Route::apiResource('external_link/{action}', ExternalLinkController::class);
 
 //List users
 Route::get('/users', [UserController::class, 'index']);
