@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Faculty;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CoiTxn;
+use App\Models\Admin;
+use App\Models\Prerog;
+use App\Services\ApplyPrerogativeEnrollment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class FacultyCoiTxnController extends Controller
+class AdminPrerogController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,20 +17,20 @@ class FacultyCoiTxnController extends Controller
      */
     public function index(Request $request)
     {
-        $coi_txns = CoiTxn::filter($request, 'faculties');
+        $admin = Admin::where('sais_id', $request->sais_id)->first();
+        $request->merge(['admin' => $admin]);
+
+        $prgs = Prerog::filter($request, 'admins');
 
         if($request->has('items')) {
-            $coi_txns = $coi_txns->paginate($request->items);
+            $prgs = $prgs->paginate($request->items);
         } else {
-            $coi_txns = $coi_txns->get();
+            $prgs = $prgs->get();
         }
-
-        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
-
+        
         return response()->json(
             [
-             'txns' => $coi_txns,
-             'keys' => $keys,
+             'prgs' => $prgs,
             ], 200
          );
     }
@@ -63,9 +64,9 @@ class FacultyCoiTxnController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
-        //
+        return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'admins');
     }
 
     /**

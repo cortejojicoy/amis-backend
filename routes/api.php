@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminPrerogController;
+use App\Http\Controllers\Admin\AdminPrerogTxnController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -12,8 +14,12 @@ use App\Http\Controllers\Student\Program;
 use App\Http\Controllers\Faculty\BasicInfoController;
 use App\Http\Controllers\Faculty\FacultyCoiController;
 use App\Http\Controllers\Faculty\FacultyCoiTxnController;
+use App\Http\Controllers\Faculty\FacultyPrerogController;
+use App\Http\Controllers\Faculty\FacultyPrerogTxnController;
 use App\Http\Controllers\Student\StudentCoiController;
 use App\Http\Controllers\Student\StudentCoiTxnController;
+use App\Http\Controllers\Student\StudentPrerogController;
+use App\Http\Controllers\Student\StudentPrerogTxnController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,16 +47,25 @@ Route::middleware('auth:sanctum')->post('/auth/logout', [GoogleController::class
 Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculties'], function () {
     Route::apiResource('advisees', AdviserController::class);
     Route::apiResource('mentor-assignments', AdviserController::class);
-    Route::apiResource('coitxn', FacultyCoiTxnController::class);
-    Route::apiResource('consent-of-instructor', FacultyCoiController::class);
+    Route::apiResource('coitxns', FacultyCoiTxnController::class);
+    Route::apiResource('consent-of-instructors', FacultyCoiController::class);
+    Route::apiResource('prerog_txns', FacultyPrerogTxnController::class);
+    Route::apiResource('prerogative-enrollments', FacultyPrerogController::class);
 });
 
 Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'students'], function () {
     Route::post('{sais_id}/nominated-mentors/collection', [SaveMentorController::class, 'bulkUpdate']);
     Route::apiResource('{sais_id}/nominated-mentors', SaveMentorController::class);
     Route::apiResource('programs', Program::class);
-    Route::apiResource('consent-of-instructor', StudentCoiController::class);
-    Route::apiResource('coitxn', StudentCoiTxnController::class);
+    Route::apiResource('consent-of-instructors', StudentCoiController::class);
+    Route::apiResource('coitxns', StudentCoiTxnController::class);
+    Route::apiResource('prerogative-enrollments', StudentPrerogController::class);
+    Route::apiResource('prerog_txns', StudentPrerogTxnController::class);
+});
+
+Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins'], function () {
+    Route::apiResource('prerog_txns', AdminPrerogTxnController::class);
+    Route::apiResource('prerogative-enrollments', AdminPrerogController::class);
 });
 
 //routes open for all roles but needs auth

@@ -11,18 +11,15 @@ return new class extends Migration
      *
      * @return void
      */
-
     public function up()
     {
-        Schema::create('admins', function (Blueprint $table) {
-            $table->bigIncrements('admin_id');
-            $table->integer('uuid');
+        Schema::create('prerogs', function (Blueprint $table) {
+            $table->string('prg_id', 15)->primary();
+            $table->integer('class_id');
+            $table->string('status', 20);
             $table->integer('sais_id');
-            $table->string('unit', 10);
-            $table->string('college', 10);
-            $table->integer('university');
-            $table->integer('graduate');
-            $table->integer('undergrad');
+            $table->text('comment');
+            $table->dateTime('submitted_to_sais')->nullable();
             $table->timestamps();
         });
     }
@@ -34,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admins');
+        Schema::dropIfExists('prerogs');
     }
 };

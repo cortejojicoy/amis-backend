@@ -17,7 +17,7 @@ class StudentCoiTxnController extends Controller
     public function index(Request $request)
     {
         //get the coi_txn_history of student
-        $coi_txns = CoiTxn::studentTxns()->filter($request, 'students');
+        $coi_txns = CoiTxn::filter($request, 'students');
         
         if($request->has('items')) {
             $coi_txns = $coi_txns->paginate($request->items);
