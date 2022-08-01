@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
-use App\Models\CoiTxn;
+use App\Models\PrerogTxn;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class FacultyCoiTxnController extends Controller
+class FacultyPrerogTxnController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,19 +15,19 @@ class FacultyCoiTxnController extends Controller
      */
     public function index(Request $request)
     {
-        $coi_txns = CoiTxn::filter($request, 'faculties');
+        $prg_txns = PrerogTxn::filter($request, 'faculties');
 
         if($request->has('items')) {
-            $coi_txns = $coi_txns->paginate($request->items);
+            $prg_txns = $prg_txns->paginate($request->items);
         } else {
-            $coi_txns = $coi_txns->get();
+            $prg_txns = $prg_txns->get();
         }
 
-        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
+        $keys = ['reference_id', 'term', 'course', 'section', 'student_no', 'action', 'date_created', 'committed_by', 'last_action_date'];
 
         return response()->json(
             [
-             'txns' => $coi_txns,
+             'txns' => $prg_txns,
              'keys' => $keys,
             ], 200
          );

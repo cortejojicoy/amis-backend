@@ -15,6 +15,11 @@ class CourseOffering extends Model
         return $this->hasMany(Coi::class, 'class_id', 'class_nbr');
     }
 
+    public function prerogs()
+    {
+        return $this->hasMany(Prerog::class, 'class_id', 'class_nbr');
+    }
+
     public function faculty()
     {
         return $this->belongsTo(Faculty::class, 'id', 'sais_id');
@@ -56,6 +61,15 @@ class CourseOffering extends Model
                 $query->where('cois.status', '=', $filters->coi_status);
             }, 'cois.user', 'cois.student', 'cois.coitxns' => function ($query) use($filters) {
                 $query->where('coitxns.action', '=', $filters->coi_txn_status);
+            }]);
+        }
+
+        //with clauses
+        if($filters->has('with_prg')) {
+            $query->with(['prerogs' => function ($query) use($filters) {
+                $query->whereIn('prerogs.status', $filters->prg_status);
+            }, 'prerogs.user', 'prerogs.student', 'prerogs.prerog_txns' => function ($query) use($filters) {
+                $query->where('prerog_txns.action', '=', $filters->prg_txn_status);
             }]);
         }
     }

@@ -1,28 +1,29 @@
 <?php
 namespace App\Services;
 
-use App\Models\Coi;
-use App\Models\CoiTxn;
 use App\Models\CourseOffering;
 use App\Models\ExternalLink;
 use App\Models\MailWorker;
+use App\Models\Prerog;
+use App\Models\PrerogTxn;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class ApplyConsentOfInstructor{
-    function createCoi($request, $coi_id, $external_link_token){
+class ApplyPrerogativeEnrollment{
+    function createPrerog($request, $prg_id, $external_link_token){
         //check if student has already applied for the same class
-        $existingCOI = Coi::where('class_id', $request->class_id)
+        $existingPrerog = Prerog::where('class_id', $request->class_id)
             ->where('sais_id', Auth::user()->sais_id)
             ->where(function($query) {
                 $query->orWhere('status', 'Requested')
+                    ->orWhere('status', 'Accepted')
                     ->orWhere('status', 'Approved');
             })
             ->first();
         
         //if student still hasn't applied for this class, continue
-        if(empty($existingCOI)) {
+        if(empty($existingPrerog)) {
             //check if course_offering has faculty assigned
             $co = CourseOffering::where('class_nbr', $request->class_id)
                 ->first()
@@ -39,21 +40,23 @@ class ApplyConsentOfInstructor{
             } else { // if there is faculty assigned
                 //begins transaction but won't commit it to DB first
                 DB::beginTransaction();
+
+                $status = "Requested";
                 try {
-                    //Create COI
-                    Coi::create([
-                        "coi_id" => $coi_id,
+                    //Create Prerog
+                    Prerog::create([
+                        "prg_id" => $prg_id,
                         "class_id" => $request->class_id,
                         "sais_id" => Auth::user()->sais_id,
-                        "status" => "Requested",
+                        "status" => $status,
                         "comment" => "",
                         "created_at" => now()
                     ]);
                     
                     //Create COI TXN
-                    CoiTxn::create([
-                        "coi_id" => $coi_id,
-                        "action" => "Requested",
+                    PrerogTxn::create([
+                        "prg_id" => $prg_id,
+                        "action" => $status,
                         "committed_by" => Auth::user()->sais_id,
                         "note" => $request->justification ? $request->justification : 'None',
                         "created_at" => now()
@@ -62,8 +65,8 @@ class ApplyConsentOfInstructor{
                     //create external link
                     ExternalLink::create([
                         "token" => $external_link_token,
-                        "model_type" => 'App\Models\Coi',
-                        "model_id" => $coi_id
+                        "model_type" => 'App\Models\Prerog',
+                        "model_id" => $prg_id
                     ]);
 
                     //Get user instance
@@ -71,7 +74,7 @@ class ApplyConsentOfInstructor{
 
                     //initialize mail data which will be used in the email template
                     $mailData = [
-                        "status" => 'requested', 
+                        "status" => strtoupper($status), 
                         "token" => $external_link_token,
                         "class" => $co,
                         "student" => [
@@ -81,12 +84,12 @@ class ApplyConsentOfInstructor{
                             'campus_id' => $user->student->campus_id
                         ]
                     ];
-                    
+
                     //Create the mailing entry
                     MailWorker::create([
-                        "subject" => $co['course'] . ' ' . $co['section'] . ' COI Application',
+                        "subject" => $co['course'] . ' ' . $co['section'] . ' Prerog Application',
                         "recipient" => $co['email'],
-                        "blade" => 'coi_mail',
+                        "blade" => 'prerog_mail',
                         "data" => json_encode($mailData),
                         "queued_at" => now()
                     ]);
@@ -97,7 +100,7 @@ class ApplyConsentOfInstructor{
                     //return ok
                     return response()->json(
                         [
-                            'message' => 'COI successfully requested',
+                            'message' => 'Prerog successfully requested',
                             'status' => 'Ok'
                         ], 200
                     );
@@ -118,59 +121,101 @@ class ApplyConsentOfInstructor{
             //return error
             return response()->json(
                 [
-                    'message' => 'You have already applied COI to this class with status: ' . $existingCOI->status,
+                    'message' => 'You have already applied for a Prerog to this class with status: ' . $existingPrerog->status,
                 ], 400
             );
         }
     }
 
-    function updateCoi($request, $id) { 
-        $coi = Coi::find($id);
+    function updatePrerog($request, $id, $role, $external_link_token = null) {
+        $prg = Prerog::find($id);
         if($request->status == 'approve') {
             $status = 'Approved';
+        } else if ($request->status == 'accept') {
+            $status = 'Accepted';
+        } else if ($request->status == 'disapprove' && $role == 'faculties') {
+            $status = 'Disapproved by FIC';
         } else {
-            $status = 'Disapproved';
-        } 
+            $status = 'Disapproved by OCS';
+        }
 
-        if($coi) {
+        if($prg) {
             DB::beginTransaction();
 
             try {
-                $coi->status = $status;
-                $coi->save();
+                $prg->status = $status;
+                $prg->save();
 
-                CoiTxn::create([
-                    "coi_id" => $coi->coi_id,
+                PrerogTxn::create([
+                    "prg_id" => $prg->prg_id,
                     "action" => $status,
                     "committed_by" => Auth::user()->sais_id,
                     "note" => $request->justification ? $request->justification : "None",
                     "created_at" => now()
                 ]);
 
-                ExternalLink::where('model_id', $coi->coi_id)
-                    ->where('model_type', 'App\Model\Coi')
+                //Close the previous external link
+                ExternalLink::where('model_id', $prg->prg_id)
+                    ->where('model_type', 'App\Model\Prerog')
                     ->update(['action' => $status]);
 
-                $mailData = [
-                    "status" => $status == 'Approved' ? 'approved' : 'disapproved',
-                    "reason" => $request->justification,
-                    "class" => $coi->course_offering,
-                ];
-                
-                //Create the mailing entry
-                MailWorker::create([
-                    "subject" => $coi->course_offering->course . ' ' . $coi->course_offering->section . ' COI Application',
-                    "recipient" => $coi->user->email,
-                    "blade" => 'coi_mail',
-                    "data" => json_encode($mailData),
-                    "queued_at" => now()
-                ]);
+                //If the action of the user is just accept, create another external link
+                if($status == 'accept') {
+                    //create external link
+                    ExternalLink::create([
+                        "token" => $external_link_token,
+                        "model_type" => 'App\Models\Prerog',
+                        "model_id" => $prg->prg_id
+                    ]);
+                }
+
+                if($status != 'Accepted') { //if the status of the prerog application is approved, disapproved by FIC, or disapproved by OCS, send email to student
+                    $mailData = [
+                        "status" => strtoupper($status), 
+                        "reason" => $request->justification,
+                        "class" => $prg->course_offering
+                    ];
+                    
+                    //Create the mailing entry
+                    MailWorker::create([
+                        "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
+                        "recipient" => $prg->user->email,
+                        "blade" => 'prg_mail',
+                        "data" => json_encode($mailData),
+                        "queued_at" => now()
+                    ]);
+                } else {
+                    // send email to OCS that the email has been accepted by the faculty
+
+                    // $mailData = [
+                    //     "status" => strtoupper($status), 
+                    //     "class" => $prg->course_offering,
+                    //     "token" => $external_link_token,
+                    //     "student" => [
+                    //          'name' => $prg->user->full_name,
+                    //          'email' => $prg->user->email,
+                    //          'justification' =>  $request->justification,
+                    //          'campus_id' => $prg->student->campus_id
+                    //      ]
+                    // ];
+                    
+                    // //Create the mailing entry
+                    // MailWorker::create([
+                    //     "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
+                    //     "recipient" => $prg->user->email,
+                    //     "blade" => 'prg_mail',
+                    //     "data" => json_encode($mailData),
+                    //     "queued_at" => now()
+                    // ]);
+                }
+
+                //add another for the OCS
 
                 DB::commit();
 
                 return response()->json(
                     [
-                        'message' => 'COI Successfully ' . $status,
+                        'message' => 'Prerog Successfully ' . $status,
                         'status' => 'Ok'
                     ], 200
                 );

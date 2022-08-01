@@ -63,7 +63,7 @@ class Coi extends Model
             }
 
             if($filters->has('with_students')) {
-                $query->with(['user', 'coitxns' => function ($query) use($filters) {
+                $query->with(['user', 'student', 'coitxns' => function ($query) use($filters) {
                     $query->where('coitxns.action', '=', $filters->coi_txn_status);
                 }]);
             }

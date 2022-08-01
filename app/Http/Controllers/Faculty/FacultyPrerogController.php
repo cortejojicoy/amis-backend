@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
-use App\Models\CoiTxn;
+use App\Models\Prerog;
+use App\Services\ApplyPrerogativeEnrollment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class FacultyCoiTxnController extends Controller
+class FacultyPrerogController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,20 +16,17 @@ class FacultyCoiTxnController extends Controller
      */
     public function index(Request $request)
     {
-        $coi_txns = CoiTxn::filter($request, 'faculties');
+        $prgs = Prerog::filter($request, 'faculties');
 
         if($request->has('items')) {
-            $coi_txns = $coi_txns->paginate($request->items);
+            $prgs = $prgs->paginate($request->items);
         } else {
-            $coi_txns = $coi_txns->get();
+            $prgs = $prgs->get();
         }
-
-        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
-
+        
         return response()->json(
             [
-             'txns' => $coi_txns,
-             'keys' => $keys,
+             'prgs' => $prgs,
             ], 200
          );
     }
@@ -63,9 +60,11 @@ class FacultyCoiTxnController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
-        //
+        $external_link_token = $this->generateRandomAlphaNum(50, 1);
+
+        return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'faculties', $external_link_token);
     }
 
     /**

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Faculty;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\CoiTxn;
+use App\Models\Admin;
+use App\Models\PrerogTxn;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class FacultyCoiTxnController extends Controller
+class AdminPrerogTxnController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,21 +15,26 @@ class FacultyCoiTxnController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {
-        $coi_txns = CoiTxn::filter($request, 'faculties');
+    {   
+        $admin = Admin::where('sais_id', $request->sais_id)->first();
+        $request->merge(['admin' => $admin]);
 
+        $prerog_txns = PrerogTxn::filter($request, 'admins');
+        
         if($request->has('items')) {
-            $coi_txns = $coi_txns->paginate($request->items);
+            $prerog_txns = $prerog_txns->paginate($request->items);
         } else {
-            $coi_txns = $coi_txns->get();
+            $prerog_txns = $prerog_txns->get();
         }
 
-        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
+        //get the keys of the txns
+        $keys = ['reference_id', 'term', 'course', 'section', 'student_no', 'action', 'date_created', 'committed_by', 'last_action_date'];
 
         return response()->json(
             [
-             'txns' => $coi_txns,
+             'txns' => $prerog_txns,
              'keys' => $keys,
+             'admin' => $admin->college
             ], 200
          );
     }
