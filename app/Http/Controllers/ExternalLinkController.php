@@ -13,15 +13,17 @@ class ExternalLinkController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($action, $token, UseExternalLinks $useExternalLinks)
+    public function index(Request $request, $action, UseExternalLinks $useExternalLinks)
     {
-        $ex_link = ExternalLink::where('token', $token)
+        $ex_link = ExternalLink::where('token', $request->token)
             ->where('action', null)
-            ->first();;
+            ->first();
 
         if($ex_link) {
             if($ex_link->model_type == 'App\Models\Coi') {
                 return $useExternalLinks->updateCoi($action, $ex_link);
+            } else if ($ex_link->model_type == 'App\Models\Prerog') {
+                return $useExternalLinks->updatePrerog($action, $ex_link);
             }
         } else {
             return view('external-link', [

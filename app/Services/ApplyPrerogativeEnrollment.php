@@ -89,7 +89,7 @@ class ApplyPrerogativeEnrollment{
                     MailWorker::create([
                         "subject" => $co['course'] . ' ' . $co['section'] . ' Prerog Application',
                         "recipient" => $co['email'],
-                        "blade" => 'prerog_mail',
+                        "blade" => 'prg_mail',
                         "data" => json_encode($mailData),
                         "queued_at" => now()
                     ]);
@@ -156,24 +156,26 @@ class ApplyPrerogativeEnrollment{
 
                 //Close the previous external link
                 ExternalLink::where('model_id', $prg->prg_id)
-                    ->where('model_type', 'App\Model\Prerog')
+                    ->where('model_type', 'App\Models\Prerog')
+                    ->where('action', null)
                     ->update(['action' => $status]);
 
                 //If the action of the user is just accept, create another external link
-                if($status == 'accept') {
-                    //create external link
-                    ExternalLink::create([
-                        "token" => $external_link_token,
-                        "model_type" => 'App\Models\Prerog',
-                        "model_id" => $prg->prg_id
-                    ]);
-                }
+                // if($status == 'accept') {
+                //     //create external link
+                //     ExternalLink::create([
+                //         "token" => $external_link_token,
+                //         "model_type" => 'App\Models\Prerog',
+                //         "model_id" => $prg->prg_id
+                //     ]);
+                // }
 
                 if($status != 'Accepted') { //if the status of the prerog application is approved, disapproved by FIC, or disapproved by OCS, send email to student
                     $mailData = [
                         "status" => strtoupper($status), 
                         "reason" => $request->justification,
-                        "class" => $prg->course_offering
+                        "class" => $prg->course_offering,
+                        "role" => $role
                     ];
                     
                     //Create the mailing entry

@@ -23,8 +23,8 @@
 
             <p>
                 To ACCEPT this Prerog application, click on the link below. <br>
-                <b>WARNING:</b> Clicking the Link below will automatically accept the request. Alternatively, you may approve Prerog Applications by going to AMIS (<a href="https://amis.uplb.edu.ph/faculty/prerogative-enrollment">amis.uplb.edu.ph</a>), login with your UP Mail, Select Faculty Portal > Prerogative Enrollment in the left menu. <br>
-                Accept Prerog Link: <a href="{{ env('APP_URL', 'https://amis.uplb.edu.ph') . '/external_link/accept/' . $mailData->data->token}}"  target="_blank">ACCEPT PREROG</a>
+                <b>WARNING:</b> Clicking the Link below will automatically accept the request. Alternatively, you may accept Prerog Applications by going to AMIS (<a href="https://amis.uplb.edu.ph/faculty/prerogative-enrollment">amis.uplb.edu.ph</a>), login with your UP Mail, Select Faculty Portal > Prerogative Enrollment in the left menu. <br>
+                Accept Prerog Link: <a href="{{ env('APP_URL', 'https://amis.uplb.edu.ph') . '/api/external_link/accept/?token=' . $mailData->data->token}}"  target="_blank">ACCEPT PREROG</a>
                 <br><br>
                 To DISAPPROVE this Prerog Application go to AMIS (<a href="https://amis.uplb.edu.ph/faculty/prerogative-enrollment">amis.uplb.edu.ph</a>), login with your UP Mail, Select Faculty Portal > Prerogative Enrollment in the left menu.
             </p>
@@ -44,12 +44,16 @@
             </p>
 
             <p>
+                You may approve/disapprove Prerog Applications by going to AMIS (<a href="https://amis.uplb.edu.ph/admin/prerogative-enrollment">amis.uplb.edu.ph</a>), login with your UP Mail, Select Admin Portal > Prerogative Enrollment in the left menu.
+            </p>
+
+            {{-- <p>
                 To APPROVE this Prerog application, click on the link below. <br>
                 <b>WARNING:</b> Clicking the Link below will automatically approve the request. Alternatively, you may approve Prerog Applications by going to AMIS (<a href="https://amis.uplb.edu.ph/admin/prerogative-enrollment">amis.uplb.edu.ph</a>), login with your UP Mail, Select Faculty Portal > Prerogative Enrollment in the left menu. <br>
-                Approve Prerog Link: <a href="{{ env('APP_URL', 'https://amis.uplb.edu.ph') . '/external_link/approve/' . $mailData->data->token}}"  target="_blank">APPROVE PREROG</a>
+                Approve Prerog Link: <a href="{{ env('APP_URL', 'https://amis.uplb.edu.ph') . '/api/external_link/approve/?token=' . $mailData->data->token}}"  target="_blank">APPROVE PREROG</a>
                 <br><br>
                 To DISAPPROVE this Prerog Application go to AMIS (<a href="https://amis.uplb.edu.ph/admin/prerogative-enrollment">amis.uplb.edu.ph</a>), login with your UP Mail, Select Admin Portal > Prerogative Enrollment in the left menu.
-            </p>
+            </p> --}}
 
             <p>You may contact the student thru his/her email: <b>{{$mailData->data->student->email}}</b></p>
             
@@ -57,7 +61,7 @@
         @elseif ($mailData->data->status == 'APPROVED')
             <p>Dear Student,</p>
             
-            <p>Your Prerog/Change of Matriculation Application for <b>{{$mailData->data->class->course}} {{$mailData->data->class->section}}</b> has been approved by the faculty in charge: {{ $mailData->data->class->name }} and the Office of the College Secretary administering your program</p>
+            <p>Your Prerog/Change of Matriculation Application for <b>{{$mailData->data->class->course}} {{$mailData->data->class->section}}</b> has been approved by the faculty in charge: {{ $mailData->data->class->name }} and the Office of the College Secretary administering your program.</p>
 
             <p>Kindly wait at least 24 hours before your Prerog approval is reflected in SAIS.</p>  
 
@@ -67,13 +71,9 @@
                 
             <p>Your Prerog/Change of Matriculation Application for <b>{{$mailData->data->class->course}} {{$mailData->data->class->section}}</b> has been disapproved by the 
                 @if($mailData->data->role == 'faculties')
-                    <div>
-                        faculty-in-charge: {{ $mailData->data->class->name }} with note/comment:
-                    </div>
+                    faculty-in-charge: {{ $mailData->data->class->name }} with note/comment:
                 @else
-                    <div>
-                        <b>Office of the College Secretary</b> administering your program with note/comment:
-                    </div>
+                    <b>Office of the College Secretary</b> administering your program with note/comment:
                 @endif
             </p>
 
