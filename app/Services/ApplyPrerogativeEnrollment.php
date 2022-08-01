@@ -161,14 +161,14 @@ class ApplyPrerogativeEnrollment{
                     ->update(['action' => $status]);
 
                 //If the action of the user is just accept, create another external link
-                if($status == 'accept') {
-                    //create external link
-                    ExternalLink::create([
-                        "token" => $external_link_token,
-                        "model_type" => 'App\Models\Prerog',
-                        "model_id" => $prg->prg_id
-                    ]);
-                }
+                // if($status == 'accept') {
+                //     //create external link
+                //     ExternalLink::create([
+                //         "token" => $external_link_token,
+                //         "model_type" => 'App\Models\Prerog',
+                //         "model_id" => $prg->prg_id
+                //     ]);
+                // }
 
                 if($status != 'Accepted') { //if the status of the prerog application is approved, disapproved by FIC, or disapproved by OCS, send email to student
                     $mailData = [
