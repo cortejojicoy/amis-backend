@@ -51,7 +51,21 @@ class User extends Authenticatable
         return $this->hasOne(Student::class, 'sais_id', 'sais_id');
     }
 
+    public function faculty() {
+        return $this->hasOne(Faculty::class, 'sais_id', 'sais_id');
+    }
+
+    public function admin() {
+        return $this->hasOne(Admin::class, 'sais_id', 'sais_id');
+    }
+
     public function getFullNameAttribute() {
         return $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name;
+    }
+
+    public function scopeFilter($query, $filters) {
+        $query->with(['student', 'faculty', 'admin', 'student.program_records' => function ($query) use($filters) {
+            $query->where('student_program_records.status', '=', $filters->program_record_status);
+        }]);
     }
 }

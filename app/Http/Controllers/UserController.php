@@ -61,13 +61,16 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
         ///Get users
-        $user = User::findOrFail($id);
+        $user = User::filter($request)->find($id);
 
-        //Return single user as a resource
-        return  new UserResource($user);
+        return response()->json(
+            [
+             'user' => $user
+            ], 200
+         );
     }
 
     /**
