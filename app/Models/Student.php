@@ -15,4 +15,9 @@ class Student extends Model
     {
         return $this->hasMany(Coi::class, 'student_id', 'campus_id');
     }
+
+    public function program_records()
+    {
+        return $this->hasMany(StudentProgramRecord::class, 'campus_id', 'campus_id');
+    }
 }

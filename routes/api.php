@@ -71,17 +71,18 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins']
 //routes open for all roles but needs auth
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('course-offerings', CourseOfferingController::class);
+    Route::apiResource('users', UserController::class);
 });
 
 Route::apiResource('external_link/{action}', ExternalLinkController::class);
 
 //List users
-Route::get('/users', [UserController::class, 'index']);
-//List single user
-Route::get('/user/{id}', [UserController::class, 'show']);
-//Create new user
-Route::post('/user', [UserController::class, 'store']);
-//Update user
-Route::put('/user', [UserController::class, 'store']);
-//Delete user
-Route::delete('/user/{id}', [UserController::class, 'destroy']);
+// Route::get('/users', [UserController::class, 'index']);
+// //List single user
+// Route::get('/user/{id}', [UserController::class, 'show']);
+// //Create new user
+// Route::post('/user', [UserController::class, 'store']);
+// //Update user
+// Route::put('/user', [UserController::class, 'store']);
+// //Delete user
+// Route::delete('/user/{id}', [UserController::class, 'destroy']);
