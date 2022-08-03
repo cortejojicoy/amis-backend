@@ -1,11 +1,13 @@
 <?php
 namespace App\Services;
 
+use App\Models\Admin;
 use App\Models\CourseOffering;
 use App\Models\ExternalLink;
 use App\Models\MailWorker;
 use App\Models\Prerog;
 use App\Models\PrerogTxn;
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -129,6 +131,7 @@ class ApplyPrerogativeEnrollment{
 
     function updatePrerog($request, $id, $role, $external_link_token = null) {
         $prg = Prerog::find($id);
+
         if($request->status == 'approve') {
             $status = 'Approved';
         } else if ($request->status == 'accept') {
@@ -141,6 +144,11 @@ class ApplyPrerogativeEnrollment{
 
         if($prg) {
             DB::beginTransaction();
+
+            //find the admin of the student's degree
+            $student = Student::where('sais_id', $prg->sais_id)->first();
+            $student_program_records = $student->program_records()->where('status', 'ACTIVE')->first();
+            $admin = Admin::where('college', $student_program_records->acad_group)->first();
 
             try {
                 $prg->status = $status;
@@ -160,16 +168,6 @@ class ApplyPrerogativeEnrollment{
                     ->where('action', null)
                     ->update(['action' => $status]);
 
-                //If the action of the user is just accept, create another external link
-                // if($status == 'accept') {
-                //     //create external link
-                //     ExternalLink::create([
-                //         "token" => $external_link_token,
-                //         "model_type" => 'App\Models\Prerog',
-                //         "model_id" => $prg->prg_id
-                //     ]);
-                // }
-
                 if($status != 'Accepted') { //if the status of the prerog application is approved, disapproved by FIC, or disapproved by OCS, send email to student
                     $mailData = [
                         "status" => strtoupper($status), 
@@ -181,34 +179,35 @@ class ApplyPrerogativeEnrollment{
                     //Create the mailing entry
                     MailWorker::create([
                         "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
-                        "recipient" => $prg->user->email,
+                        "recipient" => $prg->user()->email,
                         "blade" => 'prg_mail',
                         "data" => json_encode($mailData),
                         "queued_at" => now()
                     ]);
-                } else {
-                    // send email to OCS that the email has been accepted by the faculty
+                } else { // send email to OCS that the email has been accepted by the faculty
+                    //get the prerogtxn of student with his/her appeal
+                    $prgtxn = $prg->prerog_txns()->where('action', 'Requested')->first();
 
-                    // $mailData = [
-                    //     "status" => strtoupper($status), 
-                    //     "class" => $prg->course_offering,
-                    //     "token" => $external_link_token,
-                    //     "student" => [
-                    //          'name' => $prg->user->full_name,
-                    //          'email' => $prg->user->email,
-                    //          'justification' =>  $request->justification,
-                    //          'campus_id' => $prg->student->campus_id
-                    //      ]
-                    // ];
+                    $mailData = [
+                        "status" => strtoupper($status), 
+                        "class" => $prg->course_offering,
+                        "token" => $external_link_token,
+                        "student" => [
+                             'name' => $prg->user->full_name,
+                             'email' => $prg->user->email,
+                             'justification' =>  $prgtxn->note,
+                             'campus_id' => $prg->student->campus_id
+                         ]
+                    ];
                     
-                    // //Create the mailing entry
-                    // MailWorker::create([
-                    //     "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
-                    //     "recipient" => $prg->user->email,
-                    //     "blade" => 'prg_mail',
-                    //     "data" => json_encode($mailData),
-                    //     "queued_at" => now()
-                    // ]);
+                    //Create the mailing entry
+                    MailWorker::create([
+                        "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
+                        "recipient" => $admin->user->email,
+                        "blade" => 'prg_mail',
+                        "data" => json_encode($mailData),
+                        "queued_at" => now()
+                    ]);
                 }
 
                 //add another for the OCS
