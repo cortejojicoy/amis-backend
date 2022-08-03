@@ -44,7 +44,7 @@ Route::middleware('auth:sanctum')->post('/auth/logout', [GoogleController::class
 
 //faculty
 // Route::apiResource('faculties', BasicInfoController::class);
-Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculties'], function () {
+Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculties', 'as' => 'faculties.'], function () {
     Route::apiResource('advisees', AdviserController::class);
     Route::apiResource('mentor-assignments', AdviserController::class);
     Route::apiResource('coitxns', FacultyCoiTxnController::class);
@@ -53,7 +53,7 @@ Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculti
     Route::apiResource('prerogative-enrollments', FacultyPrerogController::class);
 });
 
-Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'students'], function () {
+Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'students', 'as' => 'students.'], function () {
     Route::post('{sais_id}/nominated-mentors/collection', [SaveMentorController::class, 'bulkUpdate']);
     Route::apiResource('{sais_id}/nominated-mentors', SaveMentorController::class);
     Route::apiResource('programs', Program::class);
@@ -63,7 +63,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'studen
     Route::apiResource('prerog_txns', StudentPrerogTxnController::class);
 });
 
-Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins'], function () {
+Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins', 'as' => 'admins.'], function () {
     Route::apiResource('prerog_txns', AdminPrerogTxnController::class);
     Route::apiResource('prerogative-enrollments', AdminPrerogController::class);
 });
