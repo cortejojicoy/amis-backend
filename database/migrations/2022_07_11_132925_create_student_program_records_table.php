@@ -18,6 +18,7 @@ return new class extends Migration
             $table->bigIncrements('student_program_record_id');
             $table->string('campus_id', 10);
             $table->string('academic_program_id', 5);
+            $table->string('acad_group', 10);
             $table->string('status', 10);
             $table->timestamps();
         });

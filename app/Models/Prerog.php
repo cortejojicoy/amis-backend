@@ -67,19 +67,23 @@ class Prerog extends Model
         }
 
         if($role == 'admins') {
-            if($filters->admin->university == 0) {
-                // if the access is for college level
-                if($filters->admin->college != '') {
-                    $query->whereRelation('course_offering', 'acad_group', $filters->admin->college);
-                } else if ($filters->admin->unit != '') { //if the access is for unit level
-                    $query->whereRelation('course_offering', 'acad_org', $filters->admin->unit);
-                }
-            } else { //if university level
-                if($filters->admin->graduate == 1 && $filters->admin->undergrad == 0) {
-                    $query->whereRelation('course_offering', 'career', 'GRAD');
-                } else if ($filters->admin->graduate == 0 && $filters->admin->undergrad == 1) {
-                    $query->whereRelation('course_offering', 'career', 'UGRD');
-                }
+            // if($filters->admin->university == 0) {
+            //     // if the access is for college level
+            //     if($filters->admin->college != '') {
+            //         $query->whereRelation('course_offering', 'acad_group', $filters->admin->college);
+            //     } else if ($filters->admin->unit != '') { //if the access is for unit level
+            //         $query->whereRelation('course_offering', 'acad_org', $filters->admin->unit);
+            //     }
+            // } else { //if university level
+            //     if($filters->admin->graduate == 1 && $filters->admin->undergrad == 0) {
+            //         $query->whereRelation('course_offering', 'career', 'GRAD');
+            //     } else if ($filters->admin->graduate == 0 && $filters->admin->undergrad == 1) {
+            //         $query->whereRelation('course_offering', 'career', 'UGRD');
+            //     }
+            // }
+
+            if($filters->admin->college != '') {
+                $query->whereRelation('student.program_records', 'acad_group', $filters->admin->college);
             }
 
             if($filters->has('prg_status')) {
@@ -87,7 +91,7 @@ class Prerog extends Model
             }
 
             if($filters->has('with_students')) {
-                $query->with(['user', 'student', 'course_offering', 'prerog_txns' => function($query) use ($filters) {
+                $query->with(['user', 'student', 'student.program_records', 'course_offering', 'prerog_txns' => function($query) use ($filters) {
                     $query->where('prerog_txns.action', '=', $filters->prg_txn_status);
                 }]);
             }
