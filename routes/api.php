@@ -74,7 +74,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('users', UserController::class);
 });
 
-Route::apiResource('external_link/{action}', ExternalLinkController::class);
+Route::apiResource('{action}/external_links', ExternalLinkController::class);
 
 //List users
 // Route::get('/users', [UserController::class, 'index']);

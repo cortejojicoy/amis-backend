@@ -24,7 +24,7 @@
             <p>
                 To ACCEPT this Prerog application, click on the link below. <br>
                 <b>WARNING:</b> Clicking the Link below will automatically accept the request. Alternatively, you may accept Prerog Applications by going to AMIS (<a href="https://amis.uplb.edu.ph/faculty/prerogative-enrollment">amis.uplb.edu.ph</a>), login with your UP Mail, Select Faculty Portal > Prerogative Enrollment in the left menu. <br>
-                Accept Prerog Link: <a href="{{ env('APP_URL', 'https://amis.uplb.edu.ph') . '/api/external_link/accept/?token=' . $mailData->data->token}}"  target="_blank">ACCEPT PREROG</a>
+                Accept Prerog Link: <a href="{{ env('APP_URL', 'https://amis.uplb.edu.ph') . '/api/accept/external_links/?token=' . $mailData->data->token}}"  target="_blank">ACCEPT PREROG</a>
                 <br><br>
                 To DISAPPROVE this Prerog Application go to AMIS (<a href="https://amis.uplb.edu.ph/faculty/prerogative-enrollment">amis.uplb.edu.ph</a>), login with your UP Mail, Select Faculty Portal > Prerogative Enrollment in the left menu.
             </p>
