@@ -68,7 +68,7 @@ class CourseOffering extends Model
         if($filters->has('with_prg')) {
             $query->with(['prerogs' => function ($query) use($filters) {
                 $query->whereIn('prerogs.status', $filters->prg_status);
-            }, 'prerogs.user', 'prerogs.student', 'prerogs.prerog_txns' => function ($query) use($filters) {
+            }, 'prerogs.user', 'prerogs.student', 'prerogs.student.program_records' ,'prerogs.prerog_txns' => function ($query) use($filters) {
                 $query->where('prerog_txns.action', '=', $filters->prg_txn_status);
             }]);
         }

@@ -24,7 +24,7 @@
             <p>
                 To APPROVE this COI application, click on the link below. <br>
                 <b>WARNING:</b> Clicking the Link below will automatically approve the request. Alternatively, you may approve COI Applications by going to AMIS (<a href="https://amis.uplb.edu.ph/faculty-coi">amis.uplb.edu.ph</a>), login with your UP Mail, Select Faculty Portal > Consent of Instructor in the left menu. <br>
-                Approve COI Link: <a href="{{ env('APP_URL', 'https://amis.uplb.edu.ph') . '/api/approve/external_links/?token=' . $mailData->data->token}}"  target="_blank">Approve COI</a>
+                Approve COI Link: <a href="{{ config('app.url', 'https://amis.uplb.edu.ph') . '/api/approve/external_links/?token=' . $mailData->data->token}}"  target="_blank">Approve COI</a>
                 <br><br>
                 To DISAPPROVE this COI Application go to AMIS (<a href="https://amis.uplb.edu.ph/faculty-coi">amis.uplb.edu.ph</a>), login with your UP Mail, Select Faculty Portal > Consent of Instructor in the left menu.
             </p>

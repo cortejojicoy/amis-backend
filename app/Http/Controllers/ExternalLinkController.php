@@ -23,7 +23,9 @@ class ExternalLinkController extends Controller
             if($ex_link->model_type == 'App\Models\Coi') {
                 return $useExternalLinks->updateCoi($action, $ex_link);
             } else if ($ex_link->model_type == 'App\Models\Prerog') {
-                return $useExternalLinks->updatePrerog($action, $ex_link);
+                $external_link_token = $this->generateRandomAlphaNum(50, 1);
+
+                return $useExternalLinks->updatePrerog($action, $ex_link, $external_link_token);
             }
         } else {
             return view('external-link', [
