@@ -1,12 +1,14 @@
 <?php
 namespace App\Services;
 
+use App\Models\Admin;
 use App\Models\Coi;
 use App\Models\CoiTxn;
 use App\Models\ExternalLink;
 use App\Models\MailWorker;
 use App\Models\Prerog;
 use App\Models\PrerogTxn;
+use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 
 class UseExternalLinks {
@@ -59,7 +61,7 @@ class UseExternalLinks {
         }
     }
 
-    function updatePrerog($action, $ex_link) {
+    function updatePrerog($action, $ex_link, $external_link_token = null) {
         $prg = Prerog::find($ex_link->model_id);
 
         if($action == 'accept') {
@@ -73,6 +75,10 @@ class UseExternalLinks {
 
         if($prg) {
             DB::beginTransaction();
+
+            $student = Student::where('sais_id', $prg->sais_id)->first();
+            $student_program_records = $student->program_records()->where('status', 'ACTIVE')->first();
+            $admin = Admin::where('college', $student_program_records->acad_group)->first();
 
             try {
                 $prg->status = $status;
@@ -91,27 +97,28 @@ class UseExternalLinks {
                 $ex_link->save();
 
                 // send email to OCS that the email has been accepted by the faculty
+                $prgtxn = $prg->prerog_txns()->where('action', 'Requested')->first();
 
-                // $mailData = [
-                //     "status" => strtoupper($status), 
-                //     "class" => $prg->course_offering,
-                //     "token" => $external_link_token,
-                //     "student" => [
-                //          'name' => $prg->user->full_name,
-                //          'email' => $prg->user->email,
-                //          'justification' =>  $request->justification,
-                //          'campus_id' => $prg->student->campus_id
-                //      ]
-                // ];
+                $mailData = [
+                    "status" => strtoupper($status), 
+                    "class" => $prg->course_offering,
+                    "token" => $external_link_token,
+                    "student" => [
+                         'name' => $prg->user->full_name,
+                         'email' => $prg->user->email,
+                         'justification' =>  $prgtxn->note,
+                         'campus_id' => $prg->student->campus_id
+                     ]
+                ];
                 
-                // //Create the mailing entry
-                // MailWorker::create([
-                //     "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
-                //     "recipient" => $prg->user->email,
-                //     "blade" => 'prg_mail',
-                //     "data" => json_encode($mailData),
-                //     "queued_at" => now()
-                // ]);
+                //Create the mailing entry
+                MailWorker::create([
+                    "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
+                    "recipient" => $admin->user->email,
+                    "blade" => 'prg_mail',
+                    "data" => json_encode($mailData),
+                    "queued_at" => now()
+                ]);
 
                 DB::commit();
 

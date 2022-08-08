@@ -41,10 +41,10 @@ class GoogleController extends Controller
      
                 Auth::login($finduser);
                 $token = $finduser->createToken('sample-token-name')->plainTextToken;
-                return redirect( env('SANCTUM_STATEFUL_DOMAINS').'/auth/callback?token='.$token);
+                return redirect( config('app.sanctum_stateful_domains').'/auth/callback?token='.$token);
      
             }else{
-                return redirect( env('SANCTUM_STATEFUL_DOMAINS').'/auth/callback?error=nf');
+                return redirect( config('app.sanctum_stateful_domains').'/auth/callback?error=nf');
             }
     
         } catch (Exception $e) {

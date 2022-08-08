@@ -43,6 +43,10 @@ class CoiTxn extends Model
             if($filters->has('sais_id')) {
                 $query->where('c.sais_id', $filters->sais_id);
             }
+
+            if($filters->has('distinct')) {
+                $query->select($filters->column_name)->distinct();
+            }
         } else if($role == 'faculties') {
             if($filters->has('txn_history')) {
                 $query->select(DB::raw("c.coi_id as reference_id, co.term, co.course as class, co.section, s.campus_id as student_no, to_char(coitxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, coitxns.action as trx_status, u.email as last_commit"))
