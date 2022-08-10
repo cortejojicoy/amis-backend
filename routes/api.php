@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminCoiTxnController;
 use App\Http\Controllers\Admin\AdminPrerogController;
 use App\Http\Controllers\Admin\AdminPrerogTxnController;
 use Illuminate\Http\Request;
@@ -64,6 +65,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'studen
 });
 
 Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins', 'as' => 'admins.'], function () {
+    Route::apiResource('coitxns', AdminCoiTxnController::class);
     Route::apiResource('prerog_txns', AdminPrerogTxnController::class);
     Route::apiResource('prerogative-enrollments', AdminPrerogController::class);
 });

@@ -179,7 +179,7 @@ class ApplyPrerogativeEnrollment{
                     //Create the mailing entry
                     MailWorker::create([
                         "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
-                        "recipient" => $prg->user()->email,
+                        "recipient" => $prg->user->email,
                         "blade" => 'prg_mail',
                         "data" => json_encode($mailData),
                         "queued_at" => now()

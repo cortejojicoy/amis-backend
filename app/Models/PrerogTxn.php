@@ -59,7 +59,8 @@ class PrerogTxn extends Model
                     ->join('students AS s', 's.sais_id', '=', 'p.sais_id')
                     ->join('users AS u', 'u.sais_id', '=', 'prerog_txns.committed_by')
                     ->join('course_offerings AS co', 'co.class_nbr', '=', 'p.class_id')
-                    ->join('student_program_records as spr', 's.campus_id', 'spr.campus_id');
+                    ->join('student_program_records as spr', 's.campus_id', 'spr.campus_id')
+                    ->where('spr.status', 'ACTIVE');
             }
 
             if($filters->admin->college != '') {
