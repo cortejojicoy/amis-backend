@@ -70,7 +70,10 @@ class Prerog extends Model
 
         if($role == 'admins') {
             if($filters->admin->college != '') {
-                $query->whereRelation('student.program_records', 'acad_group', $filters->admin->college);
+                $query->whereHas('student.program_records', function ($query) use($filters) {
+                    $query->where('student_program_records.acad_group', $filters->admin->college)
+                        ->where('student_program_records.status', 'ACTIVE');
+                });
             }
 
             if($filters->has('prg_status')) {
