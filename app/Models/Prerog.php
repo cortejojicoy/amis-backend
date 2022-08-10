@@ -60,7 +60,9 @@ class Prerog extends Model
             }
 
             if($filters->has('with_students')) {
-                $query->with(['user', 'student', 'student.program_records', 'prerog_txns' => function ($query) use($filters) {
+                $query->with(['user', 'student', 'student.program_records' => function ($query) {
+                    $query->where('student_program_records.status', '=', 'ACTIVE');
+                }, 'prerog_txns' => function ($query) use($filters) {
                     $query->where('prerog_txns.action', '=', $filters->prg_txn_status);
                 }]);
             }
@@ -76,7 +78,9 @@ class Prerog extends Model
             }
 
             if($filters->has('with_students')) {
-                $query->with(['user', 'student', 'student.program_records', 'course_offering', 'prerog_txns' => function($query) use ($filters) {
+                $query->with(['user', 'student', 'student.program_records' => function ($query) {
+                    $query->where('student_program_records.status', '=', 'ACTIVE');
+                }, 'course_offering', 'prerog_txns' => function($query) use ($filters) {
                     $query->where('prerog_txns.action', '=', $filters->prg_txn_status);
                 }]);
             }
