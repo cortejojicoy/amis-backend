@@ -43,10 +43,6 @@ class CoiTxn extends Model
             if($filters->has('sais_id')) {
                 $query->where('c.sais_id', $filters->sais_id);
             }
-
-            if($filters->has('distinct')) {
-                $query->select($filters->column_name)->distinct();
-            }
         } else if($role == 'faculties') {
             if($filters->has('txn_history')) {
                 $query->select(DB::raw("c.coi_id as reference_id, co.term, co.course as class, co.section, s.campus_id as student_no, to_char(coitxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, coitxns.action as trx_status, u.email as last_commit"))
@@ -62,8 +58,36 @@ class CoiTxn extends Model
             }
         }
 
+        if($filters->has('distinct')) {
+            $query->select($filters->column_name)->distinct();
+        }
+
+        $query = $this->filterData($query, $filters);
+
         if($filters->has('order_type')) {
             $query->orderBy($filters->order_field, $filters->order_type);
         }
+    }
+
+    public function filterData($query, $filters) {
+        if($filters->has('course')) {
+            if($filters->course != '--') {
+                $query->where('co.course', $filters->course);
+            }
+        }
+
+        if($filters->has('action')) {
+            if($filters->action != '--') {
+                $query->where('coitxns.action', $filters->action);
+            }
+        }
+
+        if($filters->has('coi_id')) {
+            if($filters->coi_id != '--') {
+                $query->where('c.coi_id', $filters->coi_id);
+            }
+        }
+
+        return $query;
     }
 }
