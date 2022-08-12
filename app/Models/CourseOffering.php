@@ -25,8 +25,15 @@ class CourseOffering extends Model
         return $this->belongsTo(Faculty::class, 'id', 'sais_id');
     }
 
+    public function term()
+    {
+        return $this->belongsTo(StudentTerm::class, 'term', 'term_id');
+    }
+
     public function scopeFilter($query, $filters)
     {
+        $query->whereRelation('term', 'status', 'ACTIVE');
+
         //select fields
         if($filters->has('fields')) {
             $query->select($filters->fields);

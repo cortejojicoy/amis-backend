@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('term_id');
             $table->string('term', 50);
             $table->string('ay', 11);
+            $table->string('status', 10);
             $table->timestamps();
         });
     }

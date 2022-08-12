@@ -33,7 +33,7 @@ class CoiTxn extends Model
     public function scopeFilter($query, $filters, $role) {
         if($role == 'students') {
             if($filters->has('txn_history')) {
-                $query->select(DB::raw("c.coi_id as reference_id, co.course, co.section, CONCAT(co.days, ' ', co.times) AS schedule, coitxns.note, coitxns.action, to_char(coitxns.created_at, 'DD MON YYYY hh12:mi AM') as date_created, u.email as committed_by, to_char(c.submitted_to_sais, 'DD MON YYYY hh12:mi AM') as last_action_date"))
+                $query->select(DB::raw("c.coi_id as reference_id, c.term, co.course, co.section, CONCAT(co.days, ' ', co.times) AS schedule, coitxns.note, coitxns.action, to_char(coitxns.created_at, 'DD MON YYYY hh12:mi AM') as date_created, u.email as committed_by"))
                     ->leftJoin('cois AS c', 'c.coi_id', '=', 'coitxns.coi_id')
                     ->leftJoin('course_offerings AS co', 'c.class_id', 'co.class_nbr')
                     ->leftJoin('users AS u', 'u.sais_id', '=', 'coitxns.committed_by')
@@ -45,7 +45,7 @@ class CoiTxn extends Model
             }
         } else if($role == 'faculties') {
             if($filters->has('txn_history')) {
-                $query->select(DB::raw("c.coi_id as reference_id, co.term, co.course as class, co.section, s.campus_id as student_no, to_char(coitxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, coitxns.action as trx_status, u.email as last_commit"))
+                $query->select(DB::raw("c.coi_id as reference_id, c.term, co.course as class, co.section, s.campus_id as student_no, to_char(coitxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, coitxns.action as trx_status, u.email as last_commit"))
                     ->join('cois AS c', 'c.coi_id', '=', 'coitxns.coi_id')
                     ->join('students AS s', 's.sais_id', '=', 'c.sais_id')
                     ->join('users AS u', 'u.sais_id', '=', 'coitxns.committed_by')
@@ -58,7 +58,7 @@ class CoiTxn extends Model
             }
         } else if($role == 'admins') {
             if($filters->has('txn_history')) {
-                $query->select(DB::raw("co.acad_group, co.acad_org, co.career, c.coi_id as reference_id, co.term, co.course as class, co.section, s.campus_id as student_no, to_char(coitxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, coitxns.action as trx_status, u.email as last_commit"))
+                $query->select(DB::raw("co.acad_group, co.acad_org, co.career, c.coi_id as reference_id, c.term, co.course as class, co.section, s.campus_id as student_no, to_char(coitxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, coitxns.action as trx_status, u.email as last_commit"))
                 ->join('cois AS c', 'coitxns.coi_id', '=', 'c.coi_id')
                 ->join('students AS s', 's.sais_id', '=', 'c.sais_id')
                 ->join('users AS u', 'u.sais_id', '=', 'coitxns.committed_by')
@@ -99,6 +99,12 @@ class CoiTxn extends Model
         if($filters->has('coi_id')) {
             if($filters->coi_id != '--') {
                 $query->where('c.coi_id', $filters->coi_id);
+            }
+        }
+
+        if($filters->has('campus_id')) {
+            if($filters->campus_id != '--') {
+                $query->where('s.campus_id', $filters->campus_id);
             }
         }
 

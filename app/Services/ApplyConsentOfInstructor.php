@@ -6,19 +6,22 @@ use App\Models\CoiTxn;
 use App\Models\CourseOffering;
 use App\Models\ExternalLink;
 use App\Models\MailWorker;
+use App\Models\StudentTerm;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ApplyConsentOfInstructor{
     function createCoi($request, $coi_id, $external_link_token){
+        $student_term = StudentTerm::where('status', 'ACTIVE')->first();
+
         //check if student has already applied for the same class
         $existingCOI = Coi::where('class_id', $request->class_id)
             ->where('sais_id', Auth::user()->sais_id)
             ->where(function($query) {
                 $query->orWhere('status', 'Requested')
                     ->orWhere('status', 'Approved');
-            })
+            })->where('term', $student_term->term_id)
             ->first();
         
         //if student still hasn't applied for this class, continue
@@ -44,6 +47,7 @@ class ApplyConsentOfInstructor{
                     Coi::create([
                         "coi_id" => $coi_id,
                         "class_id" => $request->class_id,
+                        "term" => $student_term->term_id,
                         "sais_id" => Auth::user()->sais_id,
                         "status" => "Requested",
                         "comment" => "",

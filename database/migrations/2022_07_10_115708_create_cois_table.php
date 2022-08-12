@@ -16,6 +16,7 @@ return new class extends Migration
     {
         Schema::create('cois', function (Blueprint $table) {
             $table->string('coi_id', 15)->primary();
+            $table->integer('term');
             $table->integer('class_id');
             $table->string('status', 20);
             $table->integer('sais_id');

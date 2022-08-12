@@ -17,6 +17,7 @@ class Coi extends Model
     protected $fillable = [
         'coi_id',
         'class_id',
+        'term',
         'status',
         'sais_id',
         'comment',
@@ -44,10 +45,17 @@ class Coi extends Model
         return $this->belongsTo(CourseOffering::class, 'class_id', 'class_nbr');
     }
 
+    public function term()
+    {
+        return $this->belongsTo(StudentTerm::class, 'term', 'term_id');
+    }
+
     public function scopeFilter($query, $filters, $role) {
         if($filters->has('class_nbr')) {
             $query->where('cois.class_id', $filters->class_nbr);
         }
+
+        $query->whereRelation('term', 'status', 'ACTIVE');
 
         if($role == 'faculties') {
             if($filters->has('sais_id')) {

@@ -17,6 +17,7 @@ class Prerog extends Model
 
     protected $fillable = [
         'prg_id',
+        'term',
         'class_id',
         'status',
         'sais_id',
