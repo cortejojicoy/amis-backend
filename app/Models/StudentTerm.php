@@ -9,7 +9,7 @@ class StudentTerm extends Model
 {
     use HasFactory;
     protected $primaryKey = 'term_id';
-    protected $table = 'student_ay_terms';
+    protected $table = 'student_terms';
 
     public function terms()
     {

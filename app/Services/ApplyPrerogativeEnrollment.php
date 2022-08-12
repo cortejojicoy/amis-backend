@@ -8,12 +8,15 @@ use App\Models\MailWorker;
 use App\Models\Prerog;
 use App\Models\PrerogTxn;
 use App\Models\Student;
+use App\Models\StudentTerm;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ApplyPrerogativeEnrollment{
     function createPrerog($request, $prg_id, $external_link_token){
+        $student_term = StudentTerm::where('status', 'ACTIVE')->first();
+
         //check if student has already applied for the same class
         $existingPrerog = Prerog::where('class_id', $request->class_id)
             ->where('sais_id', Auth::user()->sais_id)
@@ -21,7 +24,7 @@ class ApplyPrerogativeEnrollment{
                 $query->orWhere('status', 'Requested')
                     ->orWhere('status', 'Accepted')
                     ->orWhere('status', 'Approved');
-            })
+            })->where('term', $student_term->term_id)
             ->first();
         
         //if student still hasn't applied for this class, continue
@@ -49,6 +52,7 @@ class ApplyPrerogativeEnrollment{
                     Prerog::create([
                         "prg_id" => $prg_id,
                         "class_id" => $request->class_id,
+                        "term" => $student_term->term_id,
                         "sais_id" => Auth::user()->sais_id,
                         "status" => $status,
                         "comment" => "",

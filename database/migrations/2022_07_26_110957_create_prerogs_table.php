@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('prerogs', function (Blueprint $table) {
             $table->string('prg_id', 15)->primary();
+            $table->integer('term');
             $table->integer('class_id');
             $table->string('status', 20);
             $table->integer('sais_id');
