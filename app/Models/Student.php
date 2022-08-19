@@ -11,13 +11,13 @@ class Student extends Model
     protected $primaryKey = 'campus_id';
     protected $keyType = 'string';
 
-    public function cois()
-    {
-        return $this->hasMany(Coi::class, 'student_id', 'campus_id');
-    }
-
     public function program_records()
     {
         return $this->hasMany(StudentProgramRecord::class, 'campus_id', 'campus_id');
+    }
+
+    public function student_grades()
+    {
+        return $this->hasMany(StudentGrade::class, 'campus_id', 'campus_id');
     }
 }

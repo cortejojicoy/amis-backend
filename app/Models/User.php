@@ -64,7 +64,7 @@ class User extends Authenticatable
     }
 
     public function scopeFilter($query, $filters) {
-        $query->with(['student', 'faculty', 'admin', 'student.program_records' => function ($query) use($filters) {
+        $query->with(['student', 'faculty', 'admin', 'student.student_grades', 'student.program_records' => function ($query) use($filters) {
             $query->where('student_program_records.status', '=', $filters->program_record_status);
         }]);
     }

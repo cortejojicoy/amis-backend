@@ -14,7 +14,8 @@ class RoleTableSeeder extends Seeder
             ['id' => 1, 'name' => 'student', 'guard_name' => 'web'],
             ['id' => 2, 'name' => 'faculty', 'guard_name' => 'web'],
             ['id' => 3, 'name' => 'reps', 'guard_name' => 'web'],
-            ['id' => 4, 'name' => 'admin', 'guard_name' => 'web']
+            ['id' => 4, 'name' => 'admin', 'guard_name' => 'web'],
+            ['id' => 5, 'name' => 'super_admin', 'guard_name' => 'web']
          ];
       
          foreach ($roles as $role) {
