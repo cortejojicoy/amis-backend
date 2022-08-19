@@ -32,10 +32,10 @@
             <p>You may contact the student thru his/her email: <b>{{$mailData->data->student->email}}</b></p>
             
             <p>Thank you!</p>
-        @elseif ($mailData->data->status == 'ACCEPTED')
+        @elseif ($mailData->data->status == 'APPROVED BY OCS')
             <p>Dear OCS Admin,</p>
 
-            <p>A student named {{ strtoupper($mailData->data->student->name) }} with student number {{ $mailData->data->student->campus_id}}, has applied for a Prerog in <b>{{$mailData->data->class->course}} {{$mailData->data->class->section}}</b> and has been approved by the Faculty-in-Charge: {{ $mailData->data->class->name }}</p>
+            <p>A student named {{ strtoupper($mailData->data->student->name) }} with student number {{ $mailData->data->student->campus_id}}, has applied for a Prerog in your class: <b>{{$mailData->data->class->course}} {{$mailData->data->class->section}}</b> and has been approved by the student's OCS.</p>
             
             <p>The student has applied for the Prerog with the following remarks/appeal:
                 <ul>
@@ -58,7 +58,7 @@
             <p>You may contact the student thru his/her email: <b>{{$mailData->data->student->email}}</b></p>
             
         {{-- Try to put this code into one if else condition --}}
-        @elseif ($mailData->data->status == 'APPROVED')
+        @elseif ($mailData->data->status == 'APPROVED BY FIC')
             <p>Dear Student,</p>
             
             <p>Your Prerog/Change of Matriculation Application for <b>{{$mailData->data->class->course}} {{$mailData->data->class->section}}</b> has been approved by the faculty in charge: {{ $mailData->data->class->name }} and the Office of the College Secretary administering your program.</p>

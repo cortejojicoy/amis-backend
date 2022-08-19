@@ -44,6 +44,11 @@ class CourseOffering extends Model
             $query->where('id', '=', $filters->id);
         }
 
+        //add restriction here that consent = "I" should only be the ones displayed
+        if($filters->has('consent')) {
+            $query->where('consent', '=', $filters->consent);
+        }
+
         if($filters->has('class_nbr')) {
             $query->where('class_nbr', '=', $filters->class_nbr);
         }

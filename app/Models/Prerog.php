@@ -26,6 +26,13 @@ class Prerog extends Model
         'created_at',
     ];
 
+    const REQUESTED = 'Requested';
+    const PRE_APPROVED = 'Pre-Approved';
+    const APPROVED_FIC = 'Approved by FIC';
+    const APPROVED_OCS = 'Approved by OCS';
+    const DISAPPROVED_FIC = 'Disapproved by FIC';
+    const DISAPPROVED_OCS = 'Disapproved by OCS';
+
     public function prerog_txns()
     {
         return $this->hasMany(PrerogTxn::class, 'prg_id', 'prg_id');
