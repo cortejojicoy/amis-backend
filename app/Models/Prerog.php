@@ -58,6 +58,10 @@ class Prerog extends Model
             $query->where('prerogs.class_id', $filters->class_nbr);
         }
 
+        if($filters->has('prg_term')) {
+            $query->where('prerogs.term', $filters->prg_term);
+        }
+
         if($role == 'faculties') {
             if($filters->has('sais_id')) {
                 $query->where('co.id', $filters->sais_id);

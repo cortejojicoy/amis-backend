@@ -17,17 +17,13 @@ class ApplyPrerogativeEnrollment{
     function createPrerog($request, $prg_id, $external_link_token){
         $student_term = StudentTerm::where('status', 'ACTIVE')->first();
 
-        $without_approval = ['CAS', 'CAFS', 'CEM', 'CEAT'];
+        $without_approval = ['CAS', 'CAFS', 'CEM', 'CEAT', 'GS', 'CVM', 'CDC', 'CFNR', 'CHE'];
 
         //check if student has already applied for the same class
         $existingPrerog = Prerog::where('class_id', $request->class_id)
             ->where('sais_id', Auth::user()->sais_id)
-            ->where(function($query) {
-                $query->orWhere('status', Prerog::REQUESTED)
-                    ->orWhere('status', Prerog::APPROVED_FIC)
-                    ->orWhere('status', Prerog::APPROVED_OCS)
-                    ->orWhere('status', Prerog::PRE_APPROVED);
-            })->where('term', $student_term->term_id)
+            ->whereIn('status', [Prerog::REQUESTED, Prerog::APPROVED_FIC, Prerog::APPROVED_OCS, Prerog::PRE_APPROVED])
+            ->where('term', $student_term->term_id)
             ->first();
         
         //if student still hasn't applied for this class, continue
@@ -37,128 +33,143 @@ class ApplyPrerogativeEnrollment{
                 ->first()
                 ->toArray();
 
-            //if no faculty assigned
-            if($co['email'] == '') {
+            //if faculty assigned
+            if($co['email'] != '') {
+
+                $requestedPrerogs = Prerog::where('class_id', $request->class_id)
+                    ->whereIn('status', [Prerog::REQUESTED, Prerog::PRE_APPROVED])
+                    ->where('term', $student_term->term_id)
+                    ->count();
+
+                if($requestedPrerogs < 15) {
+                    //begins transaction but won't commit it to DB first
+                    DB::beginTransaction();
+    
+                    //Get user instance
+                    $user = User::find(Auth::user()->sais_id);
+    
+                    $program_record = $user->student->program_records()->where('status', 'ACTIVE')->first();
+    
+                    try {
+    
+                        //if needs to be approved by OCS
+                        if(!in_array($program_record->acad_group, $without_approval)) {
+                            //Create Prerog
+                            Prerog::create([
+                                "prg_id" => $prg_id,
+                                "class_id" => $request->class_id,
+                                "term" => $student_term->term_id,
+                                "sais_id" => Auth::user()->sais_id,
+                                "status" => Prerog::REQUESTED,
+                                "comment" => "",
+                                "created_at" => now()
+                            ]);
+    
+                            //Create COI TXN
+                            PrerogTxn::create([
+                                "prg_id" => $prg_id,
+                                "action" => Prerog::REQUESTED,
+                                "committed_by" => Auth::user()->sais_id,
+                                "note" => $request->justification ? $request->justification : 'None',
+                                "created_at" => now()
+                            ]);
+                        } else {
+                            //Create Prerog
+                            Prerog::create([
+                                "prg_id" => $prg_id,
+                                "class_id" => $request->class_id,
+                                "term" => $student_term->term_id,
+                                "sais_id" => Auth::user()->sais_id,
+                                "status" => Prerog::PRE_APPROVED,
+                                "comment" => "",
+                                "created_at" => now()
+                            ]);
+    
+                            //Create COI TXN
+                            PrerogTxn::create([
+                                "prg_id" => $prg_id,
+                                "action" => Prerog::REQUESTED,
+                                "committed_by" => Auth::user()->sais_id,
+                                "note" => $request->justification ? $request->justification : 'None',
+                                "created_at" => now()
+                            ]);
+    
+                            //Create COI TXN
+                            PrerogTxn::create([
+                                "prg_id" => $prg_id,
+                                "action" => Prerog::PRE_APPROVED,
+                                "committed_by" => Auth::user()->sais_id,
+                                "note" => $request->justification ? $request->justification : 'None',
+                                "created_at" => now()
+                            ]);
+    
+                            //create external link
+                            ExternalLink::create([
+                                "token" => $external_link_token,
+                                "model_type" => 'App\Models\Prerog',
+                                "model_id" => $prg_id
+                            ]);
+    
+                            //initialize mail data which will be used in the email template
+                            $mailData = [
+                                "status" => strtoupper(Prerog::REQUESTED), 
+                                "token" => $external_link_token,
+                                "class" => $co,
+                                "student" => [
+                                    'name' => $user->full_name,
+                                    'email' => Auth::user()->email,
+                                    'justification' =>  $request->justification,
+                                    'campus_id' => $user->student->campus_id
+                                ]
+                            ];
+    
+                            //Create the mailing entry
+                            MailWorker::create([
+                                "subject" => $co['course'] . ' ' . $co['section'] . ' Prerog Application',
+                                "recipient" => $co['email'],
+                                "blade" => 'prg_mail',
+                                "data" => json_encode($mailData),
+                                "queued_at" => now()
+                            ]);
+                        }
+    
+                        //Commit the changes to db if there is no error
+                        DB::commit();
+                        
+                        //return ok
+                        return response()->json(
+                            [
+                                'message' => 'Prerog successfully requested',
+                                'status' => 'Ok'
+                            ], 200
+                        );
+            
+                    } catch (\Exception $ex) {
+                        //if there is an error, rollback to previous state of db before beginTransaction
+                        DB::rollback();
+            
+                        //return error
+                        return response()->json(
+                            [
+                                'message' => $ex->getMessage()
+                            ], 500
+                        );
+                    }
+                } else {
+                    //return error
+                    return response()->json(
+                        [
+                            'message' => 'There are already too many requests on queue. Please try again later.',
+                        ], 400
+                    );
+                }
+            } else { // if there is no faculty assigned
                 //return error
                 return response()->json(
                     [
                         'message' => 'No Faculty-in-Charge assigned in this class. Contact the unit offering the course so they can enter the FIC in SAIS',
                     ], 400
                 );
-            } else { // if there is faculty assigned
-                //begins transaction but won't commit it to DB first
-                DB::beginTransaction();
-
-                //Get user instance
-                $user = User::find(Auth::user()->sais_id);
-
-                $program_record = $user->student->program_records()->where('status', 'ACTIVE')->first();
-
-                try {
-
-                    //if needs to be approved by OCS
-                    if(!in_array($program_record->acad_group, $without_approval)) {
-                        //Create Prerog
-                        Prerog::create([
-                            "prg_id" => $prg_id,
-                            "class_id" => $request->class_id,
-                            "term" => $student_term->term_id,
-                            "sais_id" => Auth::user()->sais_id,
-                            "status" => Prerog::REQUESTED,
-                            "comment" => "",
-                            "created_at" => now()
-                        ]);
-
-                        //Create COI TXN
-                        PrerogTxn::create([
-                            "prg_id" => $prg_id,
-                            "action" => Prerog::REQUESTED,
-                            "committed_by" => Auth::user()->sais_id,
-                            "note" => $request->justification ? $request->justification : 'None',
-                            "created_at" => now()
-                        ]);
-                    } else {
-                        //Create Prerog
-                        Prerog::create([
-                            "prg_id" => $prg_id,
-                            "class_id" => $request->class_id,
-                            "term" => $student_term->term_id,
-                            "sais_id" => Auth::user()->sais_id,
-                            "status" => Prerog::PRE_APPROVED,
-                            "comment" => "",
-                            "created_at" => now()
-                        ]);
-
-                        //Create COI TXN
-                        PrerogTxn::create([
-                            "prg_id" => $prg_id,
-                            "action" => Prerog::REQUESTED,
-                            "committed_by" => Auth::user()->sais_id,
-                            "note" => $request->justification ? $request->justification : 'None',
-                            "created_at" => now()
-                        ]);
-
-                        //Create COI TXN
-                        PrerogTxn::create([
-                            "prg_id" => $prg_id,
-                            "action" => Prerog::PRE_APPROVED,
-                            "committed_by" => Auth::user()->sais_id,
-                            "note" => $request->justification ? $request->justification : 'None',
-                            "created_at" => now()
-                        ]);
-
-                        //create external link
-                        ExternalLink::create([
-                            "token" => $external_link_token,
-                            "model_type" => 'App\Models\Prerog',
-                            "model_id" => $prg_id
-                        ]);
-
-                        //initialize mail data which will be used in the email template
-                        $mailData = [
-                            "status" => strtoupper(Prerog::REQUESTED), 
-                            "token" => $external_link_token,
-                            "class" => $co,
-                            "student" => [
-                                'name' => $user->full_name,
-                                'email' => Auth::user()->email,
-                                'justification' =>  $request->justification,
-                                'campus_id' => $user->student->campus_id
-                            ]
-                        ];
-
-                        //Create the mailing entry
-                        MailWorker::create([
-                            "subject" => $co['course'] . ' ' . $co['section'] . ' Prerog Application',
-                            "recipient" => $co['email'],
-                            "blade" => 'prg_mail',
-                            "data" => json_encode($mailData),
-                            "queued_at" => now()
-                        ]);
-                    }
-
-                    //Commit the changes to db if there is no error
-                    DB::commit();
-                    
-                    //return ok
-                    return response()->json(
-                        [
-                            'message' => 'Prerog successfully requested',
-                            'status' => 'Ok'
-                        ], 200
-                    );
-        
-                } catch (\Exception $ex) {
-                    //if there is an error, rollback to previous state of db before beginTransaction
-                    DB::rollback();
-        
-                    //return error
-                    return response()->json(
-                        [
-                            'message' => $ex->getMessage()
-                        ], 500
-                    );
-                }
             }
         } else { //if student has already applied for this class
             //return error
