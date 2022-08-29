@@ -49,6 +49,10 @@ class CourseOffering extends Model
             $query->where('consent', '=', $filters->consent);
         }
 
+        if($filters->has('prerog')) {
+            $query->where('prerog', '=', TRUE);
+        }
+
         if($filters->has('class_nbr')) {
             $query->where('class_nbr', '=', $filters->class_nbr);
         }
