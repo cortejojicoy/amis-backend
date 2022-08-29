@@ -49,7 +49,10 @@ return new class extends Migration
             $table->string('name', 255);
             $table->string('email', 255);
             $table->string('consent', 1);
+            $table->boolean('prerog');
+            $table->integer('offer_nbr')->nullable();
             $table->integer('topic_id')->nullable();
+            $table->text('prereq_coi')->nullable();
             $table->timestamps();
         });
     }
