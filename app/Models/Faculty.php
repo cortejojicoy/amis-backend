@@ -9,6 +9,8 @@ class Faculty extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'faculty_id';
+
     // /**
     //  * Get the post that owns the comment.
     // */
