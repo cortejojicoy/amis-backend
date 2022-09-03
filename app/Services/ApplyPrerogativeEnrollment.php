@@ -21,9 +21,6 @@ class ApplyPrerogativeEnrollment{
 
         //check if student has already applied for the same class
         $toBeAppliedTo = CourseOffering::where('class_nbr', $request->class_id)
-            // ->where('sais_id', Auth::user()->sais_id)
-            // ->whereIn('status', [Prerog::REQUESTED, Prerog::APPROVED_FIC, Prerog::APPROVED_OCS, Prerog::PRE_APPROVED])
-            // ->where('term', $student_term->term_id)
             ->first();
 
         $conflictingCourses = CourseOffering::select('class_nbr')
