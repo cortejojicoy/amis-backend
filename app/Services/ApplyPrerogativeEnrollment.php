@@ -20,7 +20,16 @@ class ApplyPrerogativeEnrollment{
         $without_approval = ['CAS', 'CAFS', 'CEM', 'CEAT', 'GS', 'CVM', 'CDC', 'CFNR', 'CHE'];
 
         //check if student has already applied for the same class
-        $existingPrerog = Prerog::where('class_id', $request->class_id)
+        $toBeAppliedTo = CourseOffering::where('class_nbr', $request->class_id)
+            ->first();
+
+        $conflictingCourses = CourseOffering::select('class_nbr')
+            ->where('course', $toBeAppliedTo->course)
+            ->where('component', $toBeAppliedTo->component)
+            ->get()->pluck('class_nbr');
+
+
+        $existingPrerog = Prerog::whereIn('class_id', $conflictingCourses)
             ->where('sais_id', Auth::user()->sais_id)
             ->whereIn('status', [Prerog::REQUESTED, Prerog::APPROVED_FIC, Prerog::APPROVED_OCS, Prerog::PRE_APPROVED])
             ->where('term', $student_term->term_id)
@@ -175,7 +184,7 @@ class ApplyPrerogativeEnrollment{
             //return error
             return response()->json(
                 [
-                    'message' => 'You have already applied for a Prerog to this class with status: ' . $existingPrerog->status,
+                    'message' => 'You have already applied for this class of the same course code with status: ' . $existingPrerog->status,
                 ], 400
             );
         }
@@ -190,6 +199,8 @@ class ApplyPrerogativeEnrollment{
             $status = Prerog::APPROVED_OCS;
         } else if ($request->status == 'disapprove' && $role == 'faculties') {
             $status = Prerog::DISAPPROVED_FIC;
+        } else if ($request->status == 'cancel' && $role == 'students') {
+            $status = Prerog::CANCELLED;
         } else {
             $status = Prerog::DISAPPROVED_OCS;
         }
@@ -220,46 +231,48 @@ class ApplyPrerogativeEnrollment{
                     ->where('action', null)
                     ->update(['action' => $status]);
 
-                if($status != Prerog::APPROVED_OCS) { //if the status of the prerog application is approved, disapproved by FIC, or disapproved by OCS, send email to student
-                    $mailData = [
-                        "status" => strtoupper($status), 
-                        "reason" => $request->justification,
-                        "class" => $prg->course_offering,
-                        "role" => $role
-                    ];
-                    
-                    //Create the mailing entry
-                    MailWorker::create([
-                        "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
-                        "recipient" => $prg->user->email,
-                        "blade" => 'prg_mail',
-                        "data" => json_encode($mailData),
-                        "queued_at" => now()
-                    ]);
-                } else { // send email to faculty that the email has been approved by the OCS
-                    //get the prerogtxn of student with his/her appeal
-                    $prgtxn = $prg->prerog_txns()->where('action', Prerog::REQUESTED)->first();
-
-                    $mailData = [
-                        "status" => strtoupper($status), 
-                        "class" => $prg->course_offering,
-                        "token" => $external_link_token,
-                        "student" => [
-                             'name' => $prg->user->full_name,
-                             'email' => $prg->user->email,
-                             'justification' =>  $prgtxn->note,
-                             'campus_id' => $prg->student->campus_id
-                         ]
-                    ];
-                    
-                    //Create the mailing entry
-                    MailWorker::create([
-                        "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
-                        "recipient" => $prg->course_offering->email,
-                        "blade" => 'prg_mail',
-                        "data" => json_encode($mailData),
-                        "queued_at" => now()
-                    ]);
+                if($status != Prerog::CANCELLED) {
+                    if($status != Prerog::APPROVED_OCS) { //if the status of the prerog application is approved, disapproved by FIC, or disapproved by OCS, send email to student
+                        $mailData = [
+                            "status" => strtoupper($status), 
+                            "reason" => $request->justification,
+                            "class" => $prg->course_offering,
+                            "role" => $role
+                        ];
+                        
+                        //Create the mailing entry
+                        MailWorker::create([
+                            "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
+                            "recipient" => $prg->user->email,
+                            "blade" => 'prg_mail',
+                            "data" => json_encode($mailData),
+                            "queued_at" => now()
+                        ]);
+                    } else { // send email to faculty that the email has been approved by the OCS
+                        //get the prerogtxn of student with his/her appeal
+                        $prgtxn = $prg->prerog_txns()->where('action', Prerog::REQUESTED)->first();
+    
+                        $mailData = [
+                            "status" => strtoupper($status), 
+                            "class" => $prg->course_offering,
+                            "token" => $external_link_token,
+                            "student" => [
+                                 'name' => $prg->user->full_name,
+                                 'email' => $prg->user->email,
+                                 'justification' =>  $prgtxn->note,
+                                 'campus_id' => $prg->student->campus_id
+                             ]
+                        ];
+                        
+                        //Create the mailing entry
+                        MailWorker::create([
+                            "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
+                            "recipient" => $prg->course_offering->email,
+                            "blade" => 'prg_mail',
+                            "data" => json_encode($mailData),
+                            "queued_at" => now()
+                        ]);
+                    }
                 }
 
                 //add another for the OCS
