@@ -28,6 +28,7 @@ class Prerog extends Model
 
     const REQUESTED = 'Requested';
     const PRE_APPROVED = 'Pre-Approved';
+    const CANCELLED = 'Cancelled';
     const APPROVED_FIC = 'Approved by FIC';
     const APPROVED_OCS = 'Approved by OCS';
     const DISAPPROVED_FIC = 'Disapproved by FIC';
@@ -60,6 +61,16 @@ class Prerog extends Model
 
         if($filters->has('prg_term')) {
             $query->where('prerogs.term', $filters->prg_term);
+        } 
+
+        if($role == 'students') {
+            if($filters->has('sais_id')) {
+                $query->where('prerogs.sais_id', $filters->sais_id);
+            }
+
+            if($filters->has('with_course_offerings')) {
+                $query->with(['course_offering']);
+            }
         }
 
         if($role == 'faculties') {

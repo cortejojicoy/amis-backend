@@ -38,13 +38,16 @@ class GoogleController extends Controller
             $finduser = User::where('email', $user->email)->first();
      
             if($finduser){
-     
-                Auth::login($finduser);
-                $token = $finduser->createToken('sample-token-name')->plainTextToken;
-                return redirect( config('app.sanctum_stateful_domains').'/auth/callback?token='.$token);
+                if((config('app.app_maintenance') && $finduser->tester) || !config('app.app_maintenance')) {
+                    Auth::login($finduser);
+                    $token = $finduser->createToken('sample-token-name')->plainTextToken;
+                    return redirect( config('app.sanctum_stateful_domains').'/auth/callback?token='.$token);
+                } else {
+                    return redirect( config('app.sanctum_stateful_domains').'/auth/callback?error=on_maintenance');
+                }
      
             }else{
-                return redirect( config('app.sanctum_stateful_domains').'/auth/callback?error=nf');
+                return redirect( config('app.sanctum_stateful_domains').'/auth/callback?error=not_found');
             }
     
         } catch (Exception $e) {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Prerog;
 use App\Services\ApplyPrerogativeEnrollment;
 use Illuminate\Http\Request;
 
@@ -13,9 +14,21 @@ class StudentPrerogController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $prgs = Prerog::filter($request, 'students');
+
+        if($request->has('items')) {
+            $prgs = $prgs->paginate($request->items);
+        } else {
+            $prgs = $prgs->get();
+        }
+        
+        return response()->json(
+            [
+             'prgs' => $prgs,
+            ], 200
+         );
     }
 
     /**
@@ -50,9 +63,9 @@ class StudentPrerogController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
-        //
+        return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'students');
     }
 
     /**
