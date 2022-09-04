@@ -10,7 +10,7 @@
         <p class="color:red"><b> * * * * * * *</b></p>
     </div>
     <div>
-        @if ($mailData->data->status == 'Pre-Approved' || $mailData->data->status == 'Approved by OCS')
+        @if ($mailData->data->status == 'Logged by OCS' || $mailData->data->status == 'Approved by OCS')
             <p>Dear Faculty,</p>
 
             <p>A student named {{ strtoupper($mailData->data->student->name) }} with student number {{ $mailData->data->student->campus_id}}, has applied for a Prerog in your class <b>{{$mailData->data->class->course}} {{$mailData->data->class->section}}</b></p>
