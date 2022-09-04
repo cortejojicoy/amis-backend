@@ -121,7 +121,7 @@ class ApplyPrerogativeEnrollment{
     
                             //initialize mail data which will be used in the email template
                             $mailData = [
-                                "status" => strtoupper(Prerog::REQUESTED), 
+                                "status" => Prerog::PRE_APPROVED, 
                                 "token" => $external_link_token,
                                 "class" => $co,
                                 "student" => [
@@ -234,7 +234,7 @@ class ApplyPrerogativeEnrollment{
                 if($status != Prerog::CANCELLED) {
                     if($status != Prerog::APPROVED_OCS) { //if the status of the prerog application is approved, disapproved by FIC, or disapproved by OCS, send email to student
                         $mailData = [
-                            "status" => strtoupper($status), 
+                            "status" => $status, 
                             "reason" => $request->justification,
                             "class" => $prg->course_offering,
                             "role" => $role
