@@ -31,7 +31,7 @@ class ApplyPrerogativeEnrollment{
 
         $existingPrerog = Prerog::whereIn('class_id', $conflictingCourses)
             ->where('sais_id', Auth::user()->sais_id)
-            ->whereIn('status', [Prerog::REQUESTED, Prerog::APPROVED_FIC, Prerog::APPROVED_OCS, Prerog::PRE_APPROVED])
+            ->whereIn('status', [Prerog::REQUESTED, Prerog::APPROVED_FIC, Prerog::APPROVED_OCS, Prerog::LOGGED_OCS])
             ->where('term', $student_term->term_id)
             ->first();
         
@@ -46,7 +46,7 @@ class ApplyPrerogativeEnrollment{
             if($co['email'] != '') {
 
                 $requestedPrerogs = Prerog::where('class_id', $request->class_id)
-                    ->whereIn('status', [Prerog::REQUESTED, Prerog::PRE_APPROVED])
+                    ->whereIn('status', [Prerog::REQUESTED, Prerog::LOGGED_OCS])
                     ->where('term', $student_term->term_id)
                     ->count();
 
@@ -89,7 +89,7 @@ class ApplyPrerogativeEnrollment{
                                 "class_id" => $request->class_id,
                                 "term" => $student_term->term_id,
                                 "sais_id" => Auth::user()->sais_id,
-                                "status" => Prerog::PRE_APPROVED,
+                                "status" => Prerog::LOGGED_OCS,
                                 "comment" => "",
                                 "created_at" => now()
                             ]);
@@ -106,7 +106,7 @@ class ApplyPrerogativeEnrollment{
                             //Create COI TXN
                             PrerogTxn::create([
                                 "prg_id" => $prg_id,
-                                "action" => Prerog::PRE_APPROVED,
+                                "action" => Prerog::LOGGED_OCS,
                                 "committed_by" => Auth::user()->sais_id,
                                 "note" => $request->justification ? $request->justification : 'None',
                                 "created_at" => now()
@@ -121,7 +121,7 @@ class ApplyPrerogativeEnrollment{
     
                             //initialize mail data which will be used in the email template
                             $mailData = [
-                                "status" => Prerog::PRE_APPROVED, 
+                                "status" => Prerog::LOGGED_OCS, 
                                 "token" => $external_link_token,
                                 "class" => $co,
                                 "student" => [
