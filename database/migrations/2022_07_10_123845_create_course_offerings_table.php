@@ -15,7 +15,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('course_offerings', function (Blueprint $table) {
-            $table->bigIncrements('course_offerings_id');
+            $table->bigIncrements('course_offerings_id')->from(20129);
             $table->string('institution', 10);
             $table->string('career', 10);
             $table->integer('term');
