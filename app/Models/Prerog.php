@@ -27,7 +27,7 @@ class Prerog extends Model
     ];
 
     const REQUESTED = 'Requested';
-    const PRE_APPROVED = 'Pre-Approved';
+    const LOGGED_OCS = 'Logged by OCS';
     const CANCELLED = 'Cancelled';
     const APPROVED_FIC = 'Approved by FIC';
     const APPROVED_OCS = 'Approved by OCS';
