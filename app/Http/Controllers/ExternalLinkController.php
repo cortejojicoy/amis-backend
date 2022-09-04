@@ -28,8 +28,23 @@ class ExternalLinkController extends Controller
                 return $useExternalLinks->updatePrerog($action, $ex_link, $external_link_token);
             }
         } else {
+            $ex_link = ExternalLink::where('token', $request->token)
+                ->first();
+            
+            if($ex_link->model_type == 'App\Models\Coi') {
+                $module = 'COI';
+            } else if ($ex_link->model_type == 'App\Models\Prerog') {
+                $module = 'Prerog';
+            }
+
+            if($ex_link->action == 'Cancelled') {
+                $message = "Link has been disabled. " . $module . " has been cancelled by the student.";
+            } else {
+                $message = "Link already used or the " . $module . " has already been acted upon via the system!";
+            }
+
             return view('external-link', [
-                "message" => "Link already used or COI has already been acted upon via the system!",
+                "message" => $message,
                 "subMessage" => "You may now exit this tab. Thank you!"
             ]);
         }

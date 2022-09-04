@@ -64,12 +64,12 @@ class UseExternalLinks {
     function updatePrerog($action, $ex_link, $external_link_token = null) {
         $prg = Prerog::find($ex_link->model_id);
 
-        if($action == 'accept') {
-            $status = 'Accepted';
+        if($action == 'approved_by_fic') {
+            $status = Prerog::APPROVED_FIC;
         } else {
             return view('external-link', [
                 "message" => "Action not recognized!",
-                "subMessage" => "If you want to disapprove a COI, kindly login to AMIS, Select Faculty/Admin Portal > Prerogative Enrollment in the left menu. Thank you!"
+                "subMessage" => "If you want to disapprove a Prerog, kindly login to AMIS, Select Faculty/Admin Portal > Prerogative Enrollment in the left menu. Thank you!"
             ]);
         }
 
@@ -93,28 +93,21 @@ class UseExternalLinks {
                 ]);
 
                 //Close the previous external link
-                $ex_link->action = $action;
+                $ex_link->action = $status;
                 $ex_link->save();
 
-                // send email to OCS that the email has been accepted by the faculty
-                $prgtxn = $prg->prerog_txns()->where('action', 'Requested')->first();
-
+                //send email to user that his/her prerog application has been approved
                 $mailData = [
-                    "status" => strtoupper($status), 
+                    "status" => $status, 
+                    "reason" => "None",
                     "class" => $prg->course_offering,
-                    "token" => $external_link_token,
-                    "student" => [
-                         'name' => $prg->user->full_name,
-                         'email' => $prg->user->email,
-                         'justification' =>  $prgtxn->note,
-                         'campus_id' => $prg->student->campus_id
-                     ]
+                    "role" => "faculties"
                 ];
                 
                 //Create the mailing entry
                 MailWorker::create([
                     "subject" => $prg->course_offering->course . ' ' . $prg->course_offering->section . ' Prerog Application',
-                    "recipient" => $admin->user->email,
+                    "recipient" => $prg->user->email,
                     "blade" => 'prg_mail',
                     "data" => json_encode($mailData),
                     "queued_at" => now()
@@ -123,7 +116,7 @@ class UseExternalLinks {
                 DB::commit();
 
                 return view('external-link', [
-                    "message" => "Prerog Successfully Accepted!",
+                    "message" => "Prerog Successfully Approved!",
                     "subMessage" => "You may now exit this tab. Thank you!"
                 ]);
             } catch (\Exception $ex) {
