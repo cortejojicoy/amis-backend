@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('status', 20);
             $table->integer('sais_id');
             $table->text('comment');
-            $table->string('last_action', 25);
+            $table->string('last_action', 25)->nullable();
             $table->dateTime('last_action_date')->nullable();
             $table->timestamps();
         });
