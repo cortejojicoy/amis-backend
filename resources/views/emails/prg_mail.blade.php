@@ -35,7 +35,7 @@
         @elseif ($mailData->data->status == 'Approved by FIC')
             <p>Dear Student,</p>
             
-            <p>Your Prerog/Change of Matriculation Application for <b>{{$mailData->data->class->course}} {{$mailData->data->class->section}}</b> has been approved by the faculty in charge: {{ $mailData->data->class->name }} and the Office of the College Secretary administering your program.</p>
+            <p>Your Prerog/Change of Matriculation Application for <b>{{$mailData->data->class->course}} {{$mailData->data->class->section}}</b> has been approved by the faculty in charge: {{ $mailData->data->class->name }}</p>
 
             <p>Kindly wait at least 24 hours before your Prerog approval is reflected in SAIS.</p>  
 
