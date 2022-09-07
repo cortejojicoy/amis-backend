@@ -17,7 +17,7 @@ class ApplyPrerogativeEnrollment{
     function createPrerog($request, $prg_id, $external_link_token){
         $student_term = StudentTerm::where('status', 'ACTIVE')->first();
 
-        $without_approval = ['CAS', 'CAFS', 'CEM', 'CEAT', 'GS', 'CVM', 'CDC', 'CFNR', 'CHE'];
+        $without_approval = ['CAS', 'CAFS', 'CEM', 'CEAT', 'GS', 'CVM', 'CDC', 'CFNR', 'CHE', 'SESAM'];
 
         //check if student has already applied for the same class
         $toBeAppliedTo = CourseOffering::where('class_nbr', $request->class_id)

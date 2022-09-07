@@ -26,7 +26,7 @@ class StudentCoiTxnController extends Controller
         }
 
         //get the keys of the txns
-        $keys = ['reference_id', 'course', 'section', 'schedule', 'note', 'action', 'date_created', 'committed_by'];
+        $keys = ['reference_id', 'course', 'section', 'schedule', 'note', 'action', 'date_created', 'committed_by', 'last_action', 'last_action_date'];
 
         return response()->json(
             [

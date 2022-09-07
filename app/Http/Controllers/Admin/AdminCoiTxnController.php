@@ -27,7 +27,7 @@ class AdminCoiTxnController extends Controller
             $coi_txns = $coi_txns->get();
         }
 
-        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
+        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit', 'last_action', 'last_action_date'];
 
         return response()->json(
             [
