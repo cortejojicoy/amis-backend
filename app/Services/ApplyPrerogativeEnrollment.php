@@ -50,13 +50,21 @@ class ApplyPrerogativeEnrollment{
                 //     ->where('term', $student_term->term_id)
                 //     ->count();
 
-                //begins transaction but won't commit it to DB first
-                DB::beginTransaction();
-
                 //Get user instance
                 $user = User::find(Auth::user()->sais_id);
 
                 $program_record = $user->student->program_records()->where('status', 'ACTIVE')->first();
+
+                if(empty($program_record)) {
+                    return response()->json(
+                        [
+                            'message' => 'It seems that you do not have an existing/active degree program in our database, kindly contact the AMIS team to add your degree program.',
+                        ], 400
+                    );
+                }
+
+                //begins transaction but won't commit it to DB first
+                DB::beginTransaction();
 
                 try {
 
