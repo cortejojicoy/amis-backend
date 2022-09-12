@@ -23,17 +23,33 @@ class ApplyPrerogativeEnrollment{
         $toBeAppliedTo = CourseOffering::where('class_nbr', $request->class_id)
             ->first();
 
+        //get course_offerings with the same course and component
         $conflictingCourses = CourseOffering::select('class_nbr')
             ->where('course', $toBeAppliedTo->course)
             ->where('component', $toBeAppliedTo->component)
             ->get()->pluck('class_nbr');
 
-
+        //if the student has applied to one of those courses with statsus requested, approved_ocs, logged_ocs, then don't let the user apply.
         $existingPrerog = Prerog::whereIn('class_id', $conflictingCourses)
             ->where('sais_id', Auth::user()->sais_id)
             ->whereIn('status', [Prerog::REQUESTED, Prerog::APPROVED_OCS, Prerog::LOGGED_OCS])
             ->where('term', $student_term->term_id)
             ->first();
+        
+        $existingPrerogWithExactClassNbr = Prerog::where('class_id', $request->class_id)
+            ->where('sais_id', Auth::user()->sais_id)
+            ->where('status', Prerog::APPROVED_FIC)
+            ->where('term', $student_term->term_id)
+            ->first();
+        
+        //if the student has applied to this same course with approved status. Forbid student to apply again
+        if(empty($existingPrerogWithExactClassNbr)) {
+            return response()->json(
+                [
+                    'message' => 'You already have an approved prerog application in this class. You do not have to apply again.',
+                ], 400
+            );
+        }
         
         //if student still hasn't applied for this class, continue
         if(empty($existingPrerog)) {
