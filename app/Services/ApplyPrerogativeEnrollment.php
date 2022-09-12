@@ -43,7 +43,7 @@ class ApplyPrerogativeEnrollment{
             ->first();
         
         //if the student has applied to this same course with approved status. Forbid student to apply again
-        if(empty($existingPrerogWithExactClassNbr)) {
+        if(!empty($existingPrerogWithExactClassNbr)) {
             return response()->json(
                 [
                     'message' => 'You already have an approved prerog application in this class. You do not have to apply again.',
