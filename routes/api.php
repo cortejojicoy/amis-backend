@@ -21,6 +21,7 @@ use App\Http\Controllers\Student\StudentCoiController;
 use App\Http\Controllers\Student\StudentCoiTxnController;
 use App\Http\Controllers\Student\StudentPrerogController;
 use App\Http\Controllers\Student\StudentPrerogTxnController;
+use App\Http\Controllers\SuperAdmin\DownloadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,6 +69,10 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins',
     Route::apiResource('coitxns', AdminCoiTxnController::class);
     Route::apiResource('prerog_txns', AdminPrerogTxnController::class);
     Route::apiResource('prerogative-enrollments', AdminPrerogController::class);
+});
+
+Route::group(['middleware' => ['auth:sanctum', 'role:super_admin'],'prefix'=>'super_admins', 'as' => 'super_admins.'], function () {
+    Route::apiResource('{module}/download', DownloadController::class);
 });
 
 //routes open for all roles but needs auth
