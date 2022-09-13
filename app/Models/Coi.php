@@ -23,6 +23,8 @@ class Coi extends Model
         'comment',
         'submitted_to_sais',
         'created_at',
+        'last_action',
+        'last_action_date'
     ];
 
     public function coitxns()
