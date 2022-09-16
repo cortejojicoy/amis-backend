@@ -27,6 +27,10 @@ class Coi extends Model
         'last_action_date'
     ];
 
+    const REQUESTED = 'Requested';
+    const APPROVED = 'Approved';
+    const DISAPPROVED = 'Disapproved';
+
     public function coitxns()
     {
         return $this->hasMany(CoiTxn::class, 'coi_id', 'coi_id');

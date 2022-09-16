@@ -17,12 +17,12 @@ class StudentCoiTxnController extends Controller
     public function index(Request $request)
     {
         //get the coi_txn_history of student
-        $coi_txns = CoiTxn::filter($request, 'students');
+        $coiTxns = CoiTxn::filter($request, 'students');
         
         if($request->has('items')) {
-            $coi_txns = $coi_txns->paginate($request->items);
+            $coiTxns = $coiTxns->paginate($request->items);
         } else {
-            $coi_txns = $coi_txns->get();
+            $coiTxns = $coiTxns->get();
         }
 
         //get the keys of the txns
@@ -30,7 +30,7 @@ class StudentCoiTxnController extends Controller
 
         return response()->json(
             [
-             'txns' => $coi_txns,
+             'txns' => $coiTxns,
              'keys' => $keys,
             ], 200
          );

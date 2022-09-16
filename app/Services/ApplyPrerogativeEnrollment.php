@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ApplyPrerogativeEnrollment{
-    function createPrerog($request, $prg_id, $external_link_token){
-        $student_term = StudentTerm::where('status', 'ACTIVE')->first();
+    function createPrerog($request, $prgID, $externalLinkToken){
+        $studentTerm = StudentTerm::where('status', 'ACTIVE')->first();
 
-        $without_approval = ['CAS', 'CAFS', 'CEM', 'CEAT', 'GS', 'CVM', 'CDC', 'CFNR', 'CHE', 'SESAM', 'CACAS'];
+        $withoutApproval = ['CAS', 'CAFS', 'CEM', 'CEAT', 'GS', 'CVM', 'CDC', 'CFNR', 'CHE', 'SESAM', 'CACAS'];
 
         //check if student has already applied for the same class
         $toBeAppliedTo = CourseOffering::where('class_nbr', $request->class_id)
@@ -33,13 +33,13 @@ class ApplyPrerogativeEnrollment{
         $existingPrerog = Prerog::whereIn('class_id', $conflictingCourses)
             ->where('sais_id', Auth::user()->sais_id)
             ->whereIn('status', [Prerog::REQUESTED, Prerog::APPROVED_OCS, Prerog::LOGGED_OCS])
-            ->where('term', $student_term->term_id)
+            ->where('term', $studentTerm->term_id)
             ->first();
         
         $existingPrerogWithExactClassNbr = Prerog::where('class_id', $request->class_id)
             ->where('sais_id', Auth::user()->sais_id)
             ->where('status', Prerog::APPROVED_FIC)
-            ->where('term', $student_term->term_id)
+            ->where('term', $studentTerm->term_id)
             ->first();
         
         //if the student has applied to this same course with approved status. Forbid student to apply again
@@ -60,18 +60,13 @@ class ApplyPrerogativeEnrollment{
 
             //if faculty assigned
             if($co['email'] != '') {
-
-                // $requestedPrerogs = Prerog::where('class_id', $request->class_id)
-                //     ->whereIn('status', [Prerog::REQUESTED, Prerog::LOGGED_OCS])
-                //     ->where('term', $student_term->term_id)
-                //     ->count();
-
+                
                 //Get user instance
                 $user = User::find(Auth::user()->sais_id);
 
-                $program_record = $user->student->program_records()->where('status', 'ACTIVE')->first();
+                $programRecord = $user->student->program_records()->where('status', 'ACTIVE')->first();
 
-                if(empty($program_record)) {
+                if(empty($programRecord)) {
                     return response()->json(
                         [
                             'message' => 'It seems that you do not have an existing/active degree program in our database, kindly contact the AMIS team to add your degree program.',
@@ -85,67 +80,32 @@ class ApplyPrerogativeEnrollment{
                 try {
 
                     //if needs to be approved by OCS
-                    if(!in_array($program_record->acad_group, $without_approval)) {
+                    if(!in_array($programRecord->acad_group, $withoutApproval)) {
                         //Create Prerog
-                        Prerog::create([
-                            "prg_id" => $prg_id,
-                            "class_id" => $request->class_id,
-                            "term" => $student_term->term_id,
-                            "sais_id" => Auth::user()->sais_id,
-                            "status" => Prerog::REQUESTED,
-                            "comment" => "",
-                            "created_at" => now()
-                        ]);
+                        $this->insertPrerog($prgID, $request->class_id, $studentTerm->term_id, Auth::user()->sais_id, Prerog::REQUESTED);
 
                         //Create COI TXN
-                        PrerogTxn::create([
-                            "prg_id" => $prg_id,
-                            "action" => Prerog::REQUESTED,
-                            "committed_by" => Auth::user()->sais_id,
-                            "note" => $request->justification ? $request->justification : 'None',
-                            "created_at" => now()
-                        ]);
+                        $this->insertPrerogTxns($prgID, Prerog::REQUESTED, Auth::user()->sais_id, $request->justification);
                     } else {
                         //Create Prerog
-                        Prerog::create([
-                            "prg_id" => $prg_id,
-                            "class_id" => $request->class_id,
-                            "term" => $student_term->term_id,
-                            "sais_id" => Auth::user()->sais_id,
-                            "status" => Prerog::LOGGED_OCS,
-                            "comment" => "",
-                            "created_at" => now()
-                        ]);
+                        $this->insertPrerog($prgID, $request->class_id, $studentTerm->term_id, Auth::user()->sais_id, Prerog::LOGGED_OCS);
 
                         //Create COI TXN
-                        PrerogTxn::create([
-                            "prg_id" => $prg_id,
-                            "action" => Prerog::REQUESTED,
-                            "committed_by" => Auth::user()->sais_id,
-                            "note" => $request->justification ? $request->justification : 'None',
-                            "created_at" => now()
-                        ]);
+                        $this->insertPrerogTxns($prgID, Prerog::REQUESTED, Auth::user()->sais_id, $request->justification);
 
-                        //Create COI TXN
-                        PrerogTxn::create([
-                            "prg_id" => $prg_id,
-                            "action" => Prerog::LOGGED_OCS,
-                            "committed_by" => Auth::user()->sais_id,
-                            "note" => $request->justification ? $request->justification : 'None',
-                            "created_at" => now()
-                        ]);
+                        $this->insertPrerogTxns($prgID, Prerog::LOGGED_OCS, Auth::user()->sais_id, $request->justification);
 
                         //create external link
                         ExternalLink::create([
-                            "token" => $external_link_token,
+                            "token" => $externalLinkToken,
                             "model_type" => 'App\Models\Prerog',
-                            "model_id" => $prg_id
+                            "model_id" => $prgID
                         ]);
 
                         //initialize mail data which will be used in the email template
                         $mailData = [
                             "status" => Prerog::LOGGED_OCS, 
-                            "token" => $external_link_token,
+                            "token" => $externalLinkToken,
                             "class" => $co,
                             "student" => [
                                 'name' => $user->full_name,
@@ -204,7 +164,7 @@ class ApplyPrerogativeEnrollment{
         }
     }
 
-    function updatePrerog($request, $id, $role, $external_link_token = null) {
+    function updatePrerog($request, $id, $role, $externalLinkToken = null) {
         $prg = Prerog::find($id);
 
         if($request->status == 'approve' && $role == 'faculties') {
@@ -224,20 +184,14 @@ class ApplyPrerogativeEnrollment{
 
             //find the admin of the student's degree
             $student = Student::where('sais_id', $prg->sais_id)->first(); //get student
-            $student_program_records = $student->program_records()->where('status', 'ACTIVE')->first(); //getthe active degree of the student
-            $admin = Admin::where('college', $student_program_records->acad_group)->first(); //get the admin of the college of the student
+            $studentProgramRecord = $student->program_records()->where('status', 'ACTIVE')->first(); //getthe active degree of the student
+            $admin = Admin::where('college', $studentProgramRecord->acad_group)->first(); //get the admin of the college of the student
 
             try {
                 $prg->status = $status;
                 $prg->save();
 
-                PrerogTxn::create([
-                    "prg_id" => $prg->prg_id,
-                    "action" => $status,
-                    "committed_by" => Auth::user()->sais_id,
-                    "note" => $request->justification ? $request->justification : "None",
-                    "created_at" => now()
-                ]);
+                $this->insertPrerogTxns($prg->prg_id, $status, Auth::user()->sais_id, $request->justification);
 
                 //Close the previous external link
                 ExternalLink::where('model_id', $prg->prg_id)
@@ -269,7 +223,7 @@ class ApplyPrerogativeEnrollment{
                         $mailData = [
                             "status" => strtoupper($status), 
                             "class" => $prg->course_offering,
-                            "token" => $external_link_token,
+                            "token" => $externalLinkToken,
                             "student" => [
                                  'name' => $prg->user->full_name,
                                  'email' => $prg->user->email,
@@ -312,5 +266,27 @@ class ApplyPrerogativeEnrollment{
                 );
             }
         }
+    }
+
+    public function insertPrerog($prgID, $classID, $term, $saisID, $status) {
+        Prerog::create([
+            "prg_id" => $prgID,
+            "class_id" => $classID,
+            "term" => $term,
+            "sais_id" => $saisID,
+            "status" => $status,
+            "comment" => "",
+            "created_at" => now()
+        ]);
+    }
+
+    public function insertPrerogTxns($prgID, $status, $saisID, $note) {
+        PrerogTxn::create([
+            "prg_id" => $prgID,
+            "action" => $status,
+            "committed_by" => $saisID,
+            "note" => $note ? $note : 'None',
+            "created_at" => now()
+        ]);
     }
 }
