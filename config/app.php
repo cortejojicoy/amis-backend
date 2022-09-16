@@ -144,6 +144,8 @@ return [
     ],
 
     'app_maintenance' => env('APP_MAINTENANCE'),
+    'prerog_enabled' => env('PREROG_ENABLED', true),
+    'coi_enabled' => env('COI_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
