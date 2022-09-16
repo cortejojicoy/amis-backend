@@ -39,10 +39,10 @@ class StudentPrerogController extends Controller
      */
     public function store(Request $request, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
-        $prg_id = $this->generateTxnID("PRG");
-        $external_link_token = $this->generateRandomAlphaNum(50, 1);
+        $prgID = $this->generateTxnID("PRG");
+        $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
 
-        return $applyPrerogativeEnrollment->createPrerog($request, $prg_id, $external_link_token);
+        return $applyPrerogativeEnrollment->createPrerog($request, $prgID, $externalLinkToken);
     }
 
     /**

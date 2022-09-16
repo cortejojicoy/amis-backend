@@ -16,12 +16,12 @@ class StudentPrerogTxnController extends Controller
      */
     public function index(Request $request)
     {
-        $prerog_txns = PrerogTxn::filter($request, 'students');
+        $prerogTxns = PrerogTxn::filter($request, 'students');
         
         if($request->has('items')) {
-            $prerog_txns = $prerog_txns->paginate($request->items);
+            $prerogTxns = $prerogTxns->paginate($request->items);
         } else {
-            $prerog_txns = $prerog_txns->get();
+            $prerogTxns = $prerogTxns->get();
         }
 
         //get the keys of the txns
@@ -29,7 +29,7 @@ class StudentPrerogTxnController extends Controller
 
         return response()->json(
             [
-             'txns' => $prerog_txns,
+             'txns' => $prerogTxns,
              'keys' => $keys,
             ], 200
          );

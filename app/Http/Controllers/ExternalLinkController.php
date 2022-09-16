@@ -15,29 +15,29 @@ class ExternalLinkController extends Controller
      */
     public function index(Request $request, $action, UseExternalLinks $useExternalLinks)
     {
-        $ex_link = ExternalLink::where('token', $request->token)
+        $exLink = ExternalLink::where('token', $request->token)
             ->where('action', null)
             ->first();
 
-        if($ex_link) {
-            if($ex_link->model_type == 'App\Models\Coi') {
-                return $useExternalLinks->updateCoi($action, $ex_link);
-            } else if ($ex_link->model_type == 'App\Models\Prerog') {
+        if($exLink) {
+            if($exLink->model_type == 'App\Models\Coi') {
+                return $useExternalLinks->updateCoi($action, $exLink);
+            } else if ($exLink->model_type == 'App\Models\Prerog') {
                 $external_link_token = $this->generateRandomAlphaNum(50, 1);
 
-                return $useExternalLinks->updatePrerog($action, $ex_link, $external_link_token);
+                return $useExternalLinks->updatePrerog($action, $exLink, $external_link_token);
             }
         } else {
-            $ex_link = ExternalLink::where('token', $request->token)
+            $exLink = ExternalLink::where('token', $request->token)
                 ->first();
             
-            if($ex_link->model_type == 'App\Models\Coi') {
+            if($exLink->model_type == 'App\Models\Coi') {
                 $module = 'COI';
-            } else if ($ex_link->model_type == 'App\Models\Prerog') {
+            } else if ($exLink->model_type == 'App\Models\Prerog') {
                 $module = 'Prerog';
             }
 
-            if($ex_link->action == 'Cancelled') {
+            if($exLink->action == 'Cancelled') {
                 $message = "Link has been disabled. " . $module . " has been cancelled by the student.";
             } else {
                 $message = "Link already used or the " . $module . " has already been acted upon via the system!";

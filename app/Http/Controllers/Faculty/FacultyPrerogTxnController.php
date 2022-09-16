@@ -15,19 +15,19 @@ class FacultyPrerogTxnController extends Controller
      */
     public function index(Request $request)
     {
-        $prg_txns = PrerogTxn::filter($request, 'faculties');
+        $prgTxns = PrerogTxn::filter($request, 'faculties');
 
         if($request->has('items')) {
-            $prg_txns = $prg_txns->paginate($request->items);
+            $prgTxns = $prgTxns->paginate($request->items);
         } else {
-            $prg_txns = $prg_txns->get();
+            $prgTxns = $prgTxns->get();
         }
 
         $keys = ['reference_id', 'term', 'course', 'section', 'student_no', 'action', 'date_created', 'committed_by', 'last_action_date'];
 
         return response()->json(
             [
-             'txns' => $prg_txns,
+             'txns' => $prgTxns,
              'keys' => $keys,
             ], 200
          );

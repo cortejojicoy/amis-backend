@@ -19,12 +19,12 @@ class AdminPrerogTxnController extends Controller
         $admin = Admin::where('sais_id', $request->sais_id)->first();
         $request->merge(['admin' => $admin]);
 
-        $prerog_txns = PrerogTxn::filter($request, 'admins');
+        $prerogTxns = PrerogTxn::filter($request, 'admins');
         
         if($request->has('items')) {
-            $prerog_txns = $prerog_txns->paginate($request->items);
+            $prerogTxns = $prerogTxns->paginate($request->items);
         } else {
-            $prerog_txns = $prerog_txns->get();
+            $prerogTxns = $prerogTxns->get();
         }
 
         //get the keys of the txns
@@ -32,7 +32,7 @@ class AdminPrerogTxnController extends Controller
 
         return response()->json(
             [
-             'txns' => $prerog_txns,
+             'txns' => $prerogTxns,
              'keys' => $keys,
              'admin' => $admin->college
             ], 200

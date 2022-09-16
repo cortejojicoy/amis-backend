@@ -12,16 +12,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ApplyConsentOfInstructor{
-    function createCoi($request, $coi_id, $external_link_token){
-        $student_term = StudentTerm::where('status', 'ACTIVE')->first();
+    function createCoi($request, $coiID, $externalLinkToken){
+        $studentTerm = StudentTerm::where('status', 'ACTIVE')->first();
 
         //check if student has already applied for the same class
         $existingCOI = Coi::where('class_id', $request->class_id)
             ->where('sais_id', Auth::user()->sais_id)
             ->where(function($query) {
-                $query->orWhere('status', 'Requested')
-                    ->orWhere('status', 'Approved');
-            })->where('term', $student_term->term_id)
+                $query->orWhere('status', Coi::REQUESTED)
+                    ->orWhere('status', Coi::APPROVED);
+            })->where('term', $studentTerm->term_id)
             ->first();
         
         //if student still hasn't applied for this class, continue
@@ -44,30 +44,16 @@ class ApplyConsentOfInstructor{
                 DB::beginTransaction();
                 try {
                     //Create COI
-                    Coi::create([
-                        "coi_id" => $coi_id,
-                        "class_id" => $request->class_id,
-                        "term" => $student_term->term_id,
-                        "sais_id" => Auth::user()->sais_id,
-                        "status" => "Requested",
-                        "comment" => "",
-                        "created_at" => now()
-                    ]);
+                    $this->insertCoi($coiID, $request->class_id, $studentTerm->term_id, Auth::user()->sais_id, Coi::REQUESTED);
                     
                     //Create COI TXN
-                    CoiTxn::create([
-                        "coi_id" => $coi_id,
-                        "action" => "Requested",
-                        "committed_by" => Auth::user()->sais_id,
-                        "note" => $request->justification ? $request->justification : 'None',
-                        "created_at" => now()
-                    ]);
+                    $this->insertCoiTxn($coiID, Coi::REQUESTED, Auth::user()->sais_id, $request->justification);
                     
                     //create external link
                     ExternalLink::create([
-                        "token" => $external_link_token,
+                        "token" => $externalLinkToken,
                         "model_type" => 'App\Models\Coi',
-                        "model_id" => $coi_id
+                        "model_id" => $coiID
                     ]);
 
                     //Get user instance
@@ -76,7 +62,7 @@ class ApplyConsentOfInstructor{
                     //initialize mail data which will be used in the email template
                     $mailData = [
                         "status" => 'requested', 
-                        "token" => $external_link_token,
+                        "token" => $externalLinkToken,
                         "class" => $co,
                         "student" => [
                             'name' => $user->full_name,
@@ -131,9 +117,9 @@ class ApplyConsentOfInstructor{
     function updateCoi($request, $id) { 
         $coi = Coi::find($id);
         if($request->status == 'approve') {
-            $status = 'Approved';
+            $status = Coi::APPROVED;
         } else {
-            $status = 'Disapproved';
+            $status = Coi::DISAPPROVED;
         } 
 
         if($coi) {
@@ -143,20 +129,14 @@ class ApplyConsentOfInstructor{
                 $coi->status = $status;
                 $coi->save();
 
-                CoiTxn::create([
-                    "coi_id" => $coi->coi_id,
-                    "action" => $status,
-                    "committed_by" => Auth::user()->sais_id,
-                    "note" => $request->justification ? $request->justification : "None",
-                    "created_at" => now()
-                ]);
+                $this->insertCoiTxn($coi->coi_id, $status, Auth::user()->sais_id, $request->justification);
 
                 ExternalLink::where('model_id', $coi->coi_id)
                     ->where('model_type', 'App\Model\Coi')
                     ->update(['action' => $status]);
 
                 $mailData = [
-                    "status" => $status == 'Approved' ? 'approved' : 'disapproved',
+                    "status" => $status == Coi::APPROVED ? 'approved' : 'disapproved',
                     "reason" => $request->justification,
                     "class" => $coi->course_offering,
                 ];
@@ -191,5 +171,27 @@ class ApplyConsentOfInstructor{
                 );
             }
         }
+    }
+
+    public function insertCoi($coiID, $classID, $term, $saisID, $status) {
+        Coi::create([
+            "coi_id" => $coiID,
+            "class_id" => $classID,
+            "term" => $term,
+            "sais_id" => $saisID,
+            "status" => $status,
+            "comment" => "",
+            "created_at" => now()
+        ]);
+    }
+
+    public function insertCoiTxn($coiID, $action, $saisID, $note) {
+        CoiTxn::create([
+            "coi_id" => $coiID,
+            "action" => $action,
+            "committed_by" => $saisID,
+            "note" => $note ? $note : 'None',
+            "created_at" => now()
+        ]);
     }
 }
