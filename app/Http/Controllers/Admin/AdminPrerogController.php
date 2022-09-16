@@ -66,7 +66,15 @@ class AdminPrerogController extends Controller
      */
     public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
-        return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'admins');
+        if(config('app.prerog_enabled')) {
+            return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'admins');
+        } else {
+            return response()->json(
+                [
+                    'message' => 'Action Denied',
+                ], 400
+            );
+        }
     }
 
     /**

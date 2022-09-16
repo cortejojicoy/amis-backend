@@ -20,12 +20,17 @@ class ExternalLinkController extends Controller
             ->first();
 
         if($exLink) {
-            if($exLink->model_type == 'App\Models\Coi') {
+            if($exLink->model_type == 'App\Models\Coi' && config('app.coi_enabled')) {
                 return $useExternalLinks->updateCoi($action, $exLink);
-            } else if ($exLink->model_type == 'App\Models\Prerog') {
+            } else if ($exLink->model_type == 'App\Models\Prerog' && config('app.prerog_enabled')) {
                 $external_link_token = $this->generateRandomAlphaNum(50, 1);
 
                 return $useExternalLinks->updatePrerog($action, $exLink, $external_link_token);
+            } else {
+                return view('external-link', [
+                    "message" => 'Action Denied',
+                    "subMessage" => "You may now exit this tab. Thank you!"
+                ]);
             }
         } else {
             $exLink = ExternalLink::where('token', $request->token)

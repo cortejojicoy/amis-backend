@@ -27,10 +27,18 @@ class StudentCoiController extends Controller
      */
     public function store(Request $request, ApplyConsentOfInstructor $applyConsentOfInstructor)
     {
-        $coiID = $this->generateTxnID("COI");
-        $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
-        
-        return $applyConsentOfInstructor->createCoi($request, $coiID, $externalLinkToken);
+        if(config('app.coi_enabled')) {
+            $coiID = $this->generateTxnID("COI");
+            $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
+            
+            return $applyConsentOfInstructor->createCoi($request, $coiID, $externalLinkToken);
+        } else {
+            return response()->json(
+                [
+                    'message' => 'Action Denied',
+                ], 400
+            );
+        }
     }
 
     /**

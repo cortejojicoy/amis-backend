@@ -62,9 +62,17 @@ class FacultyPrerogController extends Controller
      */
     public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
-        $external_link_token = $this->generateRandomAlphaNum(50, 1);
+        if(config('app.prerog_enabled')) {
+            $external_link_token = $this->generateRandomAlphaNum(50, 1);
 
-        return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'faculties', $external_link_token);
+            return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'faculties', $external_link_token);
+        } else {
+            return response()->json(
+                [
+                    'message' => 'Action Denied',
+                ], 400
+            );
+        }
     }
 
     /**

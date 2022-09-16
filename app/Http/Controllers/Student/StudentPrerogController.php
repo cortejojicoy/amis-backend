@@ -39,10 +39,18 @@ class StudentPrerogController extends Controller
      */
     public function store(Request $request, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
-        $prgID = $this->generateTxnID("PRG");
-        $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
+        if(config('app.prerog_enabled')) {
+            $prgID = $this->generateTxnID("PRG");
+            $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
 
-        return $applyPrerogativeEnrollment->createPrerog($request, $prgID, $externalLinkToken);
+            return $applyPrerogativeEnrollment->createPrerog($request, $prgID, $externalLinkToken);
+        } else {
+            return response()->json(
+                [
+                    'message' => 'Action Denied',
+                ], 400
+            );
+        }
     }
 
     /**
