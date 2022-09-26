@@ -1,23 +1,33 @@
 <?php
 
-namespace App\Http\Controllers\Student;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\StudentProgramRecord;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Admin;
+use App\Models\MentorStatus;
 
-class Program extends Controller
+class MaController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $tags = Admin::where('sais_id', $request->sais_id)->first();
+        $request->merge(['admin' => $tags]);
+
+        // $mas = MentorStatus::where('status', 'Endorsed')->where('student_sais_id', $request->id)->get();
+        $mas = MentorStatus::filter($request, 'admins')->get();
+
+        // dd($mas);
+
+        $keys = ['actions', 'mentor_name', 'roles', 'field_represented', 'actions'];
+        return response()->json([
+            'mas' => $mas,
+            'keys' => $keys
+        ],200);
     }
 
     /**
@@ -28,7 +38,7 @@ class Program extends Controller
      */
     public function store(Request $request)
     {
-        
+        //
     }
 
     /**
@@ -39,17 +49,7 @@ class Program extends Controller
      */
     public function show($id)
     {
-        $program = DB::table('users As u')
-        ->select(DB::raw("CONCAT(u.last_name,' ',u.first_name) AS NAME, spr.acad_program_id AS program, u.sais_id, spr.status"))
-        ->leftJoin('students AS s', 's.sais_id', '=', 'u.sais_id')
-        ->leftJoin('student_program_records AS spr', 'spr.campus_id', '=', 's.campus_id')
-        ->where('u.sais_id', Auth::user()->sais_id)
-        ->first();
-        return response()->json(
-            [
-             'program' => $program,
-            ], 200
-         );
+        //
     }
 
     /**
@@ -61,7 +61,7 @@ class Program extends Controller
      */
     public function update(Request $request, $id)
     {
-
+        //
     }
 
     /**

@@ -9,6 +9,7 @@ class Faculty extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'faculty_id';
     // /**
     //  * Get the post that owns the comment.
     // */
@@ -36,7 +37,7 @@ class Faculty extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeBasicInfo($query)
+    public function scopeInfo($query)
     {
         $query->join('users', 'users.sais_id','=','faculties.sais_id');
     }

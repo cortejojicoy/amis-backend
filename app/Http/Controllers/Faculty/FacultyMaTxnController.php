@@ -4,17 +4,30 @@ namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\MaTxn;
 
-class MentorAssignmentController extends Controller
+class FacultyMaTxnController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $ma_txns = MaTxn::filter($request, 'faculties');
+
+        if($request->has('items')) {
+            $ma_txns = $ma_txns->paginate($request->items);
+        } else {
+            $ma_txns = $ma_txns->get();
+        }
+                    
+        $keys = ['trx_id', 'trx_date', 'trx_status', 'last_commit', 'action', 'note', 'mentor', 'mentor_role'];
+        return response()->json([
+            'txns' => $ma_txns,
+            'keys' => $keys
+        ],200);
     }
 
     /**

@@ -20,4 +20,8 @@ class Student extends Model
     {
         return $this->hasMany(StudentProgramRecord::class, 'campus_id', 'campus_id');
     }
+
+    public function scopeProgramId($query) {
+        $query->join('student_program_records', 'student_program_records.campus_id' ,'=', 'students.campus_id');
+    }
 }

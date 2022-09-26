@@ -1,23 +1,35 @@
 <?php
 
-namespace App\Http\Controllers\Student;
+namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\StudentProgramRecord;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use App\Models\MaStudent;
+use App\Models\MentorStatus;
+use App\Models\Mentor;
 
-class Program extends Controller
+class FacultyMaController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        // $advisee = Mentor::mentorRole()->first();
+        // $request->merge(['faculty' => $advisee]);
+
+        // dd($request);
+        $mas = MentorStatus::filter($request, 'admins')->get();
+        
+        $keys = ['actions', 'mentor_name', 'roles', 'field_represented', 'actions'];
+        return response()->json([
+            'mas' => $mas,
+            'keys' => $keys
+        ],200);
     }
 
     /**
@@ -28,7 +40,7 @@ class Program extends Controller
      */
     public function store(Request $request)
     {
-        
+        //
     }
 
     /**
@@ -39,17 +51,7 @@ class Program extends Controller
      */
     public function show($id)
     {
-        $program = DB::table('users As u')
-        ->select(DB::raw("CONCAT(u.last_name,' ',u.first_name) AS NAME, spr.acad_program_id AS program, u.sais_id, spr.status"))
-        ->leftJoin('students AS s', 's.sais_id', '=', 'u.sais_id')
-        ->leftJoin('student_program_records AS spr', 'spr.campus_id', '=', 's.campus_id')
-        ->where('u.sais_id', Auth::user()->sais_id)
-        ->first();
-        return response()->json(
-            [
-             'program' => $program,
-            ], 200
-         );
+        //
     }
 
     /**
@@ -61,7 +63,7 @@ class Program extends Controller
      */
     public function update(Request $request, $id)
     {
-
+        //
     }
 
     /**

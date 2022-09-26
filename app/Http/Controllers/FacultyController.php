@@ -1,14 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Student;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\StudentProgramRecord;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Faculty;
 
-class Program extends Controller
+class FacultyController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,7 +14,12 @@ class Program extends Controller
      */
     public function index()
     {
-        //
+        $faculties = Faculty::info()->get();
+        return response()->json(
+            [
+             'faculty_data' => $faculties,
+            ], 200
+         );
     }
 
     /**
@@ -28,7 +30,7 @@ class Program extends Controller
      */
     public function store(Request $request)
     {
-        
+        //
     }
 
     /**
@@ -39,17 +41,7 @@ class Program extends Controller
      */
     public function show($id)
     {
-        $program = DB::table('users As u')
-        ->select(DB::raw("CONCAT(u.last_name,' ',u.first_name) AS NAME, spr.acad_program_id AS program, u.sais_id, spr.status"))
-        ->leftJoin('students AS s', 's.sais_id', '=', 'u.sais_id')
-        ->leftJoin('student_program_records AS spr', 'spr.campus_id', '=', 's.campus_id')
-        ->where('u.sais_id', Auth::user()->sais_id)
-        ->first();
-        return response()->json(
-            [
-             'program' => $program,
-            ], 200
-         );
+        //
     }
 
     /**
@@ -61,7 +53,7 @@ class Program extends Controller
      */
     public function update(Request $request, $id)
     {
-
+        //
     }
 
     /**

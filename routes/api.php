@@ -22,6 +22,34 @@ use App\Http\Controllers\Student\StudentCoiTxnController;
 use App\Http\Controllers\Student\StudentPrerogController;
 use App\Http\Controllers\Student\StudentPrerogTxnController;
 
+use App\Http\Controllers\Admin\AdminCollegeMARejectController;
+use App\Http\Controllers\Admin\AdminCollegeMAController;
+use App\Http\Controllers\Admin\AdminTagMAController;
+use App\Http\Controllers\Admin\AdminUnitTagMAController;
+use App\Http\Controllers\Admin\AdminMaTxnController;
+use App\Http\Controllers\Admin\AdminUnitMAController;
+use App\Http\Controllers\Admin\AdminUnitMARejectController;
+use App\Http\Controllers\Admin\AdminCollegeTagMAController;
+use App\Http\Controllers\Admin\AdminMaTableController;
+use App\Http\Controllers\Admin\AdminMaController;
+
+use App\Http\Controllers\Faculty\FacultyMaTableController;
+// use App\Http\Controllers\Faculty\AdviserEndorseController;
+use App\Http\Controllers\Faculty\FacultyMaTxnController;
+// use App\Http\Controllers\Faculty\FacultyNominatedController;
+// use App\Http\Controllers\Faculty\FacultyMentorRole;
+use App\Http\Controllers\Faculty\FacultyMaController;
+use App\Http\Controllers\FacultyController;
+
+use App\Http\Controllers\ReqMentorController;
+use App\Http\Controllers\MaController;
+
+use App\Http\Controllers\Student\StudentAddMentorController;
+use App\Http\Controllers\Student\StudentDetailController;
+use App\Http\Controllers\Student\StudentMaTxnController;
+use App\Http\Controllers\Student\StudentActiveMentorController;
+use App\Http\Controllers\Student\StudentConfirmController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -46,34 +74,49 @@ Route::middleware('auth:sanctum')->post('/auth/logout', [GoogleController::class
 //faculty
 // Route::apiResource('faculties', BasicInfoController::class);
 Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculties', 'as' => 'faculties.'], function () {
-    Route::apiResource('advisees', AdviserController::class);
-    Route::apiResource('mentor-assignments', AdviserController::class);
+    // Route::apiResource('advisees', AdviserController::class);
+    // Route::apiResource('mentor-assignments', AdviserController::class);
     Route::apiResource('coitxns', FacultyCoiTxnController::class);
     Route::apiResource('consent-of-instructors', FacultyCoiController::class);
     Route::apiResource('prerog_txns', FacultyPrerogTxnController::class);
     Route::apiResource('prerogative-enrollments', FacultyPrerogController::class);
+    Route::apiResource('mastxn-faculty', FacultyMaTxnController::class);
+    Route::apiResource('ma', FacultyMaController::class);
+    Route::apiResource('faculty-ma', FacultyMaTableController::class);
+
 });
 
 Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'students', 'as' => 'students.'], function () {
-    Route::post('{sais_id}/nominated-mentors/collection', [SaveMentorController::class, 'bulkUpdate']);
-    Route::apiResource('{sais_id}/nominated-mentors', SaveMentorController::class);
     Route::apiResource('programs', Program::class);
     Route::apiResource('consent-of-instructors', StudentCoiController::class);
     Route::apiResource('coitxns', StudentCoiTxnController::class);
     Route::apiResource('prerogative-enrollments', StudentPrerogController::class);
     Route::apiResource('prerog_txns', StudentPrerogTxnController::class);
+
+    Route::apiResource('mastxn-student', StudentMaTxnController::class);
+    Route::apiResource('student-confirm', StudentConfirmController::class);
+    Route::apiResource('student-details', StudentDetailController::class);
+    Route::apiResource('{sais_id}/saved-mentors', StudentAddMentorController::class);
+    Route::apiResource('{sais_id}/active-mentors', StudentActiveMentorController::class);
+    Route::post('{sais_id}/nominated-mentors/collection', [StudentAddMentorController::class, 'bulkUpdate']);
 });
 
 Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins', 'as' => 'admins.'], function () {
     Route::apiResource('coitxns', AdminCoiTxnController::class);
     Route::apiResource('prerog_txns', AdminPrerogTxnController::class);
     Route::apiResource('prerogative-enrollments', AdminPrerogController::class);
+    Route::apiResource('mastxn-admin', AdminMaTxnController::class);
+    Route::apiResource('admin-ma', AdminMaTableController::class);
+    Route::apiResource('ma', AdminMaController::class);
 });
 
 //routes open for all roles but needs auth
 Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::apiResource('mentor-assignments', MaController::class);
     Route::apiResource('course-offerings', CourseOfferingController::class);
     Route::apiResource('users', UserController::class);
+    Route::apiResource('faculties', FacultyController::class);
+    Route::get('student-info', [StudentDetailController::class, 'getStudentById']);
 });
 
 Route::apiResource('{action}/external_links', ExternalLinkController::class);
