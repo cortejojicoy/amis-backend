@@ -22,7 +22,7 @@ class AdviserController extends Controller
         ->leftJoin('students AS s', 's.sais_id', '=', 'u.sais_id')
         ->leftJoin('student_program_records AS spr', 'spr.campus_id', '=', 's.campus_id')
         ->leftJoin('mentors AS m', 'm.student_program_record_id', '=', 'spr.student_program_record_id')
-        ->leftJoin('faculty AS f', 'f.faculty_id', '=', 'm.faculty_id')
+        ->leftJoin('faculties AS f', 'f.id', '=', 'm.faculty_id')
         ->where('f.sais_id', Auth::user()->sais_id)
         ->get();
         return response()->json(
