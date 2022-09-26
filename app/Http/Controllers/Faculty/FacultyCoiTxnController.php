@@ -16,19 +16,19 @@ class FacultyCoiTxnController extends Controller
      */
     public function index(Request $request)
     {
-        $coi_txns = CoiTxn::filter($request, 'faculties');
+        $coiTxns = CoiTxn::filter($request, 'faculties');
 
         if($request->has('items')) {
-            $coi_txns = $coi_txns->paginate($request->items);
+            $coiTxns = $coiTxns->paginate($request->items);
         } else {
-            $coi_txns = $coi_txns->get();
+            $coiTxns = $coiTxns->get();
         }
 
         $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
 
         return response()->json(
             [
-             'txns' => $coi_txns,
+             'txns' => $coiTxns,
              'keys' => $keys,
             ], 200
          );

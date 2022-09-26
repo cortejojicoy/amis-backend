@@ -17,6 +17,7 @@ class Prerog extends Model
 
     protected $fillable = [
         'prg_id',
+        'term',
         'class_id',
         'status',
         'sais_id',
@@ -24,6 +25,14 @@ class Prerog extends Model
         'submitted_to_sais',
         'created_at',
     ];
+
+    const REQUESTED = 'Requested';
+    const LOGGED_OCS = 'Logged by OCS';
+    const CANCELLED = 'Cancelled';
+    const APPROVED_FIC = 'Approved by FIC';
+    const APPROVED_OCS = 'Approved by OCS';
+    const DISAPPROVED_FIC = 'Disapproved by FIC';
+    const DISAPPROVED_OCS = 'Disapproved by OCS';
 
     public function prerog_txns()
     {
@@ -48,6 +57,20 @@ class Prerog extends Model
     public function scopeFilter($query, $filters, $role) {
         if($filters->has('class_nbr')) {
             $query->where('prerogs.class_id', $filters->class_nbr);
+        }
+
+        if($filters->has('prg_term')) {
+            $query->where('prerogs.term', $filters->prg_term);
+        } 
+
+        if($role == 'students') {
+            if($filters->has('sais_id')) {
+                $query->where('prerogs.sais_id', $filters->sais_id);
+            }
+
+            if($filters->has('with_course_offerings')) {
+                $query->with(['course_offering']);
+            }
         }
 
         if($role == 'faculties') {

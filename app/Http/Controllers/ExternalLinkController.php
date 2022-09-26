@@ -15,21 +15,41 @@ class ExternalLinkController extends Controller
      */
     public function index(Request $request, $action, UseExternalLinks $useExternalLinks)
     {
-        $ex_link = ExternalLink::where('token', $request->token)
+        $exLink = ExternalLink::where('token', $request->token)
             ->where('action', null)
             ->first();
 
-        if($ex_link) {
-            if($ex_link->model_type == 'App\Models\Coi') {
-                return $useExternalLinks->updateCoi($action, $ex_link);
-            } else if ($ex_link->model_type == 'App\Models\Prerog') {
+        if($exLink) {
+            if($exLink->model_type == 'App\Models\Coi' && config('app.coi_enabled')) {
+                return $useExternalLinks->updateCoi($action, $exLink);
+            } else if ($exLink->model_type == 'App\Models\Prerog' && config('app.prerog_enabled')) {
                 $external_link_token = $this->generateRandomAlphaNum(50, 1);
 
-                return $useExternalLinks->updatePrerog($action, $ex_link, $external_link_token);
+                return $useExternalLinks->updatePrerog($action, $exLink, $external_link_token);
+            } else {
+                return view('external-link', [
+                    "message" => 'Action Denied',
+                    "subMessage" => "You may now exit this tab. Thank you!"
+                ]);
             }
         } else {
+            $exLink = ExternalLink::where('token', $request->token)
+                ->first();
+            
+            if($exLink->model_type == 'App\Models\Coi') {
+                $module = 'COI';
+            } else if ($exLink->model_type == 'App\Models\Prerog') {
+                $module = 'Prerog';
+            }
+
+            if($exLink->action == 'Cancelled') {
+                $message = "Link has been disabled. " . $module . " has been cancelled by the student.";
+            } else {
+                $message = "Link already used or the " . $module . " has already been acted upon via the system!";
+            }
+
             return view('external-link', [
-                "message" => "Link already used or COI has already been acted upon via the system!",
+                "message" => $message,
                 "subMessage" => "You may now exit this tab. Thank you!"
             ]);
         }

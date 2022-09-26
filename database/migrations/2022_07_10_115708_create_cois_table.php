@@ -16,11 +16,13 @@ return new class extends Migration
     {
         Schema::create('cois', function (Blueprint $table) {
             $table->string('coi_id', 15)->primary();
+            $table->integer('term');
             $table->integer('class_id');
             $table->string('status', 20);
             $table->integer('sais_id');
             $table->text('comment');
-            $table->dateTime('submitted_to_sais')->nullable();
+            $table->string('last_action', 25)->nullable();
+            $table->dateTime('last_action_date')->nullable();
             $table->timestamps();
         });
     }

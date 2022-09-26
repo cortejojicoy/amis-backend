@@ -21,6 +21,7 @@ use App\Http\Controllers\Student\StudentCoiController;
 use App\Http\Controllers\Student\StudentCoiTxnController;
 use App\Http\Controllers\Student\StudentPrerogController;
 use App\Http\Controllers\Student\StudentPrerogTxnController;
+use App\Http\Controllers\SuperAdmin\DownloadController;
 
 use App\Http\Controllers\Admin\AdminCollegeMARejectController;
 use App\Http\Controllers\Admin\AdminCollegeMAController;
@@ -108,6 +109,10 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins',
     Route::apiResource('mastxn-admin', AdminMaTxnController::class);
     Route::apiResource('admin-ma', AdminMaTableController::class);
     Route::apiResource('ma', AdminMaController::class);
+});
+
+Route::group(['middleware' => ['auth:sanctum', 'role:super_admin'],'prefix'=>'super_admins', 'as' => 'super_admins.'], function () {
+    Route::apiResource('{module}/download', DownloadController::class);
 });
 
 //routes open for all roles but needs auth

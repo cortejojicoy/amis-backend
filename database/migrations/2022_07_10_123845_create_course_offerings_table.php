@@ -15,10 +15,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('course_offerings', function (Blueprint $table) {
-            $table->bigIncrements('course_offerings_id');
+            $table->bigIncrements('course_offerings_id')->from(20129);
             $table->string('institution', 10);
             $table->string('career', 10);
-            $table->string('term', 5);
+            $table->integer('term');
             $table->integer('course_id');
             $table->string('acad_group', 10);
             $table->string('acad_org', 10);
@@ -28,6 +28,7 @@ return new class extends Migration
             $table->string('descr', 100);
             $table->string('activity', 100);
             $table->string('component', 5);
+            $table->integer('assoc')->nullable();
             $table->string('section', 10);
             $table->string('times', 20);
             $table->string('days', 10);
@@ -35,19 +36,23 @@ return new class extends Migration
             $table->integer('tot_enrl');
             $table->integer('cap_enrl');
             $table->integer('class_nbr');
-            $table->string('mtg_start', 20);
-            $table->string('mtg_end', 20);
-            $table->string('mon', 1);
-            $table->string('tues', 1);
-            $table->string('wed', 1);
-            $table->string('thurs', 1);
-            $table->string('fri', 1);
-            $table->string('sat', 1);
-            $table->string('sun', 1);
+            $table->string('mtg_start', 20)->nullable();
+            $table->string('mtg_end', 20)->nullable();
+            $table->string('mon', 1)->nullable();
+            $table->string('tues', 1)->nullable();
+            $table->string('wed', 1)->nullable();
+            $table->string('thurs', 1)->nullable();
+            $table->string('fri', 1)->nullable();
+            $table->string('sat', 1)->nullable();
+            $table->string('sun', 1)->nullable();
             $table->integer('id');
             $table->string('name', 255);
             $table->string('email', 255);
             $table->string('consent', 1);
+            $table->boolean('prerog');
+            $table->integer('offer_nbr')->nullable();
+            $table->integer('topic_id')->nullable();
+            $table->text('prereq_coi')->nullable();
             $table->timestamps();
         });
     }

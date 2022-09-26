@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('middle_name', 255)->nullable();
             $table->string('email', 255)->unique();
             $table->string('user_roles', 29);
+            $table->boolean('tester');
             $table->timestamps();
         });
     }

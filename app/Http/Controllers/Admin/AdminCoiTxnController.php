@@ -19,19 +19,19 @@ class AdminCoiTxnController extends Controller
         $admin = Admin::where('sais_id', $request->sais_id)->first();
         $request->merge(['admin' => $admin]);
 
-        $coi_txns = CoiTxn::filter($request, 'admins');
+        $coiTxns = CoiTxn::filter($request, 'admins');
 
         if($request->has('items')) {
-            $coi_txns = $coi_txns->paginate($request->items);
+            $coiTxns = $coiTxns->paginate($request->items);
         } else {
-            $coi_txns = $coi_txns->get();
+            $coiTxns = $coiTxns->get();
         }
 
-        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
+        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit', 'last_action', 'last_action_date'];
 
         return response()->json(
             [
-             'txns' => $coi_txns,
+             'txns' => $coiTxns,
              'keys' => $keys,
             ], 200
          );

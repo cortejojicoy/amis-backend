@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Models\Prerog;
 use App\Services\ApplyPrerogativeEnrollment;
 use Illuminate\Http\Request;
 
@@ -13,9 +14,21 @@ class StudentPrerogController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $prgs = Prerog::filter($request, 'students');
+
+        if($request->has('items')) {
+            $prgs = $prgs->paginate($request->items);
+        } else {
+            $prgs = $prgs->get();
+        }
+        
+        return response()->json(
+            [
+             'prgs' => $prgs,
+            ], 200
+         );
     }
 
     /**
@@ -26,10 +39,18 @@ class StudentPrerogController extends Controller
      */
     public function store(Request $request, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
-        $prg_id = $this->generateTxnID("PRG");
-        $external_link_token = $this->generateRandomAlphaNum(50, 1);
+        if(config('app.prerog_enabled')) {
+            $prgID = $this->generateTxnID("PRG");
+            $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
 
-        return $applyPrerogativeEnrollment->createPrerog($request, $prg_id, $external_link_token);
+            return $applyPrerogativeEnrollment->createPrerog($request, $prgID, $externalLinkToken);
+        } else {
+            return response()->json(
+                [
+                    'message' => 'Action Denied',
+                ], 400
+            );
+        }
     }
 
     /**
@@ -50,9 +71,9 @@ class StudentPrerogController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
-        //
+        return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'students');
     }
 
     /**

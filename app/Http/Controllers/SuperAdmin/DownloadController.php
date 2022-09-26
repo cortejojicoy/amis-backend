@@ -1,36 +1,30 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
-use App\Models\Prerog;
-use App\Services\ApplyPrerogativeEnrollment;
+use App\Services\DownloadModule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
-class AdminPrerogController extends Controller
+class DownloadController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, $module, DownloadModule $downloadModule) 
     {
-        $admin = Admin::where('sais_id', $request->sais_id)->first();
-        $request->merge(['admin' => $admin]);
-
-        $prgs = Prerog::filter($request, 'admins');
-
-        if($request->has('items')) {
-            $prgs = $prgs->paginate($request->items);
-        } else {
-            $prgs = $prgs->get();
+        if($module == 'coi') {
+            $filename = $downloadModule->downloadCoi($request);
+        } else if($module == 'prerog') {
+            $filename = $downloadModule->downloadPrerog();
         }
-        
+
         return response()->json(
             [
-             'prgs' => $prgs,
+             'filename' => $filename
             ], 200
          );
     }
@@ -64,17 +58,9 @@ class AdminPrerogController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
+    public function update(Request $request, $id)
     {
-        if(config('app.prerog_enabled')) {
-            return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'admins');
-        } else {
-            return response()->json(
-                [
-                    'message' => 'Action Denied',
-                ], 400
-            );
-        }
+        //
     }
 
     /**

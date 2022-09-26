@@ -15,7 +15,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('coitxns', function (Blueprint $table) {
-            $table->bigIncrements('coi_txn_id');
+            $table->bigIncrements('coi_txn_id')->from(34644);
             $table->string('coi_id', 15);
             $table->string('action', 20);
             $table->integer('committed_by');
