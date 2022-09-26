@@ -53,9 +53,6 @@ class MaStudent extends Model
         return $this->belongsTo(Mentor::class, 'student_sais_id', 'sais_id');
     }
 
-    const LBICS = 'lbics';
-
-
     public function scopeFilter($query, $filters, $roles) {
         if($roles == 'faculties') {
             if($filters->faculty == 'adviser') {
