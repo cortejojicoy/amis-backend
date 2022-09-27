@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MaTxn;
+use App\Models\Admin;
 
 class AdminMaTxnController extends Controller
 {
@@ -15,6 +16,9 @@ class AdminMaTxnController extends Controller
      */
     public function index(Request $request)
     {
+        $admin = Admin::where('sais_id', $request->sais_id)->first();
+        $request->merge(['admin' => $admin]);
+
         $ma_txns = MaTxn::filter($request, 'admins');
 
         if($request->has('items')) {

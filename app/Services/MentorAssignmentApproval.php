@@ -39,7 +39,7 @@ class MentorAssignmentApproval {
 
         if($ma) {
             DB::beginTransaction();
-
+            
             // data instance
             $student = Student::where('sais_id', $ma->student_sais_id)->first();
             $student_program_records = $student->program_records()->where('status', 'ACTIVE')->first();
@@ -74,7 +74,7 @@ class MentorAssignmentApproval {
                     MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update(["endorsed" => 1]);
                 }
 
-                if($status == MentorStatus::APPROVED && $status->actions == 'Add') {
+                if($status == MentorStatus::APPROVED && $ma->actions == 'Add') {
                     // if the actions was add it will create an entry on mentors table
                     Mentor::create([
                         "faculty_id" => $facultyId->id,
@@ -90,8 +90,8 @@ class MentorAssignmentApproval {
                     // MaStudent table was on1y for display purposes it will basically update the status based on request
                     MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update(["approved" => 1]);
 
-                } else if($status == MentorStatus::APPROVED && $status->actions == 'Remove') {
-                    // if the actions was remove data will not be deleted but rather update remove value to 1 to hide.
+                } else if($status == MentorStatus::APPROVED && $ma->actions == 'Remove') {
+                    // if the actions was remove; data will not be deleted but rather update removed column value to 1; to hide.
                     Mentor::where('student_sais_id', $ma->student_sais_id)->where('mentor_id', $mentorId->mentor_id)->update(["removed" => 1]);
 
                     // MaStudent table was on1y for display purposes it will basically update the status based on request
@@ -105,13 +105,6 @@ class MentorAssignmentApproval {
                 return response()->json(['message' => $ex->getMessage()], 500);
             }
         }
-
-        
-
-        // dd($request->data);
-        // if($ma) {
-        //     
-        // }
 
     }
 }

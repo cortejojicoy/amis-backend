@@ -32,7 +32,14 @@ class MentorStatus extends Model
     }
 
     public function scopeFilter($query, $filters, $roles)
-    {
+    {   
+        // dd($roles);
+        if($roles == 'faculties') {
+            if($filters->facultyType == 'adviser' || $filters->facultyType == 'nominated') {
+                $query->where('status', 'Pending')->where('student_sais_id', $filters->studentId);
+            }
+        }
+
         if($roles == 'admins') {
             if($filters->adminType == 'unit') {
                 $query->where('status', 'Pending')->where('student_sais_id', $filters->studentId);

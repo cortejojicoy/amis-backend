@@ -56,7 +56,7 @@ class MaStudent extends Model
     public function scopeFilter($query, $filters, $roles) {
         if($roles == 'faculties') {
             if($filters->faculty == 'adviser') {
-                $query->where('approved', 1)->where('sais_id', Auth::user()->sais_id);
+                $query->where('approved', 1)->where('mentor_id', Auth::user()->sais_id);
             }
             
             if($filters->faculty == 'nominated') {

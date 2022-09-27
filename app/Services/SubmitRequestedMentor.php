@@ -27,22 +27,22 @@ class SubmitRequestedMentor extends Controller {
             $activeMentor = Mentor::where('student_sais_id', $data['sais_id'])->where('faculty_id', $facultyId->id)->first();
             $mentorExists = Ma::where('mentor_id', $data['mentor_id'])->where('student_sais_id', Auth::user()->sais_id)->first();
             
-            $arr = false;
-            if(!empty($mentorExists)) {
-                return response()->json([
-                    'message' => 'You already have existing request',
-                    'status' => 'Error'
-                ], 200);
-                $arr = true;
-            }
+            // $arr = false;
+            // if(!empty($mentorExists)) {
+            //     return response()->json([
+            //         'message' => 'You already have existing request',
+            //         'status' => 'Error'
+            //     ], 200);
+            //     $arr = true;
+            // }
             
-            if($activeMentor != NULL) {
-                return response()->json([
-                    'message' => 'You cannot request your active mentors',
-                    'status' => 'Error'
-                ], 200);
-                $arr = true;
-            }
+            // if($activeMentor != NULL) {
+            //     return response()->json([
+            //         'message' => 'You cannot request your active mentors',
+            //         'status' => 'Error'
+            //     ], 200);
+            //     $arr = true;
+            // }
 
             DB::beginTransaction();
             try {

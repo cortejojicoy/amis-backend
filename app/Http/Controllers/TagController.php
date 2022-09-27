@@ -1,35 +1,23 @@
 <?php
 
-namespace App\Http\Controllers\Faculty;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Admin;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use App\Models\MaStudent;
-use App\Models\MentorStatus;
-use App\Models\Mentor;
-use App\Services\MentorAssignmentApproval;
 
-class FacultyMaController extends Controller
+class TagController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        // $advisee = Mentor::mentorRole()->first();
-        // $request->merge(['faculty' => $advisee]);
-
-        // dd($request);
-        $mas = MentorStatus::filter($request, 'faculties')->get();
-        
-        $keys = ['actions', 'mentor_name', 'roles', 'field_represented', 'actions'];
+        $tags = Admin::where('sais_id', Auth::user()->sais_id)->get();
         return response()->json([
-            'mas' => $mas,
-            'keys' => $keys
+            "tags" => $tags
         ],200);
     }
 
@@ -62,10 +50,9 @@ class FacultyMaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, MentorAssignmentApproval $mentorAssignmentApproval)
+    public function update(Request $request, $id)
     {
-        $mas_id = $this->generateTxnID("MAS");
-        return $mentorAssignmentApproval->updateApproval($request, $id, 'faculties', $mas_id);
+        //
     }
 
     /**

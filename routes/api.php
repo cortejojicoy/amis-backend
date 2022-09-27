@@ -44,6 +44,7 @@ use App\Http\Controllers\FacultyController;
 
 use App\Http\Controllers\ReqMentorController;
 use App\Http\Controllers\MaController;
+use App\Http\Controllers\TagController;
 
 use App\Http\Controllers\Student\StudentAddMentorController;
 use App\Http\Controllers\Student\StudentDetailController;
@@ -121,6 +122,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('course-offerings', CourseOfferingController::class);
     Route::apiResource('users', UserController::class);
     Route::apiResource('faculties', FacultyController::class);
+    Route::apiResource('check-tags', TagController::class);
     Route::get('student-info', [StudentDetailController::class, 'getStudentById']);
 });
 
