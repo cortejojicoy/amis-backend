@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 class Ma extends Model
 {
     use HasFactory;
-    protected $table = 'mentor_assignments';
+    protected $table = 'mas';
     protected $primaryKey = 'mas_id';
 
     protected $fillable = [

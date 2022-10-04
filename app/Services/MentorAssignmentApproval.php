@@ -18,17 +18,6 @@ class MentorAssignmentApproval {
 
         $ma = MentorStatus::find($id);
 
-        // dd($ma->mentor_id);
-        // if($request->maType == 'endorse' && $roles == 'admins') {
-        //     $status = MentorStatus::ENDORSED;
-        // } else if($request->maType == 'reject' && $roles == 'admins' || $roles == 'faculties') {
-        //     $status = MentorStatus::DISAPPROVED;
-        // } else if($request->maType == 'approved') {
-        //     $status = MentorStatus::APPROVED;
-        // } else {
-        //     echo "test";
-        // }
-
         if($request->maType == 'endorse') {
             $status = MentorStatus::ENDORSED;
         } else if($request->maType == 'reject') {
@@ -50,24 +39,11 @@ class MentorAssignmentApproval {
                 $ma->status = $status;
                 $ma->save();
 
-                Ma::create([
-                    "mas_id" => $mas_id,
-                    "student_sais_id" => $ma->student_sais_id,
-                    "mentor_id" => $ma->mentor_id,
-                    "status" => $status,
-                    "actions" => $ma->actions,
-                    "mentor_name" => $ma->mentor_name,
-                    "mentor_role" => $ma->mentor_role,
-                    "created_at" => Carbon::now()
-                ]);
-                // Create Mentors Transaction History
-                MaTxn::create([
-                    "mas_id" => $mas_id,
-                    "action" => $status,
-                    "committed_by" => Auth::user()->sais_id,
-                    "note" => $request->remarks,
-                    "created_at" => Carbon::now()
-                ]);
+                // create entry for transaction history
+                $this->insertMa($mas_id, $ma->student_sais_id, $ma->mentor_id, $status, $ma->actions, $ma->mentor_name, $ma->mentor_role);
+                
+                // create entry for transaction history
+                $this->insertMaTxn($mas_id, $status, $request->remarks);
 
                 if($status == MentorStatus::ENDORSED) {
                     // MaStudent table was on1y for display purposes it will basically update the status based on request
@@ -88,14 +64,18 @@ class MentorAssignmentApproval {
                     ]);
 
                     // MaStudent table was on1y for display purposes it will basically update the status based on request
-                    MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update(["approved" => 1]);
+                    MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update([
+                        "approved" => 1, "adviser" => 1
+                    ]);
 
                 } else if($status == MentorStatus::APPROVED && $ma->actions == 'Remove') {
                     // if the actions was remove; data will not be deleted but rather update removed column value to 1; to hide.
                     Mentor::where('student_sais_id', $ma->student_sais_id)->where('mentor_id', $mentorId->mentor_id)->update(["removed" => 1]);
 
                     // MaStudent table was on1y for display purposes it will basically update the status based on request
-                    MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update(["approved" => 1]);
+                    MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update([
+                        "approved" => 1, "adviser" => 0 
+                    ]);
                 }
 
                 DB::commit();
@@ -106,5 +86,28 @@ class MentorAssignmentApproval {
             }
         }
 
+    }
+
+    public function insertMa($mas_id, $student_sais_id, $mentor_id, $status, $actions, $mentor_name, $mentor_role) {
+        Ma::create([
+            "mas_id" => $mas_id,
+            "student_sais_id" => $student_sais_id,
+            "mentor_id" => $mentor_id,
+            "status" => $status,
+            "actions" => $actions,
+            "mentor_name" => $mentor_name,
+            "mentor_role" => $mentor_role,
+            "created_at" => Carbon::now()
+        ]);
+    }
+
+    public function insertMaTxn($mas_id, $status, $remarks) {
+        MaTxn::create([
+            "mas_id" => $mas_id,
+            "action" => $status,
+            "committed_by" => Auth::user()->sais_id,
+            "note" => $remarks,
+            "created_at" => Carbon::now()
+        ]);
     }
 }

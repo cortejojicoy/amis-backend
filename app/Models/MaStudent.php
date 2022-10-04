@@ -17,6 +17,7 @@ class MaStudent extends Model
     protected $fillable = [
         'sais_id',
         'name',
+        'email',
         'program',
         'status',
         'acad_group',
@@ -56,24 +57,29 @@ class MaStudent extends Model
     public function scopeFilter($query, $filters, $roles) {
         if($roles == 'faculties') {
             if($filters->faculty == 'adviser') {
-                $query->where('approved', 1)->where('mentor_id', Auth::user()->sais_id);
+                $query->where('approved', 1)->where('adviser', 1)->where('mentor_id', Auth::user()->sais_id);
             }
             
             if($filters->faculty == 'nominated') {
                 $query->where('endorsed', 0)->where('mentor_id', Auth::user()->sais_id);
             }
-            
         }  
         
         if($roles == 'admins') {
             if($filters->admin == 'unit') {
                 // students will not display to unit if they have existing adviser
-                $query->where('endorsed', 0)->where('adviser', 0);
+                $query->where('endorsed', 0)->where('adviser', 0)->where('approved', 0);
             }
 
             if($filters->admin == 'college') {
                 // students will display to college based on admins college
-                $query->where('endorsed', 1)->where('acad_group', $filters->tags->college);
+                $query->where('endorsed', 1)->where('approved', 0)->where('acad_group', $filters->tags->college);
+            }
+
+            if($filters->has('keywords')) {
+                $query->where('name', 'LIKE', "%$filters->keywords%")
+                    ->orWhere('mentor_name', 'LIKE', "%$filters->keywords%")
+                    ->orWhere('program', 'LIKE', "%$filters->keywords%");
             }
         }
 
@@ -81,6 +87,14 @@ class MaStudent extends Model
             $query->select($filters->column_name)->distinct();
         }
         $query = $this->filterData($query, $filters);
+        // $query = $this->searchData($query, $filters);
+    }
+
+    public function searchData($query, $filters)
+    {
+        $query->where('name', 'LIKE', "%$filters->keywords%")
+            ->orWhere('mentor_name', 'LIKE', "%$filters->keywords%")
+            ->orWhere('program', 'LIKE', "%$filters->keywords%");
     }
 
     public function filterData($query, $filters) {

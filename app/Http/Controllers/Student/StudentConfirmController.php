@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\SubmitRequestedMentor;
+// use App\Services\MentorAssignmentApproval;
 
 class StudentConfirmController extends Controller
 {
@@ -28,6 +29,11 @@ class StudentConfirmController extends Controller
     {
         return $submitRequestedMentor->submitRequestedMentor($request);
     }
+    // public function store(Request $request, MentorAssignmentApproval $submitRequestedMentor)
+    // {
+    //     $mas_id = $this->generateTxnID("MAS");
+    //     return $submitRequestedMentor->submitRequestedMentor($request, $mas_id);
+    // }
 
     /**
      * Display the specified resource.

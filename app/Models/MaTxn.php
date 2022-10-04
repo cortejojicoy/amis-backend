@@ -11,7 +11,7 @@ class MaTxn extends Model
 {
     use HasFactory;
 
-    protected $table = 'mentor_assignment_txns';
+    protected $table = 'matxns';
     protected $primaryKey = 'mas_txn_id';
 
     protected $fillable = [
@@ -23,12 +23,16 @@ class MaTxn extends Model
         'created_at',
     ];
 
+    // protected $hidden = [
+    //     'created_at'
+    // ];
+
     public function scopeFilter($query, $filters, $role){
         if($role == 'students') {
             if($filters->has('txn_history')) {
-                $query->select(DB::raw("mentor_assignment_txns.mas_id as trx_id, to_char(mentor_assignment_txns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
-                ->leftJoin('mentor_assignments AS ma', 'ma.mas_id', '=', 'mentor_assignment_txns.mas_id')
-                ->leftJoin('users as u', 'u.sais_id', '=', 'mentor_assignment_txns.committed_by');
+                $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
+                ->leftJoin('mas AS ma', 'ma.mas_id', '=', 'matxns.mas_id')
+                ->leftJoin('users as u', 'u.sais_id', '=', 'matxns.committed_by');
             }  
             
             if($filters->has('sais_id')) {
@@ -36,24 +40,37 @@ class MaTxn extends Model
             }
         } else if ($role == 'faculties') {
             if($filters->has('txn_history')) {
-                $query->select(DB::raw("mentor_assignment_txns.mas_id as trx_id, to_char(mentor_assignment_txns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
-                ->leftJoin('mentor_assignments as ma', 'ma.mas_id', '=', 'mentor_assignment_txns.mas_id')
-                ->leftJoin('users as u', 'u.sais_id', '=', 'mentor_assignment_txns.committed_by')
-                ->leftJoin('mentor_assignment_students as mas', 'mas.mentor_id', '=', 'ma.mentor_id');
+                $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
+                ->join('mas as ma', 'ma.mas_id', '=', 'matxns.mas_id')
+                ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by')
+                ->join('mentor_assignment_students as mast', 'mast.mentor_id', '=', 'ma.mentor_id');
+
+                // select matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id from matxns
+                // left join mas as ma on ma.mas_id = matxns.mas_id
+                // left join users as u on u.sais_id = matxns.committed_by
+                // // left join faculties as f on f.id 
+                // left join mentor_assignment_students as mast on mast.mentor_id = ma.mentor_id
+                // where mast.mentor_id = 321321321
                 
             }
+            
             if($filters->has('sais_id')) {
-                $query->where('mas.mentor_id', $filters->mentor_id);
+                $query->where('mast.mentor_id', $filters->sais_id);
             }
+            
         } else if ($role == 'admins') {
             if($filters->has('txn_history')) {
-                $query->select(DB::raw("mentor_assignment_txns.mas_id as trx_id, to_char(mentor_assignment_txns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
-                ->leftJoin('mentor_assignments as ma', 'ma.mas_id', '=', 'mentor_assignment_txns.mas_id')
-                ->leftJoin('users as u', 'u.sais_id', '=', 'mentor_assignment_txns.committed_by')
+                $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
+                ->leftJoin('mas as ma', 'ma.mas_id', '=', 'matxns.mas_id')
+                ->leftJoin('users as u', 'u.sais_id', '=', 'matxns.committed_by')
                 ->leftJoin('admins as a', 'a.sais_id', '=', 'u.sais_id')
                 ->leftJoin('students as s', 's.sais_id' ,'=', 'ma.student_sais_id')
                 ->leftJoin('student_program_records as spr', 'spr.campus_id', '=', 's.campus_id');
             }
+
+            // if($filters->admin->unit != '') {
+            //     $query->where('mast.adviser', 0);
+            // }
 
             if($filters->admin->college != '') {
                 $query->where('spr.acad_group', $filters->admin->college);
@@ -65,24 +82,28 @@ class MaTxn extends Model
         }
 
         $query = $this->filterData($query, $filters);
+
+        if($filters->has('order_type')) {
+            $query->orderBy($filters->order_field, $filters->order_type);
+        }
     }
 
     public function filterData($query, $filters) {
-        if($filters->has('transaction_id')) {
-            if($filters->transaction_id != '--') {
-                $query->where('ma.mas_id', $filters->transaction_id);
+        if($filters->has('mas_id')) {
+            if($filters->mas_id != '--') {
+                $query->where('ma.mas_id', $filters->mas_id);
             }
         }
 
-        if($filters->has('status')) {
-            if($filters->status != '--') {
-                $query->where('action', $filters->status);
+        if($filters->has('action')) {
+            if($filters->action != '--') {
+                $query->where('action', $filters->action);
             }
         }
 
-        if($filters->has('mentor')) {
-            if($filters->mentor != '--') {
-                $query->where('ma.mentor_name', $filters->mentor);
+        if($filters->has('mentor_name')) {
+            if($filters->mentor_name != '--') {
+                $query->where('ma.mentor_name', $filters->mentor_name);
             }
         }
 

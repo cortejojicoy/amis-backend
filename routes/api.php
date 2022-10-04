@@ -1,46 +1,48 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminCoiTxnController;
-use App\Http\Controllers\Admin\AdminPrerogController;
-use App\Http\Controllers\Admin\AdminPrerogTxnController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\GoogleController;
-use App\Http\Controllers\CourseOfferingController;
-use App\Http\Controllers\ExternalLinkController;
-use App\Http\Controllers\Faculty\AdviserController;
-use App\Http\Controllers\Student\SaveMentorController;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
 use App\Http\Controllers\Student\Program;
-use App\Http\Controllers\Faculty\BasicInfoController;
-use App\Http\Controllers\Faculty\FacultyCoiController;
-use App\Http\Controllers\Faculty\FacultyCoiTxnController;
-use App\Http\Controllers\Faculty\FacultyPrerogController;
-use App\Http\Controllers\Faculty\FacultyPrerogTxnController;
-use App\Http\Controllers\Student\StudentCoiController;
-use App\Http\Controllers\Student\StudentCoiTxnController;
-use App\Http\Controllers\Student\StudentPrerogController;
-use App\Http\Controllers\Student\StudentPrerogTxnController;
-use App\Http\Controllers\SuperAdmin\DownloadController;
-
-use App\Http\Controllers\Admin\AdminMaTxnController;
-use App\Http\Controllers\Admin\AdminMaTableController;
-use App\Http\Controllers\Admin\AdminMaController;
-
-use App\Http\Controllers\Faculty\FacultyMaTableController;
-use App\Http\Controllers\Faculty\FacultyMaTxnController;
-use App\Http\Controllers\Faculty\FacultyMaController;
-use App\Http\Controllers\FacultyController;
-
-use App\Http\Controllers\ReqMentorController;
-use App\Http\Controllers\MaController;
-use App\Http\Controllers\TagController;
-
 use App\Http\Controllers\Student\StudentAddMentorController;
 use App\Http\Controllers\Student\StudentDetailController;
 use App\Http\Controllers\Student\StudentMaTxnController;
 use App\Http\Controllers\Student\StudentActiveMentorController;
 use App\Http\Controllers\Student\StudentConfirmController;
+use App\Http\Controllers\Student\SaveMentorController;
+use App\Http\Controllers\Student\StudentCoiController;
+use App\Http\Controllers\Student\StudentCoiTxnController;
+use App\Http\Controllers\Student\StudentPrerogController;
+use App\Http\Controllers\Student\StudentPrerogTxnController;
+
+// use App\Http\Controllers\Faculty\AdviserController;
+use App\Http\Controllers\Faculty\BasicInfoController;
+use App\Http\Controllers\Faculty\FacultyCoiController;
+use App\Http\Controllers\Faculty\FacultyCoiTxnController;
+use App\Http\Controllers\Faculty\FacultyPrerogController;
+use App\Http\Controllers\Faculty\FacultyPrerogTxnController;
+use App\Http\Controllers\Faculty\FacultyMaTableController;
+use App\Http\Controllers\Faculty\FacultyMaTxnController;
+use App\Http\Controllers\Faculty\FacultyMaController;
+
+use App\Http\Controllers\Admin\AdminCoiTxnController;
+use App\Http\Controllers\Admin\AdminPrerogController;
+use App\Http\Controllers\Admin\AdminPrerogTxnController;
+use App\Http\Controllers\Admin\AdminMaTableController;
+use App\Http\Controllers\Admin\AdminMaTxnController;
+use App\Http\Controllers\Admin\AdminMaController;
+
+use App\Http\Controllers\SuperAdmin\DownloadController;
+
+use App\Http\Controllers\CourseOfferingController;
+use App\Http\Controllers\ExternalLinkController;
+use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\ReqMentorController;
+use App\Http\Controllers\MaController;
+use App\Http\Controllers\TagController;
+use App\Http\Controllers\UserController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -72,7 +74,7 @@ Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculti
     Route::apiResource('consent-of-instructors', FacultyCoiController::class);
     Route::apiResource('prerog_txns', FacultyPrerogTxnController::class);
     Route::apiResource('prerogative-enrollments', FacultyPrerogController::class);
-    Route::apiResource('mastxn-faculty', FacultyMaTxnController::class);
+    Route::apiResource('matxns', FacultyMaTxnController::class);
     Route::apiResource('ma', FacultyMaController::class);
     Route::apiResource('faculty-ma', FacultyMaTableController::class);
 
@@ -85,9 +87,10 @@ Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'studen
     Route::apiResource('prerogative-enrollments', StudentPrerogController::class);
     Route::apiResource('prerog_txns', StudentPrerogTxnController::class);
 
-    Route::apiResource('mastxn-student', StudentMaTxnController::class);
+    Route::apiResource('matxns', StudentMaTxnController::class);
     Route::apiResource('student-confirm', StudentConfirmController::class);
     Route::apiResource('student-details', StudentDetailController::class);
+    // Route::apiResource('saved-mentors', StudentAddMentorController::class);
     Route::apiResource('{sais_id}/saved-mentors', StudentAddMentorController::class);
     Route::apiResource('{sais_id}/active-mentors', StudentActiveMentorController::class);
     Route::post('{sais_id}/nominated-mentors/collection', [StudentAddMentorController::class, 'bulkUpdate']);
@@ -97,7 +100,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins',
     Route::apiResource('coitxns', AdminCoiTxnController::class);
     Route::apiResource('prerog_txns', AdminPrerogTxnController::class);
     Route::apiResource('prerogative-enrollments', AdminPrerogController::class);
-    Route::apiResource('mastxn-admin', AdminMaTxnController::class);
+    Route::apiResource('matxns', AdminMaTxnController::class);
     Route::apiResource('admin-ma', AdminMaTableController::class);
     Route::apiResource('ma', AdminMaController::class);
 });

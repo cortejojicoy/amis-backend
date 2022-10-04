@@ -14,7 +14,7 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::create('mentor_assignments', function (Blueprint $table) {
+        Schema::create('mas', function (Blueprint $table) {
             $table->string('mas_id', 15)->primary();
             $table->integer('student_sais_id');
             $table->integer('mentor_id');

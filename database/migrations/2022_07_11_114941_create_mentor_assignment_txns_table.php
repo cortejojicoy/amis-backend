@@ -14,12 +14,12 @@ return new class extends Migration
 
     public function up()
     {
-        Schema::create('mentor_assignment_txns', function (Blueprint $table) {
+        Schema::create('matxns', function (Blueprint $table) {
             $table->bigIncrements('mas_txn_id');
             $table->string('mas_id', 15);
             $table->string('action', 20);
             $table->integer('committed_by');
-            $table->text('note');
+            $table->text('note')->nullable();
             $table->timestamps();
         });
     }

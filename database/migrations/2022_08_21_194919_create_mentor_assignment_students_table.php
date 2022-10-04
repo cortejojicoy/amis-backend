@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('sais_id');
             $table->string('name',255);
+            $table->string('email',255);
             $table->string('program',10)->nullable();
             $table->string('acad_group',10);
             $table->string('status',10)->nullable();

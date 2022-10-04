@@ -31,6 +31,11 @@ class Faculty extends Model
         return $this->belongsTo(User::class,'sais_id','sais_id');
     }
 
+    public function mentor()
+    {
+        return $this->belongsTo(Mentor::class, 'id', 'faculty_id');
+    }
+
         /**
      * Scope a query to only include active users.
      *
@@ -39,6 +44,7 @@ class Faculty extends Model
      */
     public function scopeInfo($query)
     {
-        $query->join('users', 'users.sais_id','=','faculties.sais_id');
+        // $query->with('user');
+        $query->join('users', 'users.sais_id', '=', 'faculties.sais_id');
     }
 }

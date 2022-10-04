@@ -1,40 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\Faculty;
+namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\MaStudent;
-use App\Models\Mentor;
 
-
-class FacultyMaTableController extends Controller
+class StudentMaController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        // $advisee = Mentor::mentorRole()->get();
-        // $request->merge(['faculty' => $advisee]);
-
-        $ma = MaStudent::distinct('name')->filter($request, 'faculties');
-  
-        if($request->has('items')) {
-            $ma = $ma->paginate($request->items);
-        } else {
-            $ma = $ma->get();
-        }
-
-        $keys = ['name', 'program', 'student_status', 'mentor', 'role', 'mentor_status'];
-        return response()->json(
-            [
-                'ma' => $ma,
-                'keys' => $keys
-            ], 200
-        );
+        //
     }
 
     /**

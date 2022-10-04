@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;;
 use App\Models\SaveMentor;
+use App\Models\Faculty;
 use App\Services\BulkUpdateSaveMentor;
 use App\Http\Requests\BulkUpdateSaveMentorRequest;
 
@@ -19,6 +20,8 @@ class StudentAddMentorController extends Controller
      */
     public function index(Request $request)
     {
+        $faculties = Faculty::info()->get();
+
         $save_mentors =  SaveMentor::filter($request)->get();
         if($request->has('mentor_name')){
             $save_mentors = $save_mentors->where('mentor_name',$request->mentor_name);
@@ -26,6 +29,7 @@ class StudentAddMentorController extends Controller
         return response()->json(
             [
              'save_mentors' => $save_mentors,
+             'faculty_name' => $faculties
             ], 200
          );
     }
