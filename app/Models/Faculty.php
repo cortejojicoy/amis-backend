@@ -44,7 +44,6 @@ class Faculty extends Model
      */
     public function scopeInfo($query)
     {
-        // $query->with('user');
         $query->join('users', 'users.sais_id', '=', 'faculties.sais_id');
     }
 }

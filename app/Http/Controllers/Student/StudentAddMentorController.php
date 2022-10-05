@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;;
 use App\Models\SaveMentor;
 use App\Models\Faculty;
+use App\Models\MaStudent;
 use App\Services\BulkUpdateSaveMentor;
 use App\Http\Requests\BulkUpdateSaveMentorRequest;
 
@@ -29,7 +30,7 @@ class StudentAddMentorController extends Controller
         return response()->json(
             [
              'save_mentors' => $save_mentors,
-             'faculty_name' => $faculties
+             'faculty_name' => $faculties,
             ], 200
          );
     }

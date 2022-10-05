@@ -44,13 +44,6 @@ class MaTxn extends Model
                 ->join('mas as ma', 'ma.mas_id', '=', 'matxns.mas_id')
                 ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by')
                 ->join('mentor_assignment_students as mast', 'mast.mentor_id', '=', 'ma.mentor_id');
-
-                // select matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id from matxns
-                // left join mas as ma on ma.mas_id = matxns.mas_id
-                // left join users as u on u.sais_id = matxns.committed_by
-                // // left join faculties as f on f.id 
-                // left join mentor_assignment_students as mast on mast.mentor_id = ma.mentor_id
-                // where mast.mentor_id = 321321321
                 
             }
             
@@ -68,9 +61,12 @@ class MaTxn extends Model
                 ->leftJoin('student_program_records as spr', 'spr.campus_id', '=', 's.campus_id');
             }
 
-            // if($filters->admin->unit != '') {
-            //     $query->where('mast.adviser', 0);
-            // }
+            // select matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id from matxns
+            // left join mas as ma on ma.mas_id = matxns.mas_id
+            // left join users as u on u.sais_id = matxns.committed_by
+            // left join admins as a on a.sais_id = u.sais_id
+            // left join students as s on s.sais_id = ma.student_sais_id
+            // left join student_program_records as spr on spr.campus_id = s.campus_id
 
             if($filters->admin->college != '') {
                 $query->where('spr.acad_group', $filters->admin->college);
