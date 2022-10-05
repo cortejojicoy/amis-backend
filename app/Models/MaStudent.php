@@ -87,14 +87,6 @@ class MaStudent extends Model
             $query->select($filters->column_name)->distinct();
         }
         $query = $this->filterData($query, $filters);
-        // $query = $this->searchData($query, $filters);
-    }
-
-    public function searchData($query, $filters)
-    {
-        $query->where('name', 'LIKE', "%$filters->keywords%")
-            ->orWhere('mentor_name', 'LIKE', "%$filters->keywords%")
-            ->orWhere('program', 'LIKE', "%$filters->keywords%");
     }
 
     public function filterData($query, $filters) {

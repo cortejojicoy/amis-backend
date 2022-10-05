@@ -37,7 +37,7 @@ use App\Http\Controllers\SuperAdmin\DownloadController;
 
 use App\Http\Controllers\CourseOfferingController;
 use App\Http\Controllers\ExternalLinkController;
-use App\Http\Controllers\FacultyController;
+// use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\ReqMentorController;
 use App\Http\Controllers\MaController;
 use App\Http\Controllers\TagController;
@@ -114,7 +114,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('mentor-assignments', MaController::class);
     Route::apiResource('course-offerings', CourseOfferingController::class);
     Route::apiResource('users', UserController::class);
-    Route::apiResource('faculties', FacultyController::class);
+    // Route::apiResource('faculties', FacultyController::class);
     Route::apiResource('check-tags', TagController::class);
     Route::get('student-info', [StudentDetailController::class, 'getStudentById']);
 });
