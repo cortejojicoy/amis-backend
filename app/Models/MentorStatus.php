@@ -20,33 +20,9 @@ class MentorStatus extends Model
         'mentor_role'
     ];
 
-    const ENDORSED = 'Endorsed';
-    const PENDING = 'Pending';
-    const REJECTED = 'Rejected';
-    const APPROVED = 'Approved';
-    const DISAPPROVED = 'Disapproved';
-
     public function mentorss()
     {
         return $this->belongsTo(MaStudent::class, 'sais_id', 'student_sais_id');
     }
 
-    public function scopeFilter($query, $filters, $roles)
-    {   
-        if($roles == 'faculties') {
-            if($filters->facultyType == 'adviser' || $filters->facultyType == 'nominated') {
-                $query->where('status', 'Pending')->where('student_sais_id', $filters->studentId);
-            }
-        }
-
-        if($roles == 'admins') {
-            if($filters->adminType == 'unit') {
-                $query->where('status', 'Pending')->where('student_sais_id', $filters->studentId);
-            }
-            
-            if($filters->adminType == 'college') {
-                $query->where('status', 'Endorsed')->where('student_sais_id', $filters->studentId);
-            }
-        }
-    }
 }

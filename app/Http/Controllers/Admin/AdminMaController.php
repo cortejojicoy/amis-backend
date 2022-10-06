@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MentorStatus;
+use App\Models\Ma;
 use App\Models\Admin;
 use App\Services\MentorAssignmentApproval;
 
@@ -21,7 +22,8 @@ class AdminMaController extends Controller
         $tags = Admin::where('sais_id', $request->mentor_id)->first();
         $request->merge(['admin' => $tags]);
         
-        $mas = MentorStatus::filter($request, 'admins')->get();
+        // $mas = MentorStatus::filter($request, 'admins')->get();
+        $mas = Ma::filter($request, 'admins')->get();
         
         $keys = ['actions', 'mentor_name', 'roles', 'field_represented', 'actions'];
         return response()->json([

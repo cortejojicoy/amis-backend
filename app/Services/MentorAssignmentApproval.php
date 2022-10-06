@@ -16,14 +16,14 @@ use Illuminate\Support\Facades\Auth;
 class MentorAssignmentApproval {
     function updateApproval($request, $id, $roles, $mas_id) {
 
-        $ma = MentorStatus::find($id);
-
+        $ma = Ma::find($id);
+        
         if($request->maType == 'endorse') {
-            $status = MentorStatus::ENDORSED;
+            $status = Ma::ENDORSED;
         } else if($request->maType == 'reject') {
-            $status = MentorStatus::REJECTED;
+            $status = Ma::REJECTED;
         } else if($request->maType == 'approved') {
-            $status = MentorStatus::APPROVED;
+            $status = Ma::APPROVED;
         }   
 
         if($ma) {
@@ -40,10 +40,7 @@ class MentorAssignmentApproval {
                 $ma->save();
 
                 // create entry for transaction history
-                $this->insertMa($mas_id, $ma->student_sais_id, $ma->mentor_id, $status, $ma->actions, $ma->mentor_name, $ma->mentor_role);
-                
-                // create entry for transaction history
-                $this->insertMaTxn($mas_id, $status, $request->remarks);
+                $this->insertMaTxn($ma->mas_id, 'Endorsed', $request->remarks);
 
                 if($status == MentorStatus::ENDORSED) {
                     // MaStudent table was on1y for display purposes it will basically update the status based on request
@@ -88,25 +85,25 @@ class MentorAssignmentApproval {
 
     }
 
-    public function insertMa($mas_id, $student_sais_id, $mentor_id, $status, $actions, $mentor_name, $mentor_role) {
-        Ma::create([
-            "mas_id" => $mas_id,
-            "student_sais_id" => $student_sais_id,
-            "mentor_id" => $mentor_id,
-            "status" => $status,
-            "actions" => $actions,
-            "mentor_name" => $mentor_name,
-            "mentor_role" => $mentor_role,
-            "created_at" => Carbon::now()
-        ]);
-    }
+    // public function insertMa($mas_id, $student_sais_id, $mentor_id, $status, $actions, $mentor_name, $mentor_role) {
+    //     Ma::create([
+    //         "mas_id" => $mas_id,
+    //         "student_sais_id" => $student_sais_id,
+    //         "mentor_id" => $mentor_id,
+    //         "status" => $status,
+    //         "actions" => $actions,
+    //         "mentor_name" => $mentor_name,
+    //         "mentor_role" => $mentor_role,
+    //         "created_at" => Carbon::now()
+    //     ]);
+    // }
 
     public function insertMaTxn($mas_id, $status, $remarks) {
         MaTxn::create([
             "mas_id" => $mas_id,
             "action" => $status,
             "committed_by" => Auth::user()->sais_id,
-            "note" => $remarks,
+            "note" => $remarks ? $remarks : 'None',
             "created_at" => Carbon::now()
         ]);
     }
