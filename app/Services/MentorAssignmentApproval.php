@@ -40,14 +40,14 @@ class MentorAssignmentApproval {
                 $ma->save();
 
                 // create entry for transaction history
-                $this->insertMaTxn($ma->mas_id, 'Endorsed', $request->remarks);
+                $this->insertMaTxn($ma->mas_id, $status, $request->remarks);
 
-                if($status == MentorStatus::ENDORSED) {
+                if($status == Ma::ENDORSED) {
                     // MaStudent table was on1y for display purposes it will basically update the status based on request
                     MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update(["endorsed" => 1]);
                 }
 
-                if($status == MentorStatus::APPROVED && $ma->actions == 'Add') {
+                if($status == Ma::APPROVED && $ma->actions == 'Add') {
                     // if the actions was add it will create an entry on mentors table
                     Mentor::create([
                         "faculty_id" => $facultyId->faculty_id,
@@ -64,8 +64,10 @@ class MentorAssignmentApproval {
                     MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update([
                         "approved" => 1, "adviser" => 1
                     ]);
+                    
+                    $this->insertMaTxn($ma->mas_id, $status, $request->remarks);
 
-                } else if($status == MentorStatus::APPROVED && $ma->actions == 'Remove') {
+                } else if($status == Ma::APPROVED && $ma->actions == 'Remove') {
                     // if the actions was remove; data will not be deleted but rather update removed column value to 1; to hide.
                     Mentor::where('student_sais_id', $ma->student_sais_id)->where('mentor_id', $mentorId->mentor_id)->update(["removed" => 1]);
 
@@ -73,6 +75,8 @@ class MentorAssignmentApproval {
                     MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update([
                         "approved" => 1, "adviser" => 0 
                     ]);
+
+                    $this->insertMaTxn($ma->mas_id, $status, $request->remarks);
                 }
 
                 DB::commit();
