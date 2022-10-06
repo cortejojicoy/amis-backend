@@ -64,8 +64,6 @@ class MentorAssignmentApproval {
                     MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update([
                         "approved" => 1, "adviser" => 1
                     ]);
-                    
-                    $this->insertMaTxn($ma->mas_id, $status, $request->remarks);
 
                 } else if($status == Ma::APPROVED && $ma->actions == 'Remove') {
                     // if the actions was remove; data will not be deleted but rather update removed column value to 1; to hide.
@@ -75,8 +73,7 @@ class MentorAssignmentApproval {
                     MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update([
                         "approved" => 1, "adviser" => 0 
                     ]);
-
-                    $this->insertMaTxn($ma->mas_id, $status, $request->remarks);
+                    
                 }
 
                 DB::commit();
