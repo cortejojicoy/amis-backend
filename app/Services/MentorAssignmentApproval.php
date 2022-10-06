@@ -33,7 +33,7 @@ class MentorAssignmentApproval {
             $student = Student::where('sais_id', $ma->student_sais_id)->first();
             $student_program_records = $student->program_records()->where('status', 'ACTIVE')->first();
             $facultyId = Faculty::where('sais_id', $ma->mentor_id)->first();
-            $mentorId = Mentor::where('student_sais_id', $ma->student_sais_id)->where('faculty_id', $facultyId->id)->first();
+            $mentorId = Mentor::where('student_sais_id', $ma->student_sais_id)->where('faculty_id', $facultyId->faculty_id)->first();
 
             try {
                 $ma->status = $status;
@@ -53,7 +53,7 @@ class MentorAssignmentApproval {
                 if($status == MentorStatus::APPROVED && $ma->actions == 'Add') {
                     // if the actions was add it will create an entry on mentors table
                     Mentor::create([
-                        "faculty_id" => $facultyId->id,
+                        "faculty_id" => $facultyId->faculty_id,
                         "student_program_record_id" => $student_program_records->student_program_record_id,
                         "student_sais_id" => $ma->student_sais_id,
                         "mentor_role" => $ma->mentor_role,
