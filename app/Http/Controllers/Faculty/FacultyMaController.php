@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\MaStudent;
+use App\Models\Ma;
 use App\Models\MentorStatus;
 use App\Models\Mentor;
 use App\Services\MentorAssignmentApproval;
@@ -20,11 +21,7 @@ class FacultyMaController extends Controller
      */
     public function index(Request $request)
     {
-        // $advisee = Mentor::mentorRole()->first();
-        // $request->merge(['faculty' => $advisee]);
-
-        // dd($request);
-        $mas = MentorStatus::filter($request, 'faculties')->get();
+        $mas = Ma::filter($request, 'faculties')->get();
         
         $keys = ['actions', 'mentor_name', 'roles', 'field_represented', 'actions'];
         return response()->json([

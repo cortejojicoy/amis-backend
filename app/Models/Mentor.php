@@ -30,11 +30,6 @@ class Mentor extends Model
         return $this->belongsTo(Faculty::class, 'faculty_id', 'faculty_id');
     }
 
-    public function mentor()
-    {
-        return $this->belongsTo(MaStudent::class, 'student_sais_id', 'mentor_id');
-    }
-
     public function scopeActiveMentor($query) {
         $query->distinct()
               ->leftJoin('faculties', 'faculties.faculty_id', '=', 'mentors.faculty_id')

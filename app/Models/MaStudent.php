@@ -36,14 +36,6 @@ class MaStudent extends Model
         $query->where('mentor_id', Auth::user()->sais_id)->where('endorsed', 0);
     }
 
-    public function scopeUnit($query) {
-        $query->where('endorsed', 0);
-    }
-
-    public function scopeCollege($query) {
-        $query->where('endorsed', 1);
-    }
-
     public function user()
     {
         return $this->hasMany(User::class, 'sais_id', 'sais_id');
@@ -51,7 +43,7 @@ class MaStudent extends Model
 
     public function mentor()
     {
-        return $this->belongsTo(Mentor::class, 'student_sais_id', 'sais_id');
+        return $this->hasOne(Mentor::class, 'student_sais_id', 'sais_id');
     }
 
     public function scopeFilter($query, $filters, $roles) {
