@@ -31,8 +31,8 @@ class MaTxn extends Model
         if($role == 'students') {
             if($filters->has('txn_history')) {
                 $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
-                ->leftJoin('mas AS ma', 'ma.mas_id', '=', 'matxns.mas_id')
-                ->leftJoin('users as u', 'u.sais_id', '=', 'matxns.committed_by');
+                ->join('mas AS ma', 'ma.mas_id', '=', 'matxns.mas_id')
+                ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by');
             }  
             
             if($filters->has('sais_id')) {
@@ -42,23 +42,21 @@ class MaTxn extends Model
             if($filters->has('txn_history')) {
                 $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
                 ->join('mas as ma', 'ma.mas_id', '=', 'matxns.mas_id')
-                ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by')
-                ->join('mentor_assignment_students as mast', 'mast.mentor_id', '=', 'ma.mentor_id');
+                ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by');
                 
             }
             
             if($filters->has('sais_id')) {
-                $query->where('mast.mentor_id', $filters->sais_id);
+                $query->where('ma.mentor_id', $filters->sais_id);
             }
             
         } else if ($role == 'admins') {
             if($filters->has('txn_history')) {
                 $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
-                ->leftJoin('mas as ma', 'ma.mas_id', '=', 'matxns.mas_id')
-                ->leftJoin('users as u', 'u.sais_id', '=', 'matxns.committed_by')
-                ->leftJoin('admins as a', 'a.sais_id', '=', 'u.sais_id')
-                ->leftJoin('students as s', 's.sais_id' ,'=', 'ma.student_sais_id')
-                ->leftJoin('student_program_records as spr', 'spr.campus_id', '=', 's.campus_id');
+                ->join('mas as ma', 'ma.mas_id', '=', 'matxns.mas_id')
+                ->join('students as s', 's.sais_id' ,'=', 'ma.student_sais_id')
+                ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by')
+                ->join('student_program_records as spr', 'spr.campus_id', '=', 's.campus_id');
             }
 
             if($filters->admin->college != '') {

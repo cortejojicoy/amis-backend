@@ -46,6 +46,12 @@ class MentorAssignmentApproval {
                     // MaStudent table was on1y for display purposes it will basically update the status based on request
                     MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update(["endorsed" => 1]);
                 }
+                
+                if($status == Ma::REJECTED && $ma->actions == 'Add') {
+                    MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update(["endorsed" => 1]);
+                } else if($status == Ma::REJECTED && $ma->actions == 'Add') {
+                    MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update(["approved" => 1, "adviser" => 0 ]);
+                }
 
                 if($status == Ma::APPROVED && $ma->actions == 'Add') {
                     // if the actions was add it will create an entry on mentors table
