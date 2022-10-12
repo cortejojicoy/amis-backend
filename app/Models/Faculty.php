@@ -10,7 +10,6 @@ class Faculty extends Model
     use HasFactory;
 
     protected $primaryKey = 'faculty_id';
-
     // /**
     //  * Get the post that owns the comment.
     // */
@@ -32,14 +31,19 @@ class Faculty extends Model
         return $this->belongsTo(User::class,'sais_id','sais_id');
     }
 
+    public function mentor()
+    {
+        return $this->belongsTo(Mentor::class, 'id', 'faculty_id');
+    }
+
         /**
      * Scope a query to only include active users.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeBasicInfo($query)
+    public function scopeInfo($query)
     {
-        $query->join('users', 'users.sais_id','=','faculties.sais_id');
+        $query->join('users', 'users.sais_id', '=', 'faculties.sais_id');
     }
 }
