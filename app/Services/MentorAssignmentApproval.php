@@ -73,7 +73,8 @@ class MentorAssignmentApproval {
 
                 } else if($status == Ma::APPROVED && $ma->actions == 'Remove') {
                     // if the actions was remove; data will not be deleted but rather update removed column value to 1; to hide.
-                    Mentor::where('student_sais_id', $ma->student_sais_id)->where('mentor_id', $mentorId->mentor_id)->update(["removed" => 1]);
+                    
+                    Mentor::where('student_sais_id', $ma->student_sais_id)->where('mentor_id', $mentorId->mentor_id)->delete();
 
                     // MaStudent table was on1y for display purposes it will basically update the status based on request
                     MaStudent::where('sais_id', $ma->student_sais_id)->where('mentor_id', $ma->mentor_id)->update([
