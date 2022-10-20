@@ -16,6 +16,7 @@ class StudentActiveMentorController extends Controller
     public function index()
     {
         $activeMentors = Mentor::activeMentor()->get();
+
         return response()->json(
             [
              'active_mentors' => $activeMentors,
