@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin;
+use App\Models\MaTxn;
 use App\Models\MaStudent;
 use App\Models\MentorStatus;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +21,6 @@ class AdminMaTableController extends Controller
     {
         $tags = Admin::where('sais_id', Auth::user()->sais_id)->first();
         $request->merge(['tags' => $tags]);
-        // dd($tags);
 
         $admin = MaStudent::distinct('name')->filter($request, 'admins');
         // dd($admin);
@@ -29,7 +29,6 @@ class AdminMaTableController extends Controller
         } else {
             $admin = $admin->get();
         }
-        // dd($admin);
         
         $keys = ['name', 'program', 'student_status', 'mentor', 'role', 'mentor_status'];
 

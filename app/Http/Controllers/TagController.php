@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Admin;
+use App\Models\MaAdmin;
 use Illuminate\Support\Facades\Auth;
 
 class TagController extends Controller
@@ -15,9 +16,12 @@ class TagController extends Controller
      */
     public function index()
     {
+        $adminType = MaAdmin::where('sais_id', Auth::user()->sais_id)->get();
+
         $tags = Admin::where('sais_id', Auth::user()->sais_id)->get();
         return response()->json([
-            "tags" => $tags
+            "tags" => $tags,
+            "adminType" => $adminType
         ],200);
     }
 
