@@ -94,6 +94,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins',
     Route::apiResource('coitxns', AdminCoiTxnController::class);
     Route::apiResource('prerog_txns', AdminPrerogTxnController::class);
     Route::apiResource('prerogative-enrollments', AdminPrerogController::class);
+    Route::apiResource('check-tags', TagController::class);
     Route::apiResource('matxns', AdminMaTxnController::class);
     Route::apiResource('admin-ma', AdminMaTableController::class);
     Route::apiResource('ma', AdminMaController::class);
@@ -108,7 +109,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('mentor-assignments', MaController::class);
     Route::apiResource('course-offerings', CourseOfferingController::class);
     Route::apiResource('users', UserController::class); 
-    Route::apiResource('check-tags', TagController::class);
     Route::get('student-info', [StudentDetailController::class, 'getStudentById']);
 });
 
