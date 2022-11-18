@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\CourseController;
 use App\Http\Controllers\CourseOfferingController;
+use App\Http\Controllers\CurriculumController;
 use App\Http\Controllers\ExternalLinkController;
 use App\Http\Controllers\Faculty\AdviserController;
 use App\Http\Controllers\Student\SaveMentorController;
@@ -17,11 +19,15 @@ use App\Http\Controllers\Faculty\FacultyCoiController;
 use App\Http\Controllers\Faculty\FacultyCoiTxnController;
 use App\Http\Controllers\Faculty\FacultyPrerogController;
 use App\Http\Controllers\Faculty\FacultyPrerogTxnController;
+use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\ProgramController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Student\StudentCoiController;
 use App\Http\Controllers\Student\StudentCoiTxnController;
 use App\Http\Controllers\Student\StudentPrerogController;
 use App\Http\Controllers\Student\StudentPrerogTxnController;
 use App\Http\Controllers\SuperAdmin\DownloadController;
+use App\Http\Controllers\TagController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,12 +79,19 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins',
 
 Route::group(['middleware' => ['auth:sanctum', 'role:super_admin'],'prefix'=>'super_admins', 'as' => 'super_admins.'], function () {
     Route::apiResource('{module}/download', DownloadController::class);
+    Route::apiResource('permissions', PermissionController::class);
+    Route::apiResource('roles', RoleController::class);
+    Route::apiResource('tags', TagController::class);
+    Route::apiResource('users', UserController::class);
 });
 
 //routes open for all roles but needs auth
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('course-offerings', CourseOfferingController::class);
     Route::apiResource('users', UserController::class);
+    Route::apiResource('courses', CourseController::class);
+    Route::apiResource('programs', ProgramController::class);
+    Route::apiResource('curriculums', CurriculumController::class);
 });
 
 Route::apiResource('{action}/external_links', ExternalLinkController::class);

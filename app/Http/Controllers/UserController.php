@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Models\User;
 use App\Http\Resources\User as UserResource;
+use App\Services\UserService;
 
 class UserController extends Controller
 {
@@ -14,13 +15,21 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //Get users
-        $users = User::paginate(10);
+        $users = User::filter($request);
 
-        //Return collection of users as a resource
-        return UserResource::collection($users);
+        if($request->has('items')) {
+            $users = $users->paginate($request->items);
+        } else {
+            $users = $users->get();
+        }
+        
+        return response()->json(
+            [
+             'users' => $users,
+            ], 200
+         );
     }
 
     /**
@@ -91,9 +100,13 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, UserService $userService)
     {
-        //
+        if($request->has('updateRole')) {
+            return $userService->updateRole($request, $id);
+        } else if($request->has('updatePermission')) {
+            return $userService->updatePermission($request, $id);
+        }
     }
 
     /**

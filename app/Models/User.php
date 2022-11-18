@@ -11,10 +11,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Traits\HasPermissions;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable,  HasRoles;
+    use HasApiTokens, HasFactory, Notifiable,  HasRoles, HasPermissions;
     protected $primaryKey = 'sais_id';
     /**
      * The attributes that are mass assignable.
@@ -59,13 +60,35 @@ class User extends Authenticatable
         return $this->hasOne(Admin::class, 'sais_id', 'sais_id');
     }
 
+    public function user_permission_tags() {
+        return $this->hasMany(UserPermissionTag::class, 'model_id', 'sais_id');
+    }
+
     public function getFullNameAttribute() {
         return $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name;
     }
 
     public function scopeFilter($query, $filters) {
-        $query->with(['student', 'faculty', 'admin', 'student.student_grades', 'student.program_records' => function ($query) use($filters) {
-            $query->where('student_program_records.status', '=', $filters->program_record_status);
-        }]);
+        if($filters->has('personal_information')) {
+            $query->with(['student', 'faculty', 'admin', 'student.student_grades', 'student.program_records' => function ($query) use($filters) {
+                $query->where('student_program_records.status', '=', $filters->program_record_status);
+            }]);
+        }
+
+        if($filters->has('user_module')) {
+            $query->with(['roles', 'permissions', 'user_permission_tags']);
+        }
+
+        $query = $this->filterData($query, $filters);
+    }
+
+    public function filterData($query, $filters) {
+        if($filters->has('sais_id')) {
+            if($filters->sais_id != '--') {
+                $query->where('sais_id', $filters->sais_id);
+            }
+        }
+
+        return $query;
     }
 }
