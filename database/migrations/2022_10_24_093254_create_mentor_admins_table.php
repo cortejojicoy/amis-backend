@@ -11,15 +11,13 @@ return new class extends Migration
      *
      * @return void
      */
-
     public function up()
     {
-        Schema::create('matxns', function (Blueprint $table) {
-            $table->bigIncrements('mas_txn_id');
-            $table->string('mas_id', 15);
-            $table->string('action', 20);
-            $table->integer('committed_by');
-            $table->text('note')->nullable();
+        Schema::create('mentor_admins', function (Blueprint $table) {
+            $table->id();
+            $table->integer('sais_id');
+            $table->integer('approver')->default(0);
+            $table->integer('endorser')->default(0);
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('matxns');
+        Schema::dropIfExists('mentor_admins');
     }
 };

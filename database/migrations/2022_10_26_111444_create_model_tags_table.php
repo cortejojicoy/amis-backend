@@ -11,15 +11,12 @@ return new class extends Migration
      *
      * @return void
      */
-
     public function up()
     {
-        Schema::create('matxns', function (Blueprint $table) {
-            $table->bigIncrements('mas_txn_id');
-            $table->string('mas_id', 15);
-            $table->string('action', 20);
-            $table->integer('committed_by');
-            $table->text('note')->nullable();
+        Schema::create('model_tags', function (Blueprint $table) {
+            $table->string('model_type', 20);
+            $table->bigIncrements('model_id')->index('model_tags_id');
+            $table->integer('tags');
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('matxns');
+        Schema::dropIfExists('model_tags');
     }
 };

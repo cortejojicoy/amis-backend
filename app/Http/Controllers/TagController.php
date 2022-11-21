@@ -16,6 +16,8 @@ class TagController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    // DO NOT DELETE THIS LINE! THIS SHOWS THE IMPLEMENTATION ON HOW TAGS SHOULD WORK
     // public function index(Request $request, TagProcessor $tagProcessor)
     // {
     //     $upts = CoiTxn::filter($request, "admins", $tagProcessor)->get();
@@ -42,6 +44,17 @@ class TagController extends Controller
             ], 200
          );
     }
+    
+    // public function index()
+    // {
+    //     $adminType = MaAdmin::where('sais_id', Auth::user()->sais_id)->get();
+
+    //     $tags = Admin::where('sais_id', Auth::user()->sais_id)->get();
+    //     return response()->json([
+    //         "tags" => $tags,
+    //         "adminType" => $adminType
+    //     ],200);
+    // }
 
     /**
      * Store a newly created resource in storage.
