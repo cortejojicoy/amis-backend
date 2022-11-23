@@ -30,6 +30,7 @@ class CoiTxn extends Model
         return $this->belongsTo(Coi::class);
     }
 
+    // public function scopeFilter($query, $filters, $role, $tagProcessor) {
     public function scopeFilter($query, $filters, $role) {
         if($role == 'students') {
             if($filters->has('txn_history')) {
@@ -67,6 +68,7 @@ class CoiTxn extends Model
                 ->where('spr.status', 'ACTIVE');
             }
 
+            // $query = $tagProcessor->process($query, $filters, "can view coi");
             if($filters->admin->college != '') {
                 $query->where('spr.acad_group', $filters->admin->college);
             }

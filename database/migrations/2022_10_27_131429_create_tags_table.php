@@ -13,13 +13,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('permissions', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 255);
-            $table->string('guard_name', 255);
-            $table->string('group', 255)->nullable();
+        Schema::create('tags', function (Blueprint $table) {
+            $table->id('tag_id');
+            $table->string('tag_name', 255);
+            $table->string('reference_model', 255);
+            $table->string('reference_field', 255);
+            $table->string('reference_value', 255);
+            $table->string('reference_type', 255);
+            $table->string('reference_operation', 255);
             $table->timestamps();
-            $table->unique(['name', 'guard_name'], 'permissions_name_guard_name_unique');
         });
     }
 
@@ -30,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('permissions');
+        Schema::dropIfExists('tags');
     }
 };
