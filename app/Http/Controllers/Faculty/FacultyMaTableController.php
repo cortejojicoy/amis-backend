@@ -5,13 +5,15 @@ namespace App\Http\Controllers\Faculty;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MaStudent;
+use App\Models\Faculty;
 use App\Models\Mentor;
+use App\Models\Ma;
 
 
 class FacultyMaTableController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource.   
      *
      * @return \Illuminate\Http\Response
      */
@@ -20,7 +22,11 @@ class FacultyMaTableController extends Controller
         // $advisee = Mentor::mentorRole()->get();
         // $request->merge(['faculty' => $advisee]);
 
-        $ma = MaStudent::distinct('name')->filter($request, 'faculties');
+        // $faculty = Faculty::where('sais_id', $request->sais_id)->first();
+        // $mentor = Mentor::where('faculty_id', $faculty->faculty_id)->first();
+        // $request->merge(['adviser' => $mentor]);
+
+        $ma = Ma::filter($request, 'faculties');
   
         if($request->has('items')) {
             $ma = $ma->paginate($request->items);
@@ -28,11 +34,9 @@ class FacultyMaTableController extends Controller
             $ma = $ma->get();
         }
 
-        $keys = ['name', 'program', 'student_status', 'mentor', 'role', 'mentor_status'];
         return response()->json(
             [
-                'ma' => $ma,
-                'keys' => $keys
+                'ma' => $ma
             ], 200
         );
     }

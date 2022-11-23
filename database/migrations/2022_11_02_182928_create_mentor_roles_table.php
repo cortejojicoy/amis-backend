@@ -13,11 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('faculties', function (Blueprint $table) {
-            $table->bigIncrements('faculty_id')->from(2009);
-            $table->integer("uuid");
-            $table->integer("sais_id");
-            $table->string("program",10)->nullable();
+        Schema::create('mentor_roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('titles', 50);
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('faculties');
+        Schema::dropIfExists('mentor_roles');
     }
 };

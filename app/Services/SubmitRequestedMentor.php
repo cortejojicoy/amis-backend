@@ -1,14 +1,13 @@
 <?php
 namespace App\Services;
 use Carbon\Carbon;
-use App\Models\SaveMentor;
+use App\Models\Ma;
+use App\Models\MaTxn;
 use App\Models\Faculty;
 use App\Models\Mentor;
 use App\Models\Student;
-use App\Models\MentorStatus;
-use App\Models\Ma;
-use App\Models\MaTxn;
 use App\Models\MaStudent;
+use App\Models\SaveMentor;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -71,15 +70,6 @@ class SubmitRequestedMentor extends Controller {
                     "committed_by" => Auth::user()->sais_id,
                     "note" => '',
                     "created_at" => Carbon::now()
-                ]);
-
-                MentorStatus::create([
-                    "student_sais_id" => $data['sais_id'],
-                    "mentor_id" => $data['mentor_id'],
-                    "mentor_name" => $data['mentor_name'],
-                    "mentor_role" => $data['mentor_role'],
-                    "status" => 'Pending',
-                    "actions" => $data['actions'],
                 ]);
 
                 MaStudent::create([

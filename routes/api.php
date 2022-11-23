@@ -8,6 +8,7 @@ use App\Http\Controllers\Student\Program;
 use App\Http\Controllers\Student\StudentAddMentorController;
 use App\Http\Controllers\Student\StudentDetailController;
 use App\Http\Controllers\Student\StudentMaTxnController;
+use App\Http\Controllers\Student\StudentMaController;
 use App\Http\Controllers\Student\StudentActiveMentorController;
 use App\Http\Controllers\Student\StudentConfirmController;
 use App\Http\Controllers\Student\SaveMentorController;
@@ -84,7 +85,8 @@ Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'studen
 
     Route::apiResource('matxns', StudentMaTxnController::class);
     Route::apiResource('student-confirm', StudentConfirmController::class);
-    Route::apiResource('student-details', StudentDetailController::class);
+    // Route::apiResource('student-details', StudentMaController::class);
+    // Route::apiResource('student-details', StudentDetailController::class);
     Route::apiResource('{sais_id}/saved-mentors', StudentAddMentorController::class);
     Route::apiResource('{sais_id}/active-mentors', StudentActiveMentorController::class);
     Route::post('{sais_id}/nominated-mentors/collection', [StudentAddMentorController::class, 'bulkUpdate']);
@@ -107,6 +109,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:super_admin'],'prefix'=>'su
 //routes open for all roles but needs auth
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('mentor-assignments', MaController::class);
+    Route::apiResource('student-details', StudentMaController::class);
     Route::apiResource('course-offerings', CourseOfferingController::class);
     Route::apiResource('users', UserController::class); 
     Route::get('student-info', [StudentDetailController::class, 'getStudentById']);

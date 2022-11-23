@@ -13,27 +13,22 @@ class Faculty extends Model
     // /**
     //  * Get the post that owns the comment.
     // */
-    // public function user()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
 
-        /**
-     * Get the post that owns the comment.
-    */
-    public function courseOfferings()
-    {
+
+    public function courseOfferings() {
         return $this->hasMany(CourseOffering::class, 'id', 'sais_id');
     }
 
-    public function user()
-    {
+    public function user() {
         return $this->belongsTo(User::class,'sais_id','sais_id');
     }
 
-    public function mentor()
-    {
-        return $this->belongsTo(Mentor::class, 'id', 'faculty_id');
+    public function uuid() {
+        return $this->belongsTo(User::class, 'uuid', 'uuid');
+    }
+
+    public function mentor() {
+        return $this->hasMany(Mentor::class, 'faculty_id', 'faculty_id');
     }
 
         /**
@@ -42,8 +37,11 @@ class Faculty extends Model
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return void
      */
-    public function scopeInfo($query)
-    {
-        $query->join('users', 'users.sais_id', '=', 'faculties.sais_id');
+    public function scopeInfo($query, $filters) {
+        if($filters->program->academic_program_id != '') {
+            $query->join('users', 'users.uuid', '=', 'faculties.uuid')
+                  ->where('program', $filters->program->academic_program_id);
+            
+        }
     }
 }

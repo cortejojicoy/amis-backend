@@ -25,15 +25,26 @@ class Mentor extends Model
         'end_date'
     ];
 
-    public function faculty()
-    {
-        return $this->belongsTo(Faculty::class, 'faculty_id', 'faculty_id');
+    public function faculty() {
+        return $this->hasMany(Faculty::class, 'faculty_id', 'faculty_id');
     }
 
-    public function scopeActiveMentor($query) {
-        $query->with(['faculty', 'faculty.user', 'faculty.mentor' => function($query) {
-            $query->where('student_sais_id', Auth::user()->sais_id);
+    public function mentor_role() {
+        return $this->belongsTo(MentorRole::class, 'mentor_role', 'id');
+    }
+
+    public function mas() {
+        return $this->belongsTo(Ma::class, 'student_sais_id', 'student_sais_id');
+    }
+
+    public function scopeActiveMentor($query, $request) {
+        $query->with(['mentor_role', 'faculty', 'faculty.uuid', 'faculty.mentor' => function($query) {
+            $query->where('status', '=', 'ACTIVE');
         }]);
+
+        if($request->has('sais_id')) {
+            $query->where('student_sais_id', $request->sais_id);
+        }
     }
 
     public function scopeMentorRole($query) {

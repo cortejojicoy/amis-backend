@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Admin;
+use App\Models\Ma;
 use App\Models\MaTxn;
 use App\Models\MaStudent;
 use App\Models\MentorStatus;
@@ -22,8 +23,7 @@ class AdminMaTableController extends Controller
         $tags = Admin::where('sais_id', Auth::user()->sais_id)->first();
         $request->merge(['tags' => $tags]);
 
-        $admin = MaStudent::distinct('name')->filter($request, 'admins');
-        // dd($admin);
+        $admin = Ma::filter($request, 'admins');
         if($request->has('items')) {
             $admin = $admin->paginate($request->items);
         } else {

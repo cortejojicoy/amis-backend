@@ -21,7 +21,7 @@ class FacultyMaController extends Controller
      */
     public function index(Request $request)
     {
-        $mas = Ma::filter($request, 'faculties')->get();
+        $mas = Ma::maRequest($request, 'faculties')->get();
         
         $keys = ['actions', 'mentor_name', 'roles', 'field_represented', 'actions'];
         return response()->json([

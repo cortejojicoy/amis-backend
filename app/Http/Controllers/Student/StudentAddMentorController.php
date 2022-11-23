@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;;
 use App\Models\SaveMentor;
 use App\Models\Faculty;
+use App\Models\Student;
+use App\Models\StudentProgramRecord;
 use App\Models\MaStudent;
+use App\Models\MentorRole;
 use App\Services\BulkUpdateSaveMentor;
 use App\Http\Requests\BulkUpdateSaveMentorRequest;
 
@@ -21,7 +24,13 @@ class StudentAddMentorController extends Controller
      */
     public function index(Request $request)
     {
-        $faculties = Faculty::info()->get();
+        $student = Student::where('sais_id', $request->sais_id)->first();
+        $program = StudentProgramRecord::where('campus_id', $student->campus_id)->where('status', 'ACTIVE')->first();
+        $request->merge(['program' => $program]);
+
+        $faculties = Faculty::info($request)->get();
+
+        $mentor_role = MentorRole::get();
 
         $save_mentors =  SaveMentor::filter($request)->get();
         if($request->has('mentor_name')){
@@ -31,6 +40,7 @@ class StudentAddMentorController extends Controller
             [
              'save_mentors' => $save_mentors,
              'faculty_name' => $faculties,
+             'm_role' => $mentor_role
             ], 200
          );
     }

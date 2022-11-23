@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Faculty;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MaTxn;
+use App\Models\Mentor;
+use App\Models\Faculty;
 
 class FacultyMaTxnController extends Controller
 {
@@ -15,6 +17,10 @@ class FacultyMaTxnController extends Controller
      */
     public function index(Request $request)
     {
+        $faculty = Faculty::where('sais_id', $request->sais_id)->first();
+        $mentor = Mentor::where('faculty_id', $faculty->faculty_id)->first();
+        $request->merge(['mentor' => $mentor]);
+
         $ma_txns = MaTxn::filter($request, 'faculties');
 
         if($request->has('items')) {

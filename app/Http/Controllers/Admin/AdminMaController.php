@@ -23,7 +23,7 @@ class AdminMaController extends Controller
         $request->merge(['admin' => $tags]);
         
         // $mas = MentorStatus::filter($request, 'admins')->get();
-        $mas = Ma::filter($request, 'admins')->get();
+        $mas = Ma::maRequest($request, 'admins')->get();
         
         $keys = ['actions', 'mentor_name', 'roles', 'field_represented', 'actions'];
         return response()->json([
