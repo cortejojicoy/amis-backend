@@ -68,7 +68,7 @@ class CoiTxn extends Model
                 ->where('spr.status', 'ACTIVE');
             }
 
-            // $query = $tagProcessor->process($query, $filters, "can view coi");
+            // $query = $tagProcessor->process($query, $filters);
             if($filters->admin->college != '') {
                 $query->where('spr.acad_group', $filters->admin->college);
             }

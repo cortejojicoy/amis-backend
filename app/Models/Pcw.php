@@ -5,18 +5,39 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class StudentTerm extends Model
+class Pcw extends Model
 {
     use HasFactory;
-    protected $primaryKey = 'term_id';
-    protected $table = 'student_terms';
 
-    public function terms()
+    protected $table = 'pcws';
+    protected $primaryKey = 'pcw_id';
+    protected $keyType = 'string';
+
+    const DRAFT = 'Draft';
+    const SUBMITTED = 'Submitted';
+    const APPROVED = 'Approved';
+
+    protected $fillable = [
+        'pcw_id',
+        'pcw_type',
+        'term_id',
+        'status',
+        'sais_id',
+        'comment',
+        'created_at',
+    ];
+
+    public function pcwtxns()
     {
-        return $this->belongsTo(StudentGrades::class);
+        return $this->morphMany(PcwTxn::class, 'pcwtxnable');
     }
 
-    public function scopeFilter($query, $filters)
+    public function pcw_courses()
+    {
+        return $this->hasMany(PcwCourse::class, 'pcw_id', 'pcw_id');
+    }
+
+    public function scopeFilter($query, $filters, $role, $tagProcessor = null)
     {
         //select fields
         if($filters->has('fields')) {
@@ -24,21 +45,32 @@ class StudentTerm extends Model
         }
 
         //where clauses
-        // if($filters->has('id')){
-        //     $query->where('course_id', '=', $filters->id);
-        // }
+        if($filters->has('sais_id')){
+            $query->where('pcws.sais_id', '=', $filters->sais_id);
+        }
+        if($filters->has('status')){
+            $query->whereIn('pcws.status', $filters->status);
+        }
+        if($filters->has('type')){
+            $query->where('pcws.pcw_type', '=', $filters->type);
+        }
 
         //order
         if($filters->has('order_type')) {
             $query->orderBy($filters->order_field, $filters->order_type);
         }
-        
-        //with clauses
-        // $query->with(['program', 'curriculum_courses', 'curriculum_courses.course', 'curriculum_structures']);
 
         //distinct
         if($filters->has('distinct')) {
             $query->select($filters->column_name)->distinct();
+        }
+
+        if($role == 'student') {
+            $query->with(['pcw_courses', 'pcw_courses.course', 'pcw_courses.term', 'pcwtxns']);
+        } else if($role == 'faculty') {
+            $query->with(['pcwtxns']);
+        } else if($role == 'admin') {
+            $query = $tagProcessor->process($query, $filters);
         }
 
         //with clauses
@@ -55,17 +87,5 @@ class StudentTerm extends Model
         //         $query->where('prerog_txns.action', '=', $filters->prg_txn_status);
         //     }]);
         // }
-
-        $query = $this->filterData($query, $filters);
-    }
-
-    public function filterData($query, $filters) {
-        if($filters->has('term')) {
-            if($filters->term != '--') {
-                $query->where('term', $filters->term);
-            }
-        }
-
-        return $query;
     }
 }

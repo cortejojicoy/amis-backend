@@ -11,16 +11,16 @@ return new class extends Migration
      *
      * @return void
      */
-
     public function up()
     {
-        Schema::create('student_program_records', function (Blueprint $table) {
-            $table->bigIncrements('student_program_record_id');
-            $table->string('campus_id', 10);
-            $table->string('academic_program_id', 10);
-            $table->string('acad_group', 10);
-            $table->integer('curriculum_id');
-            $table->string('status', 10);
+        Schema::create('pcw_courses', function (Blueprint $table) {
+            $table->id();
+            $table->string('pcw_id');
+            $table->integer('course_id');
+            $table->string('course_type');
+            $table->integer('units');
+            $table->integer('term_id');
+            $table->string('version');
             $table->timestamps();
         });
     }
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('student_program_records');
+        Schema::dropIfExists('pcw_courses');
     }
 };

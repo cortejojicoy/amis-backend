@@ -11,16 +11,13 @@ return new class extends Migration
      *
      * @return void
      */
-
     public function up()
     {
-        Schema::create('student_program_records', function (Blueprint $table) {
-            $table->bigIncrements('student_program_record_id');
-            $table->string('campus_id', 10);
-            $table->string('academic_program_id', 10);
-            $table->string('acad_group', 10);
-            $table->integer('curriculum_id');
-            $table->string('status', 10);
+        Schema::create('pcw_revisions', function (Blueprint $table) {
+            $table->string('pcw_id', 15)->primary();
+            $table->string('pcw_type');
+            $table->integer('sais_id');
+            $table->string('status');
             $table->timestamps();
         });
     }
@@ -32,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('student_program_records');
+        Schema::dropIfExists('pcw_revisions');
     }
 };

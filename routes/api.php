@@ -44,8 +44,9 @@ use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\Student\Program;
-
-
+use App\Http\Controllers\Student\StudentPcwController;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentTermController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,6 +87,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'studen
     Route::apiResource('coitxns', StudentCoiTxnController::class);
     Route::apiResource('prerogative-enrollments', StudentPrerogController::class);
     Route::apiResource('prerog_txns', StudentPrerogTxnController::class);
+    Route::apiResource('plan-of-courseworks', StudentPcwController::class);
 
     Route::apiResource('matxns', StudentMaTxnController::class);
     Route::apiResource('student-confirm', StudentConfirmController::class);
@@ -121,6 +123,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('courses', CourseController::class);
     Route::apiResource('programs', ProgramController::class);
     Route::apiResource('curriculums', CurriculumController::class);
+    Route::apiResource('students', StudentController::class);
+    Route::apiResource('student-terms', StudentTermController::class);
     Route::get('student-info', [StudentDetailController::class, 'getStudentById']);
 });
 

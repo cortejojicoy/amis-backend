@@ -24,4 +24,12 @@ class Student extends Model
     public function scopeProgramId($query) {
         $query->join('student_program_records', 'student_program_records.campus_id' ,'=', 'students.campus_id');
     }
+
+    public function scopeFilter($query, $filters) {
+        if($filters->has('curriculum_data')) {
+            $query->with(['program_records' => function ($query) use($filters) {
+                $query->where('student_program_records.status', '=', $filters->program_record_status);
+            }, 'program_records.curriculum', 'program_records.curriculum.curriculum_structures', 'program_records.curriculum.curriculum_courses', 'program_records.curriculum.curriculum_courses.course']);
+        }
+    }
 }
