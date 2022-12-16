@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('mas', function (Blueprint $table) {
             $table->string('mas_id', 15)->primary();
             $table->integer('student_sais_id');
-            $table->integer('mentor_id');
+            $table->integer('faculty_id');
             $table->string('actions', 6);
             $table->string('status', 20);
             $table->string('mentor_name', 50);

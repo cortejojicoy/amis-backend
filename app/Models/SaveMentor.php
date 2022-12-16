@@ -16,14 +16,7 @@ class SaveMentor extends Model
         return $this->belongsTo(Faculty::class, 'faculty_id', 'mentor_id');
     }
 
-    public function scopeFilter($query, $filters)
-    {
+    public function scopeFilter($query, $filters) {
         $query->where('sais_id', $filters->sais_id)->where('actions_status', 'saved');
-
-        // if($filters->has('sais_id')) {
-        //     $query->with('faculty', function($query) use($filters) {
-        //         $query->where()
-        //     })
-        // }
     }
 }
