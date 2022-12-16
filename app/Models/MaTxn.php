@@ -27,6 +27,8 @@ class MaTxn extends Model
     //     'created_at'
     // ];
 
+    
+
     public function scopeFilter($query, $filters, $role){
         if($role == 'students') {
             if($filters->has('txn_history')) {
@@ -41,9 +43,13 @@ class MaTxn extends Model
         } else if ($role == 'faculties') {
             if($filters->has('txn_history')) {
                 $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
-                ->join('mas as ma', 'ma.mas_id', '=', 'matxns.mas_id')
-                ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by');
-                
+                        ->join('mas as ma', 'ma.mas_id', '=', 'matxns.mas_id')
+                        ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by');
+                // if($filters->mentor->faculty_id != NULL) {
+                //     if($filters->mentor->faculty_id != '') {
+                        
+                //     }
+                // }
             }
             
             if($filters->has('sais_id')) {
@@ -57,16 +63,14 @@ class MaTxn extends Model
                 ->join('students as s', 's.sais_id' ,'=', 'ma.student_sais_id')
                 ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by')
                 ->join('student_program_records as spr', 'spr.campus_id', '=', 's.campus_id');
-
-                // select matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id from matxns
-                // left join mas as ma on ma.mas_id = matxns.mas_id
-                // left join studetns as s on s.sais_id = ma.student_sais_id
-                // left join users as u on u.sais_id = matxns.committed_by
-                // left join student_program_records as spr on spr.campus_id = s.campus_id  
             }
 
             if($filters->admin->college != '') {
                 $query->where('spr.acad_group', $filters->admin->college);
+            }
+
+            if($filters->admin->unit != '') {
+                $query->where('spr.acad_org', $filters->admin->unit);
             }
         }
 

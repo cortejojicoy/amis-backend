@@ -4,6 +4,11 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\StudentProgramRecord;
+use App\Models\Program;
+use App\Models\SaveMentor;
+use App\Models\Student;
+use App\Models\User;
 
 class StudentMaController extends Controller
 {
@@ -12,9 +17,15 @@ class StudentMaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        // $ma = User::filter($request)->get();
+        $ma = SaveMentor::filter($request)->get();
+        return response()->json(
+            [
+             'ma' => $ma,
+            ], 200
+         );
     }
 
     /**

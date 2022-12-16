@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('faculty_id')->index('mentors_faculty_id');
             $table->integer('student_program_record_id');
             $table->integer('student_sais_id')->index('mentors_student_saisid');
-            $table->string('mentor_role', 29);
+            $table->integer('mentor_role');
             $table->string('field_represented', 29)->nullable();
             $table->string('status', 20)->nullable();
             $table->date('start_date')->nullable();

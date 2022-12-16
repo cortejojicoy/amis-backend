@@ -94,44 +94,25 @@ class User extends Authenticatable
         return $query;
     }
 
-    public function scopeStudentDetails($query) {
+    public function scopeStudentDetails($query, $request) {
         $query->leftJoin('students', 'students.sais_id', '=', 'users.sais_id')
         ->leftJoin('student_program_records', 'student_program_records.campus_id', '=', 'students.campus_id')
-        ->where('users.sais_id', Auth::user()->sais_id);
+        ->where('users.sais_id', $request->sais_id);
     }
 
     public function scopeStudentById($query, $request) {
+        // $query->with(['student', 'student.program_records', ''])
+
         $query->leftJoin('students', 'students.sais_id', '=', 'users.sais_id')
         ->leftJoin('student_program_records', 'student_program_records.campus_id', '=', 'students.campus_id')
         ->where('users.sais_id', $request->id);
     }
 
-    public function scopeStudentMentors($query) {
-
-        $query->select(DB::raw("CONCAT(users.last_name,' ',users.first_name) AS NAME, mentor_assignment_students.program, users.sais_id, mentor_assignment_students.status"))
-        ->distinct()
-        ->leftJoin('mentor_assignment_students', 'mentor_assignment_students.sais_id' ,'=', 'users.sais_id') //users.sais_id hasOne -> mentor_assignment_students.sais_id 
-        ->leftJoin('mentors', 'mentors.student_sais_id', '=', 'mentor_assignment_students.sais_id') //mentor_assignment_students.sais_id -> belongsTo -> mentors.student_sais_id
-        ->leftJoin('faculties', 'faculties.id', '=', 'mentors.faculty_id')   //mentors.faculty_id -> belongsTo -> faculties.id
-        ->where('faculties.sais_id', Auth::user()->sais_id)
-        ->where('mentor_assignment_students.approved', 1);
-
-        // select distinct CONCAT(users.last_name,' ',users.first_name) AS NAME, mentor_assignment_students.program, users.sais_id, mentor_assignment_students.status
-        // left join mentor_assignment_students on mentor_assignment_students.sais_id = users.sais_id
-        // left join mentors on mentors.student_sais_id =  mentor_assignment_students.sais_id
-        // left join faculties on faculties.id = mentors.faculty_id
-        // where faculties.sais_id = 321321321
-
-        // $query->with(['mas', 'mas.ma_mentor', '', 'faculty.ma_faculty' => function($query) { 
-        //     $query->where('faculties.sais_id', Auth::user()->sais_id)
-        //           ->where('mentor_assignment_students.approved', 1);
-        // }]);
-    }
-
-    public function mas()
-    {
+    public function mas() {
         return $this->hasMany(MaStudent::class, 'sais_id', 'sais_id');
     }
+}
+
     
     public function scopeKeywords($query, $search) {
         // $query->select(DB::raw("faculties.sais_id AS faculty, CONCAT(users.first_name,' ',users.middle_name,' ',users.last_name) AS NAME, student_program_records.academic_program_id AS program, users.sais_id, student_program_records.status"))

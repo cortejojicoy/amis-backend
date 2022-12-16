@@ -22,7 +22,7 @@ return new class extends Migration
             $table->date('effectivity_start')->nullable();
             $table->date('effectivity_end')->nullable();
             $table->integer('sais_id');
-            $table->integer('mentor_id');
+            $table->integer('faculty_id');
             $table->string('actions_status', 11);
             $table->timestamps();
         });
