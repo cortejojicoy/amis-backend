@@ -13,13 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('permissions', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 255);
-            $table->string('guard_name', 255);
-            $table->string('group', 255)->nullable();
+        Schema::create('curriculum_standings', function (Blueprint $table) {
+            $table->integer('curriculum_id');
+            $table->string('classification', 20);
+            $table->integer('units_attained');
+            $table->primary(['curriculum_id', 'classification'], 'curriculum_standings_pkey');
             $table->timestamps();
-            $table->unique(['name', 'guard_name'], 'permissions_name_guard_name_unique');
         });
     }
 
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('permissions');
+        Schema::dropIfExists('curriculum_standings');
     }
 };
