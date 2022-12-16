@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Student;
 
-use App\Services\MentorAssignmentApproval;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Mentor;
+use App\Models\StudentProgramRecord;
+use App\Models\Program;
+use App\Models\SaveMentor;
+use App\Models\Student;
 use App\Models\User;
 
 class StudentMaController extends Controller
@@ -17,14 +19,13 @@ class StudentMaController extends Controller
      */
     public function index(Request $request)
     {
-        $studentActiveMentor = Mentor::activeMentor($request)->get();
-        $studentInfo = User::studentDetails($request)->get();
+        // $ma = User::filter($request)->get();
+        $ma = SaveMentor::filter($request)->get();
         return response()->json(
             [
-            'stud_info' => $studentInfo,
-            'stud_active_mentor' => $studentActiveMentor
-            ],200
-        );
+             'ma' => $ma,
+            ], 200
+         );
     }
 
     /**
@@ -33,9 +34,9 @@ class StudentMaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, MentorAssignmentApproval $submitRequestedMentor)
+    public function store(Request $request)
     {
-        return $submitRequestedMentor->submitRequestedMentor($request);
+        //
     }
 
     /**
