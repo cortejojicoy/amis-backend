@@ -1,6 +1,9 @@
 <?php
 namespace App\Services;
 
+use App\Models\Faculty;
+use App\Models\Student;
+use App\Models\StudentProgramRecord;
 use App\Models\Tag;
 use App\Models\User;
 use App\Models\UserPermissionTag;
@@ -23,6 +26,33 @@ class UserService {
                         ], 400
                     );
                 } else {
+                    if($request->role == 'student') {
+                        //create student table entry
+                        Student::create([
+                            'uuid' => 0,
+                            'sais_id' => $id,
+                            'campus_id' => $request->student_info['student_number']
+                        ]);
+                        
+                        //update previous SPR to NOT ACTIVE if existing
+                        StudentProgramRecord::where('campus_id', $request->student_info['student_number'])->update([
+                            'status' => 'NOT ACTIVE'
+                        ]);
+
+                        //Add the new SPR entry
+                        StudentProgramRecord::create([
+                            'campus_id' => $request->student_info['student_number'],
+                            'academic_program_id' => $request->student_info['acad_program'],
+                            'acad_group' => $request->student_info['acad_group'],
+                            'status' => 'ACTIVE'
+                        ]);
+                    } else if($request->role == 'faculty') {
+                        //create faculty table entry
+                        Faculty::create([
+                            'uuid' => 0,
+                            'sais_id' => $id
+                        ]);
+                    }
                     $user->assignRole($request->role);
                 }
             } else if ($request->mode == 'remove') {

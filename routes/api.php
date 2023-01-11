@@ -44,10 +44,14 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\Faculty\FacultyMentorController;
+use App\Http\Controllers\Faculty\FacultyPcwController;
+use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\Student\Program;
 use App\Http\Controllers\Student\StudentPcwController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentTermController;
+use App\Http\Controllers\SuperAdmin\CourseOfferingController as SuperAdminCourseOfferingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,7 +83,8 @@ Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculti
     Route::apiResource('matxns', FacultyMaTxnController::class);
     Route::apiResource('ma', FacultyMaController::class);
     Route::apiResource('faculty-ma', FacultyMaTableController::class);
-
+    Route::apiResource('plan-of-courseworks', FacultyPcwController::class);
+    Route::apiResource('mentors', FacultyMentorController::class);
 });
 
 Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'students', 'as' => 'students.'], function () {
@@ -115,6 +120,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:super_admin'],'prefix'=>'su
     Route::apiResource('roles', RoleController::class);
     Route::apiResource('tags', TagController::class);
     Route::apiResource('users', UserController::class);
+    Route::apiResource('course-offerings', SuperAdminCourseOfferingController::class);
 });
 
 //routes open for all roles but needs auth
@@ -127,6 +133,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::apiResource('programs', ProgramController::class);
     Route::apiResource('curriculums', CurriculumController::class);
     Route::apiResource('students', StudentController::class);
+    Route::apiResource('faculties', FacultyController::class);
     Route::apiResource('student-terms', StudentTermController::class);
     Route::get('student-info', [StudentDetailController::class, 'getStudentById']);
 });

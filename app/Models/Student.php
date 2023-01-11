@@ -11,6 +11,12 @@ class Student extends Model
     protected $primaryKey = 'campus_id';
     protected $keyType = 'string';
 
+    protected $fillable = [
+        'uuid',
+        'sais_id',
+        'campus_id',
+    ];
+
     public function program_records()
     {
         return $this->hasMany(StudentProgramRecord::class, 'campus_id', 'campus_id');
@@ -19,6 +25,11 @@ class Student extends Model
     public function student_grades()
     {
         return $this->hasMany(StudentGrade::class, 'campus_id', 'campus_id');
+    }
+
+    public function pcw()
+    {
+        return $this->hasOne(Pcw::class, 'sais_id', 'sais_id');
     }
 
     public function scopeProgramId($query) {
