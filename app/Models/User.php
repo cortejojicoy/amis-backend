@@ -111,9 +111,7 @@ class User extends Authenticatable
     public function mas() {
         return $this->hasMany(MaStudent::class, 'sais_id', 'sais_id');
     }
-}
 
-    
     public function scopeKeywords($query, $search) {
         // $query->select(DB::raw("faculties.sais_id AS faculty, CONCAT(users.first_name,' ',users.middle_name,' ',users.last_name) AS NAME, student_program_records.academic_program_id AS program, users.sais_id, student_program_records.status"))
         // ->distinct()
@@ -124,7 +122,7 @@ class User extends Authenticatable
         // ->where('users.first_name', 'LIKE', "$search")
         // ->orWhere('users.middle_name', 'LIKE', "$search")
         // ->orWhere('users.last_name', 'LIKE', "$search");
-
+    
         $query->select(DB::raw("CONCAT(users.first_name,' ',users.middle_name,' ',users.last_name) AS NAME"))
         ->where('users.first_name', 'LIKE', "$search")
         ->orWhere('users.middle_name', 'LIKE', "$search")

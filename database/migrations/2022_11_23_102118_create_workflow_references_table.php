@@ -11,16 +11,14 @@ return new class extends Migration
      *
      * @return void
      */
-
     public function up()
     {
-        Schema::create('student_program_records', function (Blueprint $table) {
-            $table->bigIncrements('student_program_record_id');
-            $table->string('campus_id', 10);
-            $table->string('academic_program_id', 10);
-            $table->string('acad_group', 10);
-            $table->integer('curriculum_id');
-            $table->string('status', 10);
+        Schema::create('workflow_references', function (Blueprint $table) {
+            $table->id();
+            $table->string('model_type');
+            $table->integer('model_id');
+            $table->string('module');
+            $table->integer('workflow_id');
             $table->timestamps();
         });
     }
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('student_program_records');
+        Schema::dropIfExists('workflow_references');
     }
 };
