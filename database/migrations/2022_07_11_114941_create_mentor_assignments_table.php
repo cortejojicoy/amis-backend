@@ -15,13 +15,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('mas', function (Blueprint $table) {
-            $table->string('mas_id', 15)->primary();
-            $table->integer('student_sais_id');
+            $table->string('id', 15)->primary();
+            $table->string('uuid', 36);
             $table->integer('faculty_id');
             $table->string('actions', 6);
             $table->string('status', 20);
             $table->string('mentor_name', 50);
-            $table->string('mentor_role', 50);
+            $table->integer('mentor_role');
             $table->timestamps();
         });
     }

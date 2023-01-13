@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->bigIncrements('admin_id')->from(53);
-            $table->integer('uuid');
+            $table->string('uuid', 36);
             $table->integer('sais_id');
             $table->string('unit', 10);
             $table->string('college', 10);

@@ -15,13 +15,14 @@ return new class extends Migration
     {
         Schema::create('save_mentors', function (Blueprint $table) {
             $table->id();
+            $table->string('mas_id', 36)->nullable();
             $table->string('actions', 20);
             $table->string('mentor_name', 255);
-            $table->string('mentor_role', 255);
+            $table->integer('mentor_role');
             $table->string('field_represented', 50)->nullable();
             $table->date('effectivity_start')->nullable();
             $table->date('effectivity_end')->nullable();
-            $table->integer('sais_id');
+            $table->string('uuid', 36);
             $table->integer('faculty_id');
             $table->string('actions_status', 11);
             $table->timestamps();

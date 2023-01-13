@@ -18,7 +18,7 @@ return new class extends Migration
             $table->bigIncrements('mas_txn_id');
             $table->string('mas_id', 15);
             $table->string('action', 20);
-            $table->integer('committed_by');
+            $table->string('committed_by', 36);
             $table->text('note')->nullable();
             $table->timestamps();
         });
