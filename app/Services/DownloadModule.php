@@ -17,11 +17,19 @@ class DownloadModule{
             $downloadData = DB::table('cois AS c')
             ->select(DB::raw("c.coi_id, co.term, co.acad_group, co.subject, co.catalog, co.section, c.class_id, u.sais_id, s.campus_id, u.last_name, u.first_name, u.middle_name, u.email, co.offer_nbr, c.created_at"))
             ->join('students AS s', 's.sais_id', '=', 'c.sais_id')
+            ->join('student_program_records AS spr', 'spr.campus_id', '=', 's.campus_id')
             ->join('users AS u', 's.sais_id', '=', 'u.sais_id')
             ->join('course_offerings AS co', 'co.class_nbr', '=', 'c.class_id')
-            ->where('c.status', 'Approved')
-            ->where('c.last_action', NULL)
-            ->whereIn('co.course', $toBeExcluded)
+            ->where(function($query) use ($toBeExcluded){
+                $query->where('c.status', 'Approved');
+                $query->where('c.last_action', NULL);
+                $query->whereIn('co.course', $toBeExcluded);
+            })
+            ->orWhere(function($query) {
+                $query->where('c.status', 'Approved');
+                $query->where('c.last_action', NULL);
+                $query->where('spr.acad_group', '=', 'CAFS');
+            })
             ->get()
             ->toArray();
 
