@@ -15,7 +15,7 @@ class DownloadModule{
 
         if($request->type == 'ocs') {
             $downloadData = DB::table('cois AS c')
-            ->select(DB::raw("c.coi_id, co.term, co.acad_group, co.subject, co.catalog, co.section, c.class_id, u.sais_id, s.campus_id, u.last_name, u.first_name, u.middle_name, u.email, co.offer_nbr, c.created_at"))
+            ->select(DB::raw("c.coi_id, co.term, co.acad_group, co.subject, co.catalog, co.section, c.class_id, u.sais_id, s.campus_id, spr.acad_group, u.last_name, u.first_name, u.middle_name, u.email, co.offer_nbr, c.created_at"))
             ->join('students AS s', 's.sais_id', '=', 'c.sais_id')
             ->join('student_program_records AS spr', 'spr.campus_id', '=', 's.campus_id')
             ->join('users AS u', 's.sais_id', '=', 'u.sais_id')
@@ -29,6 +29,7 @@ class DownloadModule{
                 $query->where('c.status', 'Approved');
                 $query->where('c.last_action', NULL);
                 $query->where('spr.acad_group', '=', 'CAFS');
+                $query->where('co.acad_group', '=', 'CAFS');
             })
             ->get()
             ->toArray();
@@ -43,6 +44,7 @@ class DownloadModule{
                 'Class Number',
                 'SAIS ID',
                 'Student Number',
+                'Student College',
                 'Last Name',
                 'First Name',
                 'Middle Name',
