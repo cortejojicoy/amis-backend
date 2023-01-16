@@ -30,7 +30,7 @@ return new class extends Migration
             $table->boolean('is_multiple_enrollment');
             $table->string('subject', 15);
             $table->string('course_number', 10);
-            $table->string('contact_hours', 50);
+            $table->string('contact_hours', 50)->nullable();
             $table->string('grading', 10);
             $table->integer('tm_id')->nullable();
             $table->timestamps();
