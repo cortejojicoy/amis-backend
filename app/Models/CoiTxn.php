@@ -69,7 +69,10 @@ class CoiTxn extends Model
                 ->join('cois AS c', 'coitxns.coi_id', '=', 'c.coi_id')
                 ->join('students AS s', 's.sais_id', '=', 'c.sais_id')
                 ->join('users AS u', 'u.sais_id', '=', 'coitxns.committed_by')
-                ->join('course_offerings AS co', 'co.class_nbr', '=', 'c.class_id')
+                ->leftJoin('course_offerings AS co', function($query) {
+                    $query->ON('co.class_nbr','=','c.class_id')
+                        ->where('co.term', '=', DB::raw('c.term'));
+                })
                 ->join('student_program_records as spr', 's.campus_id', 'spr.campus_id')
                 ->where('spr.status', 'ACTIVE');
             }
