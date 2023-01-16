@@ -100,7 +100,7 @@ class CourseOffering extends Model
         if($filters->has('with_cois')) {
             $query->with(['cois' => function ($query) use($filters) {
                 $query->where('cois.status', '=', $filters->coi_status)
-                    ->where('cois.term', '=', DB::raw("(select term_id from student_terms where status = 'ACTIVE')"));
+                    ->whereRelation('term', 'status', 'ACTIVE');
             }, 'cois.user', 'cois.student', 'cois.coitxns' => function ($query) use($filters) {
                 $query->where('coitxns.action', '=', $filters->coi_txn_status);
             }]);
