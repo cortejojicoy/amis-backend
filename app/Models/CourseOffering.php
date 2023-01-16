@@ -94,10 +94,13 @@ class CourseOffering extends Model
             $query->with(['faculty', 'faculty.user']);
         }
 
+        $query = $this->filterData($query, $filters);
+
         //with clauses
         if($filters->has('with_cois')) {
             $query->with(['cois' => function ($query) use($filters) {
-                $query->where('cois.status', '=', $filters->coi_status);
+                $query->where('cois.status', '=', $filters->coi_status)
+                    ->where('cois.term', '=', DB::raw("(select term_id from student_terms where status = 'ACTIVE')"));
             }, 'cois.user', 'cois.student', 'cois.coitxns' => function ($query) use($filters) {
                 $query->where('coitxns.action', '=', $filters->coi_txn_status);
             }]);
@@ -118,7 +121,6 @@ class CourseOffering extends Model
             }]);
         }
 
-        $query = $this->filterData($query, $filters);
     }
 
     public function filterData($query, $filters) {
