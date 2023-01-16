@@ -48,10 +48,14 @@ class UserService {
                         ]);
                     } else if($request->role == 'faculty') {
                         //create faculty table entry
-                        Faculty::create([
-                            'uuid' => 0,
-                            'sais_id' => $id
-                        ]);
+                        $faculty_exist = Faculty::where('sais_id', $id)->first();
+
+                        if(!$faculty_exist) {
+                            Faculty::create([
+                                'uuid' => 0,
+                                'sais_id' => $id
+                            ]);
+                        }
                     }
                     $user->assignRole($request->role);
                 }
