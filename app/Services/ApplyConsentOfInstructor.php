@@ -28,6 +28,7 @@ class ApplyConsentOfInstructor{
         if(empty($existingCOI)) {
             //check if course_offering has faculty assigned
             $co = CourseOffering::where('class_nbr', $request->class_id)
+                ->where('term', $studentTerm->term_id)
                 ->first()
                 ->toArray();
 
