@@ -21,12 +21,14 @@ class ApplyPrerogativeEnrollment{
 
         //check if student has already applied for the same class
         $toBeAppliedTo = CourseOffering::where('class_nbr', $request->class_id)
+            ->where('term', $studentTerm->term_id)
             ->first();
 
         //get course_offerings with the same course and component
         $conflictingCourses = CourseOffering::select('class_nbr')
             ->where('course', $toBeAppliedTo->course)
             ->where('component', $toBeAppliedTo->component)
+            ->where('term', $studentTerm->term_id)
             ->get()->pluck('class_nbr');
 
         //if the student has applied to one of those courses with statsus requested, approved_ocs, logged_ocs, then don't let the user apply.
@@ -55,6 +57,7 @@ class ApplyPrerogativeEnrollment{
         if(empty($existingPrerog)) {
             //check if course_offering has faculty assigned
             $co = CourseOffering::where('class_nbr', $request->class_id)
+                ->where('term', $studentTerm->term_id)
                 ->first()
                 ->toArray();
 
