@@ -68,6 +68,7 @@ class DownloadModule{
             ->join('course_offerings AS co', 'co.class_nbr', '=', 'c.class_id')
             ->where('c.status', 'Approved')
             ->where('c.last_action', NULL)
+            ->where('c.term', $active_term->term_id)
             ->where('co.term', $active_term->term_id)
             ->whereNotIn('co.course', $toBeExcluded)
             ->get()
