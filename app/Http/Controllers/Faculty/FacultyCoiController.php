@@ -63,15 +63,15 @@ class FacultyCoiController extends Controller
      */
     public function update(Request $request, $id, ApplyConsentOfInstructor $applyConsentOfInstructor)
     {
-        // if(config('app.coi_enabled')) {
-        return $applyConsentOfInstructor->updateCoi($request, $id);
-        // } else {
-        //     return response()->json(
-        //         [
-        //             'message' => 'Action Denied',
-        //         ], 400
-        //     );
-        // }
+        if(config('app.coi_enabled')) {
+            return $applyConsentOfInstructor->updateCoi($request, $id);
+        } else {
+            return response()->json(
+                [
+                    'message' => 'Action Denied',
+                ], 400
+            );
+        }
     }
 
     /**
