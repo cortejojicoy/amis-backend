@@ -26,6 +26,7 @@ class CourseOffering extends Model
         'class_nbr',
         'descr',
         'component',
+        'assoc',
         'section',
         'times',
         'days',
@@ -39,7 +40,8 @@ class CourseOffering extends Model
         'consent',
         'prerog',
         'offer_nbr',
-        'topic_id'
+        'topic_id',
+        'class_type'
     ];
 
     public function cois()

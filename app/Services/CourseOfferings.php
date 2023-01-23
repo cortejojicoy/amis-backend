@@ -57,6 +57,7 @@ class CourseOfferings{
                 'catalog' => $request->catalog,
                 'descr' => $request->descr,
                 'component' => $request->component,
+                'assoc' => $request->assoc,
                 'section' => $request->section,
                 'class_nbr' => $request->class_nbr,
                 'times' => $request->times ? $request->times : '',
@@ -70,7 +71,8 @@ class CourseOfferings{
                 'consent' => $request->consent,
                 'prerog' => true,
                 'offer_nbr' => $request->offer_nbr,
-                'topic_id' => $request->topic_id
+                'topic_id' => $request->topic_id,
+                'class_type' => $request->class_type
             ]);
 
             DB::commit();
