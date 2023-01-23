@@ -48,7 +48,6 @@ class PrerogTxn extends Model
                     ->join('prerogs AS p', 'p.prg_id', '=', 'prerog_txns.prg_id')
                     ->join('students AS s', 's.sais_id', '=', 'p.sais_id')
                     ->join('users AS u', 'u.sais_id', '=', 'prerog_txns.committed_by')
-                    ->join('course_offerings AS co', 'co.class_nbr', '=', 'p.class_id')
                     ->leftJoin('course_offerings AS co', function($query) {
                         $query->ON('co.class_nbr','=','p.class_id')
                             ->where('co.term', '=', DB::raw('p.term'));
