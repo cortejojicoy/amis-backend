@@ -29,23 +29,25 @@ class PutRequest extends FormRequest
     public function rules()
     {
         return [
-            'institution' => ['required', 'string', 'max:255', 'min:1'],
-            'career' => ['required', 'string', 'max:255','min:1'],
+            'institution' => ['required', 'string', 'max:255'],
+            'career' => ['required', 'string', 'max:255'],
             'course_id' => ['required', 'integer', 'min:1'],
-            'acad_org' => ['required', 'string', 'max:255', 'min:1'],
-            'acad_group' => ['required', 'string', 'max:255', 'min:1'],
-            'subject' => ['required', 'string', 'max:255', 'min:1'],
-            'catalog' => ['required', 'string', 'max:255', 'min:1'],
-            'descr' => ['required', 'string', 'max:255', 'min:1'],
-            'component' => ['required', 'string', 'max:255', 'min:1'],
-            'section' => ['required', 'string', 'max:255', 'min:1'],
+            'acad_org' => ['required', 'string', 'max:255'],
+            'acad_group' => ['required', 'string', 'max:255'],
+            'subject' => ['required', 'string', 'max:255'],
+            'catalog' => ['required', 'string', 'max:255'],
+            'descr' => ['required', 'string', 'max:255'],
+            'component' => ['required', 'string', 'max:255'],
+            'assoc' => ['required', 'integer'],
+            'section' => ['required', 'string', 'max:255'],
             'class_nbr' => ['required', 'integer', 'min:1'],
-            'times' => ['required', 'string', 'max:255', 'min:1'],
-            'days' => ['required', 'string', 'max:255', 'min:1'],
-            'id' => ['required', 'integer', 'min:1'],
-            'consent' => ['required', 'string', 'max:1', 'min:1'],
-            'offer_nbr' => ['required', 'integer', 'min:1'],
-            'topic_id' => ['required', 'integer', 'min:1'],
+            'times' => ['required', 'string', 'max:255'],
+            'days' => ['required', 'string', 'max:255'],
+            'id' => ['required', 'integer', 'min:0'],
+            'consent' => ['required', 'string', 'max:1'],
+            'offer_nbr' => ['required', 'integer', 'min:0'],
+            'topic_id' => ['required', 'integer', 'min:0'],
+            'class_type' => ['required', 'max:1']
         ];
     }
 }
