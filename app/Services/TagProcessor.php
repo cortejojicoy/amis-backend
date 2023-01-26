@@ -11,8 +11,7 @@ class TagProcessor {
     function process($query, $filter, $permission_name){
         //check permission of the user logged in
         // $user = User::find('sais_id', Auth::user()->sais_id);
-        $user = User::where('sais_id', 10066367)->first();
-        
+        $user = User::where('sais_id', Auth::user()->sais_id)->first();
         //if has permission, get tags
         if($user->hasPermissionTo($permission_name)) {
             $upr = UserPermissionTag::where('model_id', $user->sais_id)
