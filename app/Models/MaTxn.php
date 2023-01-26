@@ -15,7 +15,6 @@ class MaTxn extends Model
     protected $primaryKey = 'mas_txn_id';
 
     protected $fillable = [
-        'mas_txn_id',
         'mas_id',
         'action',
         'committed_by',
@@ -27,51 +26,41 @@ class MaTxn extends Model
     //     'created_at'
     // ];
 
-    
-
-    public function scopeFilter($query, $filters, $role){
+    public function scopeFilter($query, $filters, $role, $tagProcessor){
         if($role == 'students') {
             if($filters->has('txn_history')) {
-                $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
-                ->join('mas AS ma', 'ma.mas_id', '=', 'matxns.mas_id')
-                ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by');
+                $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, mr.titles as mentor_role, ma.faculty_id"))
+                ->join('mas AS ma', 'ma.id', '=', 'matxns.mas_id')
+                ->join('users as u', 'u.uuid', '=', 'matxns.committed_by')
+                ->join('mentor_roles as mr', 'mr.id', '=', 'ma.mentor_role');
             }  
             
-            if($filters->has('sais_id')) {
-                $query->where('ma.student_sais_id', $filters->sais_id);
+            if($filters->has('uuid')) {
+                $query->where('ma.uuid', $filters->uuid);
             }
         } else if ($role == 'faculties') {
             if($filters->has('txn_history')) {
-                $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
-                        ->join('mas as ma', 'ma.mas_id', '=', 'matxns.mas_id')
-                        ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by');
-                // if($filters->mentor->faculty_id != NULL) {
-                //     if($filters->mentor->faculty_id != '') {
-                        
-                //     }
-                // }
+                $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, mr.titles as mentor_role, ma.faculty_id"))
+                        ->join('mas as ma', 'ma.id', '=', 'matxns.mas_id')
+                        ->join('users as u', 'u.uuid', '=', 'matxns.committed_by')
+                        ->join('mentor_roles as mr', 'mr.id', '=', 'ma.mentor_role');
             }
             
-            if($filters->has('sais_id')) {
-                $query->where('ma.mentor_id', $filters->sais_id);
-            }
-            
+            // if($filters->mentor->faculty_id != '') {
+            //     $query->where('ma.faculty_id', $filters->mentor->faculty_id);
+            // }
+
         } else if ($role == 'admins') {
             if($filters->has('txn_history')) {
-                $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, ma.mentor_role, ma.mentor_id"))
-                ->join('mas as ma', 'ma.mas_id', '=', 'matxns.mas_id')
-                ->join('students as s', 's.sais_id' ,'=', 'ma.student_sais_id')
-                ->join('users as u', 'u.sais_id', '=', 'matxns.committed_by')
-                ->join('student_program_records as spr', 'spr.campus_id', '=', 's.campus_id');
+                $query->select(DB::raw("matxns.mas_id as trx_id, to_char(matxns.created_at, 'DD MON YYYY hh12:mi AM') as trx_date, action as trx_status, u.email as last_commit, ma.actions as action, note, ma.mentor_name as mentor, mr.titles as mentor_role, ma.faculty_id"))
+                ->join('mas as ma', 'ma.id', '=', 'matxns.mas_id')
+                ->join('mentor_roles as mr', 'mr.id', '=', 'ma.mentor_role')
+                ->join('students as s', 's.uuid' ,'=', 'ma.uuid')
+                ->join('users as u', 'u.uuid', '=', 'matxns.committed_by')
+                ->join('student_program_records', 'student_program_records.campus_id', '=', 's.campus_id');
             }
 
-            if($filters->admin->college != '') {
-                $query->where('spr.acad_group', $filters->admin->college);
-            }
-
-            if($filters->admin->unit != '') {
-                $query->where('spr.acad_org', $filters->admin->unit);
-            }
+            $query = $tagProcessor->process($query, $filters, 'tags');
         }
 
         if($filters->has('distinct')) {
@@ -86,9 +75,9 @@ class MaTxn extends Model
     }
 
     public function filterData($query, $filters) {
-        if($filters->has('mas_id')) {
+        if($filters->has('id')) {
             if($filters->mas_id != '--') {
-                $query->where('ma.mas_id', $filters->mas_id);
+                $query->where('ma.id', $filters->id);
             }
         }
 

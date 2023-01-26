@@ -23,6 +23,10 @@ class Faculty extends Model
         return $this->belongsTo(User::class,'sais_id','sais_id');
     }
 
+    public function appointment() {
+        return $this->belongsTo(FacultyAppointment::class, 'faculty_id', 'faculty_id');
+    }
+
     public function uuid() {
         return $this->belongsTo(User::class, 'uuid', 'uuid');
     }
@@ -31,6 +35,38 @@ class Faculty extends Model
         return $this->hasMany(Mentor::class, 'faculty_id', 'faculty_id');
     }
 
+    public function scopeFilter($query, $filters) {
+        if($filters->has('advisees')) {
+            $query->with(['user', 'mentor.faculty', 'mentor.mentor_role','mentor.student.student_user', 'mentor.student.program_records' => function($query) {
+                $query->where('student_program_records.status', '=', 'ACTIVE');
+            }]);
+        }
+
+        if($filters->has('faculty_list')) {
+            $query->with(['user', 'appointment']);
+        }
+
+        //select fields
+        if($filters->has('fields')) {
+            $query->select($filters->fields);
+        }
+
+        if($filters->has('uuid')) {
+            $query->where('uuid', $filters->uuid);
+        }
+        
+        $query = $this->filterData($query, $filters);
+    }
+
+    public function filterData($query, $filters) {
+        if($filters->has('course_code')) {
+            if($filters->course_code != '--') {
+                $query->where('course_code', $filters->course_code);
+            }
+        }
+
+        return $query;
+    }
         /**
      * Scope a query to only include active users.
      *
@@ -38,10 +74,6 @@ class Faculty extends Model
      * @return void
      */
     public function scopeInfo($query, $filters) {
-        if($filters->program->academic_program_id != '') {
-            $query->join('users', 'users.uuid', '=', 'faculties.uuid')
-                  ->where('program', $filters->program->academic_program_id);
-            
-        }
+        $query->join('users', 'users.uuid', '=', 'faculties.uuid');
     }
 }
