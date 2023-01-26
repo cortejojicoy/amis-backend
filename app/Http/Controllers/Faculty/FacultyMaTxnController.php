@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\MaTxn;
 use App\Models\Mentor;
 use App\Models\Faculty;
+use App\Services\TagProcessor;
 
 class FacultyMaTxnController extends Controller
 {
@@ -15,13 +16,12 @@ class FacultyMaTxnController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, TagProcessor $tagProcessor)
     {
-        $faculty = Faculty::where('sais_id', $request->sais_id)->first();
-        $mentor = Mentor::where('faculty_id', $faculty->faculty_id)->first();
-        $request->merge(['mentor' => $mentor]);
+        $faculty = Faculty::where('uuid', $request->uuid)->first();
+        $request->merge(['mentor' => $faculty]);
 
-        $ma_txns = MaTxn::filter($request, 'faculties');
+        $ma_txns = MaTxn::filter($request, 'faculties', $tagProcessor);
 
         if($request->has('items')) {
             $ma_txns = $ma_txns->paginate($request->items);
