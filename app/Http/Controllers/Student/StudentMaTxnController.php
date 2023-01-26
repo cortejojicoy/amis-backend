@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\MaTxn;
+use App\Services\TagProcessor;
 
 class StudentMaTxnController extends Controller
 {
@@ -14,9 +15,9 @@ class StudentMaTxnController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, TagProcessor $tagProcessor)
     {
-        $ma_txns = MaTxn::filter($request, 'students');
+        $ma_txns = MaTxn::filter($request, 'students', $tagProcessor);
 
         if($request->has('items')) {
             $ma_txns = $ma_txns->paginate($request->items);

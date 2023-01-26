@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Student;
 
+use App\Http\Requests\MentorAssignment\SubmitRequest;
+use App\Services\MentorAssignmentService;
+use App\Models\StudentProgramRecord;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\StudentProgramRecord;
-use App\Models\Program;
 use App\Models\SaveMentor;
+use App\Models\Program;
 use App\Models\Student;
 use App\Models\User;
 
@@ -19,8 +21,13 @@ class StudentMaController extends Controller
      */
     public function index(Request $request)
     {
-        // $ma = User::filter($request)->get();
         $ma = SaveMentor::filter($request)->get();
+        // if($request->has('items')) {
+        //     $ma = $ma->paginate($request->items);
+        // } else {
+        //     $ma = $ma->get();
+        // }
+
         return response()->json(
             [
              'ma' => $ma,
@@ -34,9 +41,13 @@ class StudentMaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(SubmitRequest $request, MentorAssignmentService $service)
     {
-        //
+        foreach($request->input() as $keys => $data) {
+            $mas_id[$keys] = $this->generateTxnID("MAS");
+            $loop = $service->submitRequestedMentor($data, $mas_id[$keys]);
+        }
+        return $loop;
     }
 
     /**
@@ -71,5 +82,10 @@ class StudentMaController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function bulkUpdate(Request $request, MentorAssignmentService $bulkUpdateSaveMentor)
+    {
+        return $bulkUpdateSaveMentor->insertDeleteSaveMentor($request);
     }
 }
