@@ -5,33 +5,39 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\Auth\GoogleController;
 
+use App\Http\Controllers\Student\CoiController;
+use App\Http\Controllers\Student\CoiTxnController;
+use App\Http\Controllers\Student\PrerogController;
+use App\Http\Controllers\Student\PrerogTxnController;
+use App\Http\Controllers\Student\PcwController;
 use App\Http\Controllers\Student\StudentAddMentorController;
 use App\Http\Controllers\Student\StudentDetailController;
 use App\Http\Controllers\Student\StudentMaTxnController;
 use App\Http\Controllers\Student\StudentMaController;
 use App\Http\Controllers\Student\StudentActiveMentorController;
 use App\Http\Controllers\Student\StudentConfirmController;
-use App\Http\Controllers\Student\StudentCoiController;
-use App\Http\Controllers\Student\StudentCoiTxnController;
-use App\Http\Controllers\Student\StudentPrerogController;
-use App\Http\Controllers\Student\StudentPrerogTxnController;
+use App\Http\Controllers\Student\Program;
 
-use App\Http\Controllers\Faculty\FacultyCoiController;
-use App\Http\Controllers\Faculty\FacultyCoiTxnController;
-use App\Http\Controllers\Faculty\FacultyPrerogController;
-use App\Http\Controllers\Faculty\FacultyPrerogTxnController;
+use App\Http\Controllers\Faculty\CoiController as FacultyCoiController;
+use App\Http\Controllers\Faculty\CoiTxnController as FacultyCoiTxnController;
+use App\Http\Controllers\Faculty\PrerogController as FacultyPrerogController;
+use App\Http\Controllers\Faculty\PrerogTxnController as FacultyPrerogTxnController;
+use App\Http\Controllers\Faculty\PcwController as FacultyPcwController;
 use App\Http\Controllers\Faculty\FacultyMaTableController;
 use App\Http\Controllers\Faculty\FacultyMaTxnController;
 use App\Http\Controllers\Faculty\FacultyMaController;
+use App\Http\Controllers\Faculty\FacultyMentorController;
 
-use App\Http\Controllers\Admin\AdminCoiTxnController;
-use App\Http\Controllers\Admin\AdminPrerogController;
-use App\Http\Controllers\Admin\AdminPrerogTxnController;
+use App\Http\Controllers\Admin\CoiTxnController as AdminCoiTxnController;
+use App\Http\Controllers\Admin\PrerogController as AdminPrerogController;
+use App\Http\Controllers\Admin\PrerogTxnController as AdminPrerogTxnController;
 use App\Http\Controllers\Admin\AdminMaTableController;
 use App\Http\Controllers\Admin\AdminMaTxnController;
 use App\Http\Controllers\Admin\AdminMaController;
 
 use App\Http\Controllers\SuperAdmin\DownloadController;
+use App\Http\Controllers\SuperAdmin\CourseOfferingController as SuperAdminCourseOfferingController;
+
 
 use App\Http\Controllers\CourseOfferingController;
 use App\Http\Controllers\ExternalLinkController;
@@ -44,14 +50,9 @@ use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\CourseController;
-use App\Http\Controllers\Faculty\FacultyMentorController;
-use App\Http\Controllers\Faculty\FacultyPcwController;
 use App\Http\Controllers\FacultyController;
-use App\Http\Controllers\Student\Program;
-use App\Http\Controllers\Student\StudentPcwController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\StudentTermController;
-use App\Http\Controllers\SuperAdmin\CourseOfferingController as SuperAdminCourseOfferingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,11 +90,11 @@ Route::group(['middleware' => ['auth:sanctum','role:faculty'],'prefix'=>'faculti
 
 Route::group(['middleware' => ['auth:sanctum', 'role:student'],'prefix'=>'students', 'as' => 'students.'], function () {
     Route::apiResource('programs', Program::class);
-    Route::apiResource('consent-of-instructors', StudentCoiController::class);
-    Route::apiResource('coitxns', StudentCoiTxnController::class);
-    Route::apiResource('prerogative-enrollments', StudentPrerogController::class);
-    Route::apiResource('prerog_txns', StudentPrerogTxnController::class);
-    Route::apiResource('plan-of-courseworks', StudentPcwController::class);
+    Route::apiResource('consent-of-instructors', CoiController::class);
+    Route::apiResource('coitxns', CoiTxnController::class);
+    Route::apiResource('prerogative-enrollments', PrerogController::class);
+    Route::apiResource('prerog_txns', PrerogTxnController::class);
+    Route::apiResource('plan-of-courseworks', PcwController::class);
 
     Route::apiResource('matxns', StudentMaTxnController::class);
     Route::apiResource('student-confirm', StudentConfirmController::class);

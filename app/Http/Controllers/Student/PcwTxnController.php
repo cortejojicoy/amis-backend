@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class StudentPcwTxnController extends Controller
+class PcwTxnController extends Controller
 {
     /**
      * Display a listing of the resource.

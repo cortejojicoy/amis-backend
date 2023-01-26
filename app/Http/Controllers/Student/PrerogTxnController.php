@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use App\Models\Pcw;
-use App\Services\GenericService;
-use App\Services\PlanOfCourseworkService;
+use App\Models\PrerogTxn;
 use Illuminate\Http\Request;
+use stdClass;
 
-class StudentPcwController extends Controller
+class PrerogTxnController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,17 +16,21 @@ class StudentPcwController extends Controller
      */
     public function index(Request $request)
     {
-        $pcws = Pcw::filter($request, 'student');
-
-        if($request->has('items')) {
-            $pcws = $pcws->paginate($request->items);
-        } else {
-            $pcws = $pcws->get();
-        }
+        $prerogTxns = PrerogTxn::filter($request, 'students');
         
+        if($request->has('items')) {
+            $prerogTxns = $prerogTxns->paginate($request->items);
+        } else {
+            $prerogTxns = $prerogTxns->get();
+        }
+
+        //get the keys of the txns
+        $keys = ['reference_id', 'course', 'section', 'schedule', 'note', 'action', 'date_created', 'committed_by', 'last_action_date'];
+
         return response()->json(
             [
-             'pcws' => $pcws,
+             'txns' => $prerogTxns,
+             'keys' => $keys,
             ], 200
          );
     }
@@ -38,17 +41,9 @@ class StudentPcwController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, PlanOfCourseworkService $planOfCourseworkService)
+    public function store(Request $request)
     {
-        if(config('app.pcw_enabled')) {
-            return $planOfCourseworkService->createPCW($request);
-        } else {
-            return response()->json(
-                [
-                    'message' => 'Action Denied',
-                ], 400
-            );
-        }
+        //
     }
 
     /**
