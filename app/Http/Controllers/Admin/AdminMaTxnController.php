@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MaTxn;
 use App\Models\Admin;
+use App\Services\TagProcessor;
 
 class AdminMaTxnController extends Controller
 {
@@ -14,12 +15,9 @@ class AdminMaTxnController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, TagProcessor $tagProcessor)
     {
-        $admin = Admin::where('sais_id', $request->sais_id)->first();
-        $request->merge(['admin' => $admin]);
-
-        $ma_txns = MaTxn::filter($request, 'admins');
+        $ma_txns = MaTxn::filter($request, 'admins', $tagProcessor);
 
         if($request->has('items')) {
             $ma_txns = $ma_txns->paginate($request->items);

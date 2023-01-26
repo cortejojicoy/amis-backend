@@ -6,8 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\MentorStatus;
 use App\Models\Ma;
-use App\Models\Admin;
+use App\Models\Mentor;
 use App\Services\MentorAssignmentApproval;
+use App\Services\TagProcessor;
 
 class AdminMaController extends Controller
 {
@@ -16,19 +17,21 @@ class AdminMaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index(Request $request, TagProcessor $tagProcessor)
     {
-        // dd($request);
-        $tags = Admin::where('sais_id', $request->mentor_id)->first();
-        $request->merge(['admin' => $tags]);
+        // $mentor = Mentor::where('uuid', $request->uuid)->first();
+        // $request->merge(['mentor' => $mentor]);
+
+        $ma = Ma::filter($request, $tagProcessor);
         
-        // $mas = MentorStatus::filter($request, 'admins')->get();
-        $mas = Ma::maRequest($request, 'admins')->get();
+        if($request->has('items')) {
+            $ma = $ma->paginate($request->items);
+        } else {
+            $ma = $ma->get();
+        }
         
-        $keys = ['actions', 'mentor_name', 'roles', 'field_represented', 'actions'];
         return response()->json([
-            'mas' => $mas,
-            'keys' => $keys
+            'ma' => $ma
         ],200);
     }
 
@@ -62,11 +65,6 @@ class AdminMaController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    // public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
-    // {
-    //     return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'admins');
-    // }
-    
     public function update(Request $request, $id, MentorAssignmentApproval $mentorAssignmentApproval)
     {
         $mas_id = $this->generateTxnID("MAS");
