@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Student;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Prerog;
-use App\Services\ApplyPrerogativeEnrollment;
+use App\Models\Admin;
+use App\Models\PrerogTxn;
 use Illuminate\Http\Request;
 
-class StudentPrerogController extends Controller
+class PrerogTxnController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,18 +15,26 @@ class StudentPrerogController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {
-        $prgs = Prerog::filter($request, 'students');
+    {   
+        $admin = Admin::where('sais_id', $request->sais_id)->first();
+        $request->merge(['admin' => $admin]);
 
-        if($request->has('items')) {
-            $prgs = $prgs->paginate($request->items);
-        } else {
-            $prgs = $prgs->get();
-        }
+        $prerogTxns = PrerogTxn::filter($request, 'admins');
         
+        if($request->has('items')) {
+            $prerogTxns = $prerogTxns->paginate($request->items);
+        } else {
+            $prerogTxns = $prerogTxns->get();
+        }
+
+        //get the keys of the txns
+        $keys = ['reference_id', 'term', 'course', 'section', 'student_no', 'action', 'date_created', 'committed_by', 'last_action_date'];
+
         return response()->json(
             [
-             'prgs' => $prgs,
+             'txns' => $prerogTxns,
+             'keys' => $keys,
+             'admin' => $admin->college
             ], 200
          );
     }
@@ -37,20 +45,9 @@ class StudentPrerogController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
+    public function store(Request $request)
     {
-        if(config('app.prerog_enabled')) {
-            $prgID = $this->generateTxnID("PRG");
-            $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
-
-            return $applyPrerogativeEnrollment->createPrerog($request, $prgID, $externalLinkToken);
-        } else {
-            return response()->json(
-                [
-                    'message' => 'Action Denied',
-                ], 400
-            );
-        }
+        //
     }
 
     /**
@@ -71,9 +68,9 @@ class StudentPrerogController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
+    public function update(Request $request, $id)
     {
-        return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'students');
+        //
     }
 
     /**

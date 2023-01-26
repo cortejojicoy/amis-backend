@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Faculty;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Prerog;
 use App\Services\ApplyPrerogativeEnrollment;
 use Illuminate\Http\Request;
 
-class FacultyPrerogController extends Controller
+class PrerogController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,7 +17,10 @@ class FacultyPrerogController extends Controller
      */
     public function index(Request $request)
     {
-        $prgs = Prerog::filter($request, 'faculties');
+        $admin = Admin::where('sais_id', $request->sais_id)->first();
+        $request->merge(['admin' => $admin]);
+
+        $prgs = Prerog::filter($request, 'admins');
 
         if($request->has('items')) {
             $prgs = $prgs->paginate($request->items);
@@ -63,9 +67,7 @@ class FacultyPrerogController extends Controller
     public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
         if(config('app.prerog_enabled')) {
-            $external_link_token = $this->generateRandomAlphaNum(50, 1);
-
-            return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'faculties', $external_link_token);
+            return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'admins');
         } else {
             return response()->json(
                 [

@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Faculty;
+namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use App\Models\CoiTxn;
+use App\Models\Pcw;
+use App\Services\GenericService;
+use App\Services\PlanOfCourseworkService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class FacultyCoiTxnController extends Controller
+class PcwController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,20 +17,17 @@ class FacultyCoiTxnController extends Controller
      */
     public function index(Request $request)
     {
-        $coiTxns = CoiTxn::filter($request, 'faculties');
+        $pcws = Pcw::filter($request, 'student');
 
         if($request->has('items')) {
-            $coiTxns = $coiTxns->paginate($request->items);
+            $pcws = $pcws->paginate($request->items);
         } else {
-            $coiTxns = $coiTxns->get();
+            $pcws = $pcws->get();
         }
-
-        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
-
+        
         return response()->json(
             [
-             'txns' => $coiTxns,
-             'keys' => $keys,
+             'pcws' => $pcws,
             ], 200
          );
     }
@@ -40,9 +38,17 @@ class FacultyCoiTxnController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, PlanOfCourseworkService $planOfCourseworkService)
     {
-        //
+        if(config('app.pcw_enabled')) {
+            return $planOfCourseworkService->createPCW($request);
+        } else {
+            return response()->json(
+                [
+                    'message' => 'Action Denied',
+                ], 400
+            );
+        }
     }
 
     /**

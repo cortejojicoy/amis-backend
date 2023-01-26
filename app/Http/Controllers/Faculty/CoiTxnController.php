@@ -1,22 +1,37 @@
 <?php
 
-namespace App\Http\Controllers\Student;
+namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
-use App\Services\ApplyConsentOfInstructor;
+use App\Models\CoiTxn;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-
-class StudentCoiController extends Controller
+class CoiTxnController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $coiTxns = CoiTxn::filter($request, 'faculties');
+
+        if($request->has('items')) {
+            $coiTxns = $coiTxns->paginate($request->items);
+        } else {
+            $coiTxns = $coiTxns->get();
+        }
+
+        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
+
+        return response()->json(
+            [
+             'txns' => $coiTxns,
+             'keys' => $keys,
+            ], 200
+         );
     }
 
     /**
@@ -25,20 +40,9 @@ class StudentCoiController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, ApplyConsentOfInstructor $applyConsentOfInstructor)
+    public function store(Request $request)
     {
-        if(config('app.coi_enabled')) {
-            $coiID = $this->generateTxnID("COI");
-            $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
-            
-            return $applyConsentOfInstructor->createCoi($request, $coiID, $externalLinkToken);
-        } else {
-            return response()->json(
-                [
-                    'message' => 'Action Denied',
-                ], 400
-            );
-        }
+        //
     }
 
     /**

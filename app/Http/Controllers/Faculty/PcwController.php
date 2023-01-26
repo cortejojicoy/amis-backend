@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Student;
+namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
-use App\Models\PrerogTxn;
+use App\Http\Requests\PcwUpdateRequest;
+use App\Models\Pcw;
 use Illuminate\Http\Request;
-use stdClass;
 
-class StudentPrerogTxnController extends Controller
+class PcwController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,21 +16,17 @@ class StudentPrerogTxnController extends Controller
      */
     public function index(Request $request)
     {
-        $prerogTxns = PrerogTxn::filter($request, 'students');
-        
+        $pcws = Pcw::filter($request, 'faculty');
+
         if($request->has('items')) {
-            $prerogTxns = $prerogTxns->paginate($request->items);
+            $pcws = $pcws->paginate($request->items);
         } else {
-            $prerogTxns = $prerogTxns->get();
+            $pcws = $pcws->get();
         }
-
-        //get the keys of the txns
-        $keys = ['reference_id', 'course', 'section', 'schedule', 'note', 'action', 'date_created', 'committed_by', 'last_action_date'];
-
+        
         return response()->json(
             [
-             'txns' => $prerogTxns,
-             'keys' => $keys,
+             'pcws' => $pcws,
             ], 200
          );
     }
@@ -64,9 +60,9 @@ class StudentPrerogTxnController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PcwUpdateRequest $request, $id)
     {
-        //
+        
     }
 
     /**
