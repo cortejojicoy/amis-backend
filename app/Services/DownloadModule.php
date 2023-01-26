@@ -31,15 +31,15 @@ class DownloadModule{
                 $query->where('co.term', $active_term->term_id);
                 $query->whereIn('co.course', $toBeExcluded);
             })
-            ->orWhere(function($query) use ($active_term) {
-                $query->where('c.status', 'Approved');
-                $query->where('c.last_action', NULL);
-                $query->where('c.term', $active_term->term_id);
-                $query->where('spr.status', '=', 'ACTIVE');
-                $query->where('spr.acad_group', '=', 'CAFS');
-                $query->where('co.term', $active_term->term_id);
-                $query->where('co.acad_group', '=', 'CAFS');
-            })
+            // ->orWhere(function($query) use ($active_term) {
+            //     $query->where('c.status', 'Approved');
+            //     $query->where('c.last_action', NULL);
+            //     $query->where('c.term', $active_term->term_id);
+            //     $query->where('spr.status', '=', 'ACTIVE');
+            //     $query->where('spr.acad_group', '=', 'CAFS');
+            //     $query->where('co.term', $active_term->term_id);
+            //     $query->where('co.acad_group', '=', 'CAFS');
+            // })
             ->get()
             ->toArray();
             
