@@ -25,6 +25,7 @@ return new class extends Migration
             $table->string('uuid', 36);
             $table->integer('faculty_id');
             $table->string('actions_status', 11);
+            $table->string('status', 11)->nullable();
             $table->timestamps();
         });
     }
