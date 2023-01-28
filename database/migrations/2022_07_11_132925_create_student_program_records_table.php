@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('academic_program_id', 10);
             $table->string('acad_group', 10);
             $table->string('acad_org', 10);
+            $table->integer('curriculum_id');
             $table->string('status', 10);
             $table->timestamps();
         });

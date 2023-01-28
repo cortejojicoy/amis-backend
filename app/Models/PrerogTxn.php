@@ -31,7 +31,10 @@ class PrerogTxn extends Model
             if($filters->has('txn_history')) {
                 $query->select(DB::raw("p.prg_id as reference_id, p.term, co.course, co.section, CONCAT(co.days, ' ', co.times) AS schedule, prerog_txns.note, prerog_txns.action, to_char(prerog_txns.created_at, 'DD MON YYYY hh12:mi AM') as date_created, u.email as committed_by, to_char(p.submitted_to_sais, 'DD MON YYYY hh12:mi AM') as last_action_date"))
                     ->leftJoin('prerogs AS p', 'p.prg_id', '=', 'prerog_txns.prg_id')
-                    ->leftJoin('course_offerings AS co', 'p.class_id', 'co.class_nbr')
+                    ->leftJoin('course_offerings AS co', function($query) {
+                        $query->ON('co.class_nbr','=','p.class_id')
+                            ->where('co.term', '=', DB::raw('p.term'));
+                    })
                     ->leftJoin('users AS u', 'u.sais_id', '=', 'prerog_txns.committed_by')
                     ->leftJoin('students AS s', 's.sais_id', 'u.sais_id');
             }
@@ -45,7 +48,10 @@ class PrerogTxn extends Model
                     ->join('prerogs AS p', 'p.prg_id', '=', 'prerog_txns.prg_id')
                     ->join('students AS s', 's.sais_id', '=', 'p.sais_id')
                     ->join('users AS u', 'u.sais_id', '=', 'prerog_txns.committed_by')
-                    ->join('course_offerings AS co', 'co.class_nbr', '=', 'p.class_id')
+                    ->leftJoin('course_offerings AS co', function($query) {
+                        $query->ON('co.class_nbr','=','p.class_id')
+                            ->where('co.term', '=', DB::raw('p.term'));
+                    })
                     ->join('faculties AS f', 'f.sais_id', '=', 'co.id');
             }
 
@@ -58,7 +64,10 @@ class PrerogTxn extends Model
                     ->join('prerogs AS p', 'p.prg_id', '=', 'prerog_txns.prg_id')
                     ->join('students AS s', 's.sais_id', '=', 'p.sais_id')
                     ->join('users AS u', 'u.sais_id', '=', 'prerog_txns.committed_by')
-                    ->join('course_offerings AS co', 'co.class_nbr', '=', 'p.class_id')
+                    ->leftJoin('course_offerings AS co', function($query) {
+                        $query->ON('co.class_nbr','=','p.class_id')
+                            ->where('co.term', '=', DB::raw('p.term'));
+                    })
                     ->join('student_program_records as spr', 's.campus_id', 'spr.campus_id')
                     ->where('spr.status', 'ACTIVE');
             }

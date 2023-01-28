@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
-use App\Models\PrerogTxn;
+use App\Models\Coi;
+use App\Services\ApplyConsentOfInstructor;
 use Illuminate\Http\Request;
 
-class AdminPrerogTxnController extends Controller
+
+class CoiController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -15,26 +16,18 @@ class AdminPrerogTxnController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {   
-        $admin = Admin::where('sais_id', $request->sais_id)->first();
-        $request->merge(['admin' => $admin]);
+    {
+        $cois = Coi::filter($request, 'faculties');
 
-        $prerogTxns = PrerogTxn::filter($request, 'admins');
-        
         if($request->has('items')) {
-            $prerogTxns = $prerogTxns->paginate($request->items);
+            $cois = $cois->paginate($request->items);
         } else {
-            $prerogTxns = $prerogTxns->get();
+            $cois = $cois->get();
         }
-
-        //get the keys of the txns
-        $keys = ['reference_id', 'term', 'course', 'section', 'student_no', 'action', 'date_created', 'committed_by', 'last_action_date'];
-
+        
         return response()->json(
             [
-             'txns' => $prerogTxns,
-             'keys' => $keys,
-             'admin' => $admin->college
+             'cois' => $cois,
             ], 200
          );
     }
@@ -68,9 +61,17 @@ class AdminPrerogTxnController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, ApplyConsentOfInstructor $applyConsentOfInstructor)
     {
-        //
+        // if(config('app.coi_enabled')) {
+        return $applyConsentOfInstructor->updateCoi($request, $id);
+        // } else {
+        //     return response()->json(
+        //         [
+        //             'message' => 'Action Denied',
+        //         ], 400
+        //     );
+        // }
     }
 
     /**

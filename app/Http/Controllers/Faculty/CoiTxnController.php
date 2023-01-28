@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Student;
+namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
-use App\Models\Prerog;
-use App\Services\ApplyPrerogativeEnrollment;
+use App\Models\CoiTxn;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-class StudentPrerogController extends Controller
+class CoiTxnController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,17 +16,20 @@ class StudentPrerogController extends Controller
      */
     public function index(Request $request)
     {
-        $prgs = Prerog::filter($request, 'students');
+        $coiTxns = CoiTxn::filter($request, 'faculties');
 
         if($request->has('items')) {
-            $prgs = $prgs->paginate($request->items);
+            $coiTxns = $coiTxns->paginate($request->items);
         } else {
-            $prgs = $prgs->get();
+            $coiTxns = $coiTxns->get();
         }
-        
+
+        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
+
         return response()->json(
             [
-             'prgs' => $prgs,
+             'txns' => $coiTxns,
+             'keys' => $keys,
             ], 200
          );
     }
@@ -37,20 +40,9 @@ class StudentPrerogController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
+    public function store(Request $request)
     {
-        if(config('app.prerog_enabled')) {
-            $prgID = $this->generateTxnID("PRG");
-            $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
-
-            return $applyPrerogativeEnrollment->createPrerog($request, $prgID, $externalLinkToken);
-        } else {
-            return response()->json(
-                [
-                    'message' => 'Action Denied',
-                ], 400
-            );
-        }
+        //
     }
 
     /**
@@ -71,9 +63,9 @@ class StudentPrerogController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
+    public function update(Request $request, $id)
     {
-        return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'students');
+        //
     }
 
     /**

@@ -35,8 +35,11 @@ class CoiTxn extends Model
         if($role == 'students') {
             if($filters->has('txn_history')) {
                 $query->select(DB::raw("c.coi_id as reference_id, c.term, co.course, co.section, CONCAT(co.days, ' ', co.times) AS schedule, coitxns.note, coitxns.action, to_char(coitxns.created_at, 'DD MON YYYY hh12:mi AM') as date_created, u.email as committed_by, c.last_action, to_char(c.last_action_date, 'DD MON YYYY hh12:mi AM') as last_action_date"))
-                    ->leftJoin('cois AS c', 'c.coi_id', '=', 'coitxns.coi_id')
-                    ->leftJoin('course_offerings AS co', 'c.class_id', 'co.class_nbr')
+                    ->join('cois AS c', 'c.coi_id', 'coitxns.coi_id')
+                    ->leftJoin('course_offerings AS co', function($query) {
+                        $query->ON('co.class_nbr','=','c.class_id')
+                            ->where('co.term', '=', DB::raw('c.term'));
+                    })
                     ->leftJoin('users AS u', 'u.sais_id', '=', 'coitxns.committed_by')
                     ->leftJoin('students AS s', 's.sais_id', 'u.sais_id');
             }
@@ -50,7 +53,10 @@ class CoiTxn extends Model
                     ->join('cois AS c', 'c.coi_id', '=', 'coitxns.coi_id')
                     ->join('students AS s', 's.sais_id', '=', 'c.sais_id')
                     ->join('users AS u', 'u.sais_id', '=', 'coitxns.committed_by')
-                    ->join('course_offerings AS co', 'co.class_nbr', '=', 'c.class_id')
+                    ->leftJoin('course_offerings AS co', function($query) {
+                        $query->ON('co.class_nbr','=','c.class_id')
+                            ->where('co.term', '=', DB::raw('c.term'));
+                    })
                     ->join('faculties AS f', 'f.sais_id', '=', 'co.id');
             }
 
@@ -63,12 +69,15 @@ class CoiTxn extends Model
                 ->join('cois AS c', 'coitxns.coi_id', '=', 'c.coi_id')
                 ->join('students AS s', 's.sais_id', '=', 'c.sais_id')
                 ->join('users AS u', 'u.sais_id', '=', 'coitxns.committed_by')
-                ->join('course_offerings AS co', 'co.class_nbr', '=', 'c.class_id')
+                ->leftJoin('course_offerings AS co', function($query) {
+                    $query->ON('co.class_nbr','=','c.class_id')
+                        ->where('co.term', '=', DB::raw('c.term'));
+                })
                 ->join('student_program_records as spr', 's.campus_id', 'spr.campus_id')
                 ->where('spr.status', 'ACTIVE');
             }
 
-            // $query = $tagProcessor->process($query, $filters, "can view coi");
+            // $query = $tagProcessor->process($query, $filters);
             if($filters->admin->college != '') {
                 $query->where('spr.acad_group', $filters->admin->college);
             }

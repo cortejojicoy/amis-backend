@@ -20,8 +20,9 @@ class TagController extends Controller
     // DO NOT DELETE THIS LINE! THIS SHOWS THE IMPLEMENTATION ON HOW TAGS SHOULD WORK
     // public function index(Request $request, TagProcessor $tagProcessor)
     // {
+    //     $request->merge(['access_permission' => 'can view coi']);
     //     $upts = CoiTxn::filter($request, "admins", $tagProcessor)->get();
-        
+    //
     //     return response()->json(
     //         [
     //          'upts' => $upts,

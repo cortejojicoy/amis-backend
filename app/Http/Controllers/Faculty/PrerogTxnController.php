@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
-use App\Models\Coi;
-use App\Services\ApplyConsentOfInstructor;
+use App\Models\PrerogTxn;
 use Illuminate\Http\Request;
 
-
-class FacultyCoiController extends Controller
+class PrerogTxnController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,17 +15,20 @@ class FacultyCoiController extends Controller
      */
     public function index(Request $request)
     {
-        $cois = Coi::filter($request, 'faculties');
+        $prgTxns = PrerogTxn::filter($request, 'faculties');
 
         if($request->has('items')) {
-            $cois = $cois->paginate($request->items);
+            $prgTxns = $prgTxns->paginate($request->items);
         } else {
-            $cois = $cois->get();
+            $prgTxns = $prgTxns->get();
         }
-        
+
+        $keys = ['reference_id', 'term', 'course', 'section', 'student_no', 'action', 'date_created', 'committed_by', 'last_action_date'];
+
         return response()->json(
             [
-             'cois' => $cois,
+             'txns' => $prgTxns,
+             'keys' => $keys,
             ], 200
          );
     }
@@ -61,17 +62,9 @@ class FacultyCoiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, ApplyConsentOfInstructor $applyConsentOfInstructor)
+    public function update(Request $request, $id)
     {
-        if(config('app.coi_enabled')) {
-            return $applyConsentOfInstructor->updateCoi($request, $id);
-        } else {
-            return response()->json(
-                [
-                    'message' => 'Action Denied',
-                ], 400
-            );
-        }
+        //
     }
 
     /**

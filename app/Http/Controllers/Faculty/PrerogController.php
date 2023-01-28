@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Student;
+namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
-use App\Models\CoiTxn;
+use App\Models\Prerog;
+use App\Services\ApplyPrerogativeEnrollment;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class StudentCoiTxnController extends Controller
+class PrerogController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,22 +16,17 @@ class StudentCoiTxnController extends Controller
      */
     public function index(Request $request)
     {
-        //get the coi_txn_history of student
-        $coiTxns = CoiTxn::filter($request, 'students');
-        
+        $prgs = Prerog::filter($request, 'faculties');
+
         if($request->has('items')) {
-            $coiTxns = $coiTxns->paginate($request->items);
+            $prgs = $prgs->paginate($request->items);
         } else {
-            $coiTxns = $coiTxns->get();
+            $prgs = $prgs->get();
         }
-
-        //get the keys of the txns
-        $keys = ['reference_id', 'course', 'section', 'schedule', 'note', 'action', 'date_created', 'committed_by', 'last_action', 'last_action_date'];
-
+        
         return response()->json(
             [
-             'txns' => $coiTxns,
-             'keys' => $keys,
+             'prgs' => $prgs,
             ], 200
          );
     }
@@ -65,9 +60,19 @@ class StudentCoiTxnController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, ApplyPrerogativeEnrollment $applyPrerogativeEnrollment)
     {
-        //
+        if(config('app.prerog_enabled')) {
+            $external_link_token = $this->generateRandomAlphaNum(50, 1);
+
+            return $applyPrerogativeEnrollment->updatePrerog($request, $id, 'faculties', $external_link_token);
+        } else {
+            return response()->json(
+                [
+                    'message' => 'Action Denied',
+                ], 400
+            );
+        }
     }
 
     /**

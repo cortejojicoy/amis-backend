@@ -1,36 +1,22 @@
 <?php
 
-namespace App\Http\Controllers\Faculty;
+namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use App\Models\PrerogTxn;
+use App\Services\ApplyConsentOfInstructor;
 use Illuminate\Http\Request;
 
-class FacultyPrerogTxnController extends Controller
+
+class CoiController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $prgTxns = PrerogTxn::filter($request, 'faculties');
-
-        if($request->has('items')) {
-            $prgTxns = $prgTxns->paginate($request->items);
-        } else {
-            $prgTxns = $prgTxns->get();
-        }
-
-        $keys = ['reference_id', 'term', 'course', 'section', 'student_no', 'action', 'date_created', 'committed_by', 'last_action_date'];
-
-        return response()->json(
-            [
-             'txns' => $prgTxns,
-             'keys' => $keys,
-            ], 200
-         );
+        //
     }
 
     /**
@@ -39,9 +25,20 @@ class FacultyPrerogTxnController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, ApplyConsentOfInstructor $applyConsentOfInstructor)
     {
-        //
+        if(config('app.coi_enabled')) {
+            $coiID = $this->generateTxnID("COI");
+            $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
+            
+            return $applyConsentOfInstructor->createCoi($request, $coiID, $externalLinkToken);
+        } else {
+            return response()->json(
+                [
+                    'message' => 'Action Denied',
+                ], 400
+            );
+        }
     }
 
     /**

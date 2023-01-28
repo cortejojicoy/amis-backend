@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Faculty;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\CoiTxn;
+use App\Models\StudentTerm;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class FacultyCoiTxnController extends Controller
+class StudentTermController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,20 +14,17 @@ class FacultyCoiTxnController extends Controller
      */
     public function index(Request $request)
     {
-        $coiTxns = CoiTxn::filter($request, 'faculties');
-
+        $student_terms = StudentTerm::filter($request);
+        
         if($request->has('items')) {
-            $coiTxns = $coiTxns->paginate($request->items);
+            $student_terms = $student_terms->paginate($request->items);
         } else {
-            $coiTxns = $coiTxns->get();
+            $student_terms = $student_terms->get();
         }
-
-        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit'];
 
         return response()->json(
             [
-             'txns' => $coiTxns,
-             'keys' => $keys,
+             'student_terms' => $student_terms,
             ], 200
          );
     }

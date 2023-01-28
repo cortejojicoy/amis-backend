@@ -1,13 +1,15 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\SuperAdmin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin;
-use App\Models\CoiTxn;
+use App\Http\Requests\CourseOffering\PostRequest;
+use App\Http\Requests\CourseOffering\PutRequest;
+use App\Models\CourseOffering;
+use App\Services\CourseOfferings;
 use Illuminate\Http\Request;
 
-class AdminCoiTxnController extends Controller
+class CourseOfferingController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -16,23 +18,17 @@ class AdminCoiTxnController extends Controller
      */
     public function index(Request $request)
     {
-        $admin = Admin::where('sais_id', $request->sais_id)->first();
-        $request->merge(['admin' => $admin]);
-
-        $coiTxns = CoiTxn::filter($request, 'admins');
+        $course_offerings = CourseOffering::filter($request);
 
         if($request->has('items')) {
-            $coiTxns = $coiTxns->paginate($request->items);
+            $course_offerings = $course_offerings->paginate($request->items);
         } else {
-            $coiTxns = $coiTxns->get();
+            $course_offerings = $course_offerings->get();
         }
-
-        $keys = ['reference_id', 'term', 'class', 'section', 'student_no', 'trx_date', 'trx_status', 'last_commit', 'last_action', 'last_action_date'];
-
+        
         return response()->json(
             [
-             'txns' => $coiTxns,
-             'keys' => $keys,
+             'course_offerings' => $course_offerings,
             ], 200
          );
     }
@@ -43,9 +39,9 @@ class AdminCoiTxnController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PostRequest $request, CourseOfferings $courseOfferings)
     {
-        //
+        return $courseOfferings->createCourseOffering($request);
     }
 
     /**
@@ -66,9 +62,9 @@ class AdminCoiTxnController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PutRequest $request, $id, CourseOfferings $courseOfferings)
     {
-        //
+        return $courseOfferings->editCourseOffering($request, $id);
     }
 
     /**
@@ -77,8 +73,8 @@ class AdminCoiTxnController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id, CourseOfferings $courseOfferings)
     {
-        //
+        return $courseOfferings->deleteCourseOffering($id);
     }
 }

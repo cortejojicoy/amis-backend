@@ -11,17 +11,14 @@ return new class extends Migration
      *
      * @return void
      */
-
     public function up()
     {
-        Schema::create('mas', function (Blueprint $table) {
-            $table->string('id', 15)->primary();
-            $table->string('uuid', 36);
-            $table->integer('faculty_id');
-            $table->string('actions', 6);
-            $table->string('status', 20);
-            $table->string('mentor_name', 50);
-            $table->integer('mentor_role');
+        Schema::create('workflow_references', function (Blueprint $table) {
+            $table->id();
+            $table->string('model_type');
+            $table->integer('model_id');
+            $table->string('module');
+            $table->integer('workflow_id');
             $table->timestamps();
         });
     }
@@ -33,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('mas');
+        Schema::dropIfExists('workflow_references');
     }
 };

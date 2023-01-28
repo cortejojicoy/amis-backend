@@ -1,22 +1,33 @@
 <?php
 
-namespace App\Http\Controllers\Student;
+namespace App\Http\Controllers\Faculty;
 
 use App\Http\Controllers\Controller;
-use App\Services\ApplyConsentOfInstructor;
+use App\Models\Mentor;
 use Illuminate\Http\Request;
 
-
-class StudentCoiController extends Controller
+class FacultyMentorController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $mentors = Mentor::filter($request, 'faculty');
+
+        if($request->has('items')) {
+            $mentors = $mentors->paginate($request->items);
+        } else {
+            $mentors = $mentors->get();
+        }
+        
+        return response()->json(
+            [
+             'mentors' => $mentors,
+            ], 200
+         );
     }
 
     /**
@@ -25,20 +36,9 @@ class StudentCoiController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, ApplyConsentOfInstructor $applyConsentOfInstructor)
+    public function store(Request $request)
     {
-        if(config('app.coi_enabled')) {
-            $coiID = $this->generateTxnID("COI");
-            $externalLinkToken = $this->generateRandomAlphaNum(50, 1);
-            
-            return $applyConsentOfInstructor->createCoi($request, $coiID, $externalLinkToken);
-        } else {
-            return response()->json(
-                [
-                    'message' => 'Action Denied',
-                ], 400
-            );
-        }
+        //
     }
 
     /**

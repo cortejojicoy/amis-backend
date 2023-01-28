@@ -3,36 +3,18 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
-use App\Models\PrerogTxn;
 use Illuminate\Http\Request;
-use stdClass;
 
-class StudentPrerogTxnController extends Controller
+class PcwTxnController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request)
+    public function index()
     {
-        $prerogTxns = PrerogTxn::filter($request, 'students');
-        
-        if($request->has('items')) {
-            $prerogTxns = $prerogTxns->paginate($request->items);
-        } else {
-            $prerogTxns = $prerogTxns->get();
-        }
-
-        //get the keys of the txns
-        $keys = ['reference_id', 'course', 'section', 'schedule', 'note', 'action', 'date_created', 'committed_by', 'last_action_date'];
-
-        return response()->json(
-            [
-             'txns' => $prerogTxns,
-             'keys' => $keys,
-            ], 200
-         );
+        //
     }
 
     /**

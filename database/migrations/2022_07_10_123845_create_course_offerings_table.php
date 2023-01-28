@@ -53,6 +53,7 @@ return new class extends Migration
             $table->integer('offer_nbr')->nullable();
             $table->integer('topic_id')->nullable();
             $table->text('prereq_coi')->nullable();
+            $table->string('class_type', 1)->nullable();
             $table->timestamps();
         });
     }
