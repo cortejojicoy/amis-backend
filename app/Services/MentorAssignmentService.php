@@ -10,6 +10,8 @@ use App\Models\Ma;
 use App\Models\MaTxn;
 use App\Models\MentorRole;
 use App\Models\SaveMentor;
+use App\Models\FacultyAppointment;
+use App\Models\MentorAssignment;
 use App\Models\StudentProgramRecord;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -30,13 +32,22 @@ class MentorAssignmentService {
 
 
     function submitRequestedMentor($request, $mas_id) {
-        // validate if mentors was already submitted   
+        //mentor details
         $faculty = Faculty::where('faculty_id', $request['faculty_id'])->first();
+        $mentorUser = User::where('uuid', $faculty->uuid)->first();
+        $facultyAppointments = FacultyAppointment::where('faculty_id', $faculty->faculty_id)->first();
+
         $existRequest = Ma::where('faculty_id', $faculty->faculty_id)->where('uuid', Auth::user()->uuid)->first();
+        $mentorRole = MentorRole::where('id', $request['mentor_role'])->first();
         // instance for mentor table
-        $checkMentorExist = Mentor::where('uuid', Auth::user()->uuid)->first();
+        $checkMentorExist = Mentor::where('uuid', Auth::user()->uuid)->where('status', '=', 'ACTIVE')->first();
         // request mentors should active
         $requestMentors = Mentor::where('uuid', Auth::user()->uuid)->where('faculty_id', $request['faculty_id'])->first();
+
+        // student details
+        $studentUser = User::where('uuid', Auth::user()->uuid)->first();
+        $student = Student::where('uuid', Auth::user()->uuid)->first();
+        $studentProgramRecords = $student->program_records()->where('status', '=', 'ACTIVE')->first();
 
         // count maximum number of major adviser request
         $countMax = Ma::where('uuid', Auth::user()->uuid)->where('faculty_id', $request['faculty_id'])->get()->count();
@@ -81,6 +92,25 @@ class MentorAssignmentService {
 
                 // update status; from saved to submitted
                 SaveMentor::where('uuid', $request['uuid'])->update(['actions_status' => 'submitted']);
+
+                //insert to mentors dump data
+                $this->insertMentorAssignment(
+                    Auth::user()->uuid,
+                    $checkMentorExist->faculty_id, 
+                    $checkMentorExist ? '' : $mas_id,
+                    $faculty->faculty_id,
+                    $studentProgramRecords->acad_group,
+                    "",
+                    // student informations
+                    $studentUser->last_name ." ". $studentUser->first_name,
+                    $studentProgramRecords->academic_program_id,
+                    $studentProgramRecords->status,
+
+                    //mentors informations
+                    "UNASSIGNED",
+                    "UNASSIGNED",
+                    "UNASSIGNED"
+                );
                                                             
                 // transaction_id; uuid; faculty_id; status; actions; mentor_name; mentor_role; created_at
                 $this->insertMa($mas_id, $request['uuid'], $request['faculty_id'], 'Pending', $request['actions'], $request['mentor_name'], $request['mentor_role']);
@@ -133,8 +163,16 @@ class MentorAssignmentService {
             $student = Student::where('uuid', $ma->uuid)->first();
             $student_program_records = $student->program_records()->where('status', 'ACTIVE')->first();
             $studentMentor = Mentor::where('uuid', $ma->uuid)->where('mentor_role', '=', 1)->first();
+            
+            $faculty = Faculty::where('faculty_id', $ma->faculty_id)->first();
+            $user = User::where('uuid', $faculty->uuid)->first();
+
+            $mentorAssignment = MentorAssignment::where('uuid', $ma->uuid)->first();
+
             //check mentor id; update status to inactive
             $mentorId = Mentor::find($studentMentor->mentor_id);
+
+            $mentorAssignmentDumpData = MentorAssignment::find($mentorAssignment->id);
             $returnedMentor = SaveMentor::find($ma->mas_id);
 
             DB::beginTransaction();
@@ -190,6 +228,16 @@ class MentorAssignmentService {
                         $mentorId->end_date = Carbon::now();
                         $mentorId->save();
                     }
+
+                    // update mentor-assignment dump tables
+                    if($mentorAssignmentDumpData) {
+                        $mentorAssignmentDumpData->mentor_faculty_id = $ma->faculty_id;
+                        $mentorAssignmentDumpData->mentor = $user->last_name. " ".$user->first_name;
+                        $mentorAssignmentDumpData->role = $ma->mentor_role;
+                        // $mentorAssignmentDumpData->status = $ma->faculty_id;
+                        $mentorAssignmentDumpData->save();
+                    }
+
                 }
 
                 // create entry for transaction history
@@ -225,6 +273,26 @@ class MentorAssignmentService {
             "action" => $status,
             "committed_by" => Auth::user()->uuid,
             "note" => $remarks ? $remarks : 'None',
+            "created_at" => Carbon::now()
+        ]);
+    }
+
+
+    public function insertMentorAssignment($uuid, $mentorId, $masId, $facultyId, $acadGroup, $acadOrg, $name, $program, $studentStatus, $mentor, $role, $status)
+    {
+        MentorAssignment::create([
+            "uuid" => $uuid,
+            "mentor_faculty_id" => $mentorId ? $mentorId : '',
+            "mas_id" => $masId,
+            "faculty_id" => $facultyId,
+            "acad_group" => $acadGroup,
+            "acad_org" => $acadOrg,
+            "name" => $name,
+            "program" => $program,
+            "student_status" => $studentStatus,
+            "mentor" => $mentor,
+            "role" => $role,
+            "status" => $status,
             "created_at" => Carbon::now()
         ]);
     }

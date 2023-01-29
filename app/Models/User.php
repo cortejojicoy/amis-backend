@@ -50,7 +50,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function student() {
+    public function student() 
+    {
         return $this->hasOne(Student::class, 'sais_id', 'sais_id');
     }
 
@@ -58,33 +59,41 @@ class User extends Authenticatable
         return $this->hasOne(Faculty::class, 'sais_id', 'sais_id');
     }
 
-    public function save_mentor() {
-        return $this->hasMany(SaveMentor::class, 'sais_id', 'sais_id');
-    }
-
-    public function admin() {
+    public function admin() 
+    {
         return $this->hasOne(Admin::class, 'sais_id', 'sais_id');
     }
 
-    public function user_permission_tags() {
+    public function user_permission_tags() 
+    {
         return $this->hasMany(UserPermissionTag::class, 'model_id', 'sais_id');
     }
 
-    public function mentor() {
-        return $this->hasMany(Mentor::class, 'student_sais_id', 'sais_id');
-    }
-
-    public function getFullNameAttribute() {
+    public function getFullNameAttribute() 
+    {
         return $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name;
     }
 
-    // BELOW WAS LINK TO UUID 
-    public function student_uuid() {
+    //////////// BELOW WAS LINK TO UUID 
+
+    public function mentor() 
+    {
+        return $this->hasMany(Mentor::class, 'uuid', 'uuid');
+    }
+
+    public function save_mentor() 
+    {
+        return $this->hasMany(SaveMentor::class, 'uuid', 'uuid');
+    }
+
+    public function student_uuid() 
+    {
         return $this->hasOne(Student::class, 'uuid', 'uuid');
     }
 
-    public function faculty_uuid() {
-        // return $this->
+    public function faculty_uuid() 
+    {
+        return $this->hasOne(Faculty::class, 'uuid', 'uuid');
     }
 
 
@@ -94,7 +103,21 @@ class User extends Authenticatable
                 $query->where('student_program_records.status', '=', $filters->program_record_status);
             }]);
         }
+        
+        if($filters->has('user_module')) {
+            $query->with(['roles', 'permissions', 'user_permission_tags']);
+        }
 
+        // faculty users
+        if($filters->has('faculty_information')) {
+            $query->with(['faculty_uuid', 'faculty_uuid.mentor']);
+
+            if($filters->has('uuid')) {
+                $query->where('uuid', $filters->uuid);
+            }
+        }
+
+        // get student info by faculty users
         if($filters->has('student_information')) {
             $query->with(['student_uuid', 'student_uuid.program_records']);
 
@@ -103,27 +126,11 @@ class User extends Authenticatable
             }
         }
 
-        if($filters->has('user_module')) {
-            $query->with(['roles', 'permissions', 'user_permission_tags']);
-        }
-
+        // student users
         if($filters->has('student_add_mentor')) {
-            $query->with(['student', 'save_mentor','mentor.mentor_role', 'mentor.faculty.uuid', 'student.program_records' => function($query) {
+            $query->with(['student_uuid','mentor.mentor_role', 'mentor.faculty.uuid', 'student_uuid.program_records' => function($query) {
                 $query->where('student_program_records.status', '=', 'ACTIVE');
             }]);
-
-            // $query->whereHas('mentor.faculty.faculty_appoint', function($query) {
-
-            // });
-            // $query->whereHas('mentor.faculty.faculty_appoint.student_program', function($query) use($filters) {
-            //     $query->where('programs.acronym', $filters->program);
-            // });
-
-            // $query->whereHas('mentor', function($query) {
-            //     $query->where('mentors.status', '=', 'ACTIVE');
-            // });
-
-            // $query->with('faculty_add_mentor');
 
             if($filters->has('sais_id')) {
                 $query->where('sais_id', $filters->sais_id);
@@ -154,3 +161,4 @@ class User extends Authenticatable
         return $query;
     }
 }
+

@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\TagProcessor;
-use App\Services\MentorAssignmentService;
-use App\Models\Ma;
+use App\Models\MentorAssignment;
 use App\Models\Mentor;
-// use App\Models\Faculty;
+use App\Models\Faculty;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Services\TagProcessor;
+
 
 class MentorAssignmentController extends Controller
 {
@@ -17,13 +18,15 @@ class MentorAssignmentController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, TagProcessor $tagProcessor)
-    {   
-        $mentor = Mentor::where('uuid', $request->uuid)->first();
-        $request->merge(['mentor' => $mentor]);
+    {
+        $faculty = Faculty::where('uuid', Auth::user()->uuid)->first();
+        // $mentor = Mentor::where('faculty_id', $faculty->faculty_id)->first();
+        $request->merge([
+            'mentor' => $faculty,
+            'access_permission' => 'tags'
+        ]);
 
-        // $faculty = Faculty::where('uuid', $request)
-
-        $ma = Ma::filter($request, $tagProcessor);
+        $ma = MentorAssignment::filter($request, $tagProcessor);
         
         if($request->has('items')) {
             $ma = $ma->paginate($request->items);
@@ -65,9 +68,9 @@ class MentorAssignmentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id, MentorAssignmentService $service)
+    public function update(Request $request, $id)
     {
-        return $service->updateApproval($request, $id);
+        //
     }
 
     /**
