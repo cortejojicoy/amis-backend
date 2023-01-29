@@ -26,26 +26,36 @@ class Mentor extends Model
         'end_date'
     ];
 
-    public function mentor_role() {
+    public function mentor_role()
+    {
         return $this->belongsTo(MentorRole::class, 'mentor_role', 'id');
     }
 
-    public function student() {
+    public function student()
+    {
         return $this->hasOne(Student::class, 'sais_id', 'student_sais_id');
     }
 
     // BELOW WAS LINK TO UUID 
-    public function student_uuid() {
+    public function student_uuid()
+    {
         return $this->hasOne(Student::class, 'uuid', 'uuid');
     }
 
-    public function faculty() {
+    public function faculty()
+    {
         return $this->belongsTo(Faculty::class, 'faculty_id', 'faculty_id');
     }
 
-    public function mentor() {
+    public function mentor()
+    {
         return $this->hasMany(Ma::class, 'faculty_id', 'faculty_id');
     }
+
+    // public function mentor_assignment()
+    // {
+    //     return $this->belongsTo(MentorAssignment::class, 'faculty_id', 'mentor_faculty_id');
+    // }
 
     public function scopeFilter($query, $filters) {
         if($filters->has('mentors_information')) {
@@ -59,6 +69,11 @@ class Mentor extends Model
                 }
             }
         }
+
+
+        // if($filters->has('adviser_table')) {
+        //     $query->with(['mentor_assignment']);
+        // }
 
         $query = $this->filterData($query, $filters);
     }

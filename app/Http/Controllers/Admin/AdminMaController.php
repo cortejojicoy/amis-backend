@@ -20,8 +20,12 @@ class AdminMaController extends Controller
     public function index(Request $request, TagProcessor $tagProcessor)
     {
         // $mentor = Mentor::where('uuid', $request->uuid)->first();
-        // $request->merge(['mentor' => $mentor]);
+        // $request->merge([
+        //     'mentor' => $mentor,
+        //     'access_permission' => 'tags'
+        // ]);
 
+        $request->merge(['access_permission' => 'tags']);
         $ma = Ma::filter($request, $tagProcessor);
         
         if($request->has('items')) {

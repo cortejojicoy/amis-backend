@@ -17,6 +17,8 @@ class AdminMaTxnController extends Controller
      */
     public function index(Request $request, TagProcessor $tagProcessor)
     {
+        
+        $request->merge(['access_permission' => 'tags']);
         $ma_txns = MaTxn::filter($request, 'admins', $tagProcessor);
 
         if($request->has('items')) {
