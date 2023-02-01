@@ -22,11 +22,14 @@ class Student extends Model
         return $this->hasMany(StudentProgramRecord::class, 'campus_id', 'campus_id');
     }
 
-    public function student_grades()
-    {
+    public function student_grades() {
         return $this->hasMany(StudentGrade::class, 'campus_id', 'campus_id');
     }
 
+    public function student_user() {
+        return $this->belongsTo(User::class, 'uuid', 'uuid');
+    }
+    
     public function pcw()
     {
         return $this->hasOne(Pcw::class, 'sais_id', 'sais_id');
