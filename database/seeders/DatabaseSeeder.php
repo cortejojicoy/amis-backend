@@ -39,11 +39,10 @@ class DatabaseSeeder extends Seeder
             StudentTableSeeder::class,
             // StudentTermTableSeeder::class,
             UserTableSeeder::class,
-
             FacultyAppointmentSeeder::class,
             MentorRoleSeeder::class,
             TagSeeder::class,
-            UserPemissionTableSeeder::class,
+            UserPemissionTagTableSeeder::class,
             ModelTagSeeder::class
         ]);
     }
