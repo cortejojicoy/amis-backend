@@ -14,14 +14,14 @@ class Ma extends Model
 {
     use HasFactory;
     protected $table = 'mas';
-    protected $primaryKey = 'mas_id';
+    protected $primaryKey = 'id';
     protected $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [
-        'mas_id',
-        'student_sais_id',
-        'mentor_id',
+        'id',
+        'uuid',
+        'faculty_id',
         'status',
         'actions',
         'mentor_name',
@@ -31,66 +31,85 @@ class Ma extends Model
 
     const ENDORSED = 'Endorsed';
     const PENDING = 'Pending';
-    const REJECTED = 'Rejected';
     const APPROVED = 'Approved';
     const DISAPPROVED = 'Disapproved';
+    const RETURNED = 'Returned';
 
-    public function user() {
+    public function user() 
+    {
         return $this->hasMany(User::class, 'sais_id', 'student_sais_id');
     }
 
-    public function student() {
-        return $this->hasMany(Student::class, 'sais_id', 'student_sais_id');
+    public function student() 
+    {
+        return $this->hasOne(Student::class, 'sais_id', 'student_sais_id');
     }
 
-    public function mas() {
-        return $this->belongsTo(Ma::class, 'mas_id', 'mas_id');
+    public function mentor_role() 
+    {
+        return $this->belongsTo(MentorRole::class, 'mentor_role', 'id');
     }
 
-    public function faculty() {
-        return $this->hasMany(Faculty::class, 'sais_id', 'mentor_id');
+    public function mentor() 
+    {
+        return $this->hasMany(Mentor::class, 'uuid', 'uuid');
     }
 
-    public function scopeFilter($query, $filters, $roles) {
-        $query->with(['faculty.mentor' , 'user', 'student', 'student.program_records' => function($query) {
-            $query->where('student_program_records.status', '=', 'ACTIVE');
-        }]);
+    // BELOW WAS LINK TO UUID
+    public function student_uuid() 
+    {
+        return $this->belongsTo(Student::class, 'uuid', 'uuid');
+    }
 
-        if($roles == 'admins') {
-            if($filters->admin == 'unit') {
-                $query->whereHas('student.program_records', function($query) use($filters) {
-                    $query->where('student_program_records.acad_org', $filters->tags->unit)->where('status', '=', 'Pending');
-                });
-            } else if ($filters->admin == 'college') {
-                $query->whereHas('student.program_records', function($query) use($filters) {
-                    $query->where('student_program_records.acad_group', $filters->tags->unit)->where('status', '=', 'Endorsed');
-                });
-            }
+    public function faculty() 
+    {
+        return $this->belongsTo(Faculty::class, 'faculty_id', 'faculty_id');
+    }
 
-        } else if($roles == 'faculties') {
-            if($filters->faculty == 'adviser') {
-                $query->where('mentor_id', $filters->sais_id)->where('status', '=', 'Approved');
-                // $query->where('mentor_id', $filters->sais_id)->where('status', '=', 'Pending')->orWhere('status', '=', 'Approved');
+    public function scopeFilter($query, $filters, $tagProcessor) {
+        $query->with(['mentor_role', 'faculty.uuid']);
+
+        // requested mentor; admin view
+        if($filters->has('admins')) {
+            $query->where('mas.status', '=', 'Endorsed');
+
+            if($filters->has('uuid')) {
+                $query->where('uuid', $filters->uuid);
             }
         }
+        // requested mentor; nominees view
+        if($filters->has('nominees')) {
+            $query->where('mas.status', '=', 'Pending');
+
+            if($filters->has('uuid')) {
+                $query->where('uuid', $filters->uuid);
+            }
+        }
+
+        // requested mentor; advisee view
+        if($filters->has('advisee')) {
+            $query->where('mas.status', '=', 'Pending');
+
+            if($filters->has('uuid')) {
+                $query->where('uuid', $filters->uuid);
+            }
+        }
+        
+        $query = $this->filterData($query, $filters);
+
     }
 
-    public function scopeMaRequest($query, $filters, $roles)
-    {   
-        if($roles == 'faculties') {
-            if($filters->facultyType == 'adviser' || $filters->facultyType == 'nominated') {
-                $query->where('status', 'Pending')->where('student_sais_id', $filters->studentId);
-            }
-        }
+    public function filterData($query, $filters) {
+        //get the active mentor of students 
+        if($filters->has('active_mentor')) { 
+            $query->with(['mentor', 'mentor.student_uuid.program_records', 'mentor.faculty.uuid', 'mentor.mentor_role']);
 
-        if($roles == 'admins') {
-            if($filters->adminType == 'unit') {
-                $query->where('status', 'Pending')->where('student_sais_id', $filters->studentId);
+            //students uuid; display active mentor
+            if($filters->has('uuid')) { 
+                $query->where('uuid', $filters->uuid);
             }
-            
-            if($filters->adminType == 'college') {
-                $query->where('status', 'Endorsed')->where('student_sais_id', $filters->studentId);
-            }
-        }
+        } 
+
+        return $query;
     }
 }

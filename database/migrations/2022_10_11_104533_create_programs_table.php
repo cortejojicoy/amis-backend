@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('title', 255);
             $table->string('career', 20);
             $table->string('college', 10);
+            $table->string('unit', 10);
             $table->text('description');
             $table->integer('degree_id');
             $table->timestamps();

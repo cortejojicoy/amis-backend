@@ -9,7 +9,10 @@ class MentorRole extends Model
 {
     use HasFactory;
 
-    
     public $timestamps = false;
     protected $table = 'mentor_roles';
+
+    public function scopeRoles($query) {
+        $query->select();
+    }
 }

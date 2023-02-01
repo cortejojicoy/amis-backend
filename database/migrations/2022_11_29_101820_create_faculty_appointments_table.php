@@ -16,8 +16,9 @@ return new class extends Migration
         Schema::create('faculty_appointments', function (Blueprint $table) {
             $table->id();
             $table->integer('faculty_id');
-            $table->string('is_homeunit', 20);
-            $table->string('is_active', 20);
+            $table->string('homeunit', 20);
+            $table->string('status', 20);
+            $table->integer('is_homeunit')->nullable();
             $table->string('unit', 10)->nullable();
             $table->string('description', 255)->nullable();
             $table->timestamps();

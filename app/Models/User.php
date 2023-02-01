@@ -50,7 +50,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function student() {
+    public function student() 
+    {
         return $this->hasOne(Student::class, 'sais_id', 'sais_id');
     }
 
@@ -58,17 +59,43 @@ class User extends Authenticatable
         return $this->hasOne(Faculty::class, 'sais_id', 'sais_id');
     }
 
-    public function admin() {
+    public function admin() 
+    {
         return $this->hasOne(Admin::class, 'sais_id', 'sais_id');
     }
 
-    public function user_permission_tags() {
+    public function user_permission_tags() 
+    {
         return $this->hasMany(UserPermissionTag::class, 'model_id', 'sais_id');
     }
 
-    public function getFullNameAttribute() {
+    public function getFullNameAttribute() 
+    {
         return $this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name;
     }
+
+    //////////// BELOW WAS LINK TO UUID 
+
+    public function mentor() 
+    {
+        return $this->hasMany(Mentor::class, 'uuid', 'uuid');
+    }
+
+    public function save_mentor() 
+    {
+        return $this->hasMany(SaveMentor::class, 'uuid', 'uuid');
+    }
+
+    public function student_uuid() 
+    {
+        return $this->hasOne(Student::class, 'uuid', 'uuid');
+    }
+
+    public function faculty_uuid() 
+    {
+        return $this->hasOne(Faculty::class, 'uuid', 'uuid');
+    }
+
 
     public function scopeFilter($query, $filters) {
         if($filters->has('personal_information')) {
@@ -76,10 +103,50 @@ class User extends Authenticatable
                 $query->where('student_program_records.status', '=', $filters->program_record_status);
             }]);
         }
-
+        
         if($filters->has('user_module')) {
             $query->with(['roles', 'permissions', 'user_permission_tags']);
         }
+
+        // faculty users
+        if($filters->has('faculty_information')) {
+            $query->with(['faculty_uuid', 'faculty_uuid.mentor']);
+
+            if($filters->has('uuid')) {
+                $query->where('uuid', $filters->uuid);
+            }
+        }
+
+        // get student info by faculty users
+        if($filters->has('student_information')) {
+            $query->with(['student_uuid', 'student_uuid.program_records']);
+
+            if($filters->has('uuid')) {
+                $query->where('uuid', $filters->uuid);
+            }
+        }
+
+        // student users
+        if($filters->has('student_add_mentor')) {
+            $query->with(['student_uuid','mentor.mentor_role', 'mentor.faculty.uuid', 'student_uuid.program_records' => function($query) {
+                $query->where('student_program_records.status', '=', 'ACTIVE');
+            }]);
+
+            if($filters->has('sais_id')) {
+                $query->where('sais_id', $filters->sais_id);
+            }
+        }
+
+        //select fields
+        // if($filters->has('fields')) {
+        //     $query->select($filters->fields);
+        // }
+
+        //order
+        // if($filters->has('order_type')) {
+        //     $query->orderBy($filters->order_field, $filters->order_type);
+        // }
+
 
         $query = $this->filterData($query, $filters);
     }
@@ -93,39 +160,5 @@ class User extends Authenticatable
 
         return $query;
     }
-
-    public function scopeStudentDetails($query, $request) {
-        $query->leftJoin('students', 'students.sais_id', '=', 'users.sais_id')
-        ->leftJoin('student_program_records', 'student_program_records.campus_id', '=', 'students.campus_id')
-        ->where('users.sais_id', $request->sais_id);
-    }
-
-    public function scopeStudentById($query, $request) {
-        // $query->with(['student', 'student.program_records', ''])
-
-        $query->leftJoin('students', 'students.sais_id', '=', 'users.sais_id')
-        ->leftJoin('student_program_records', 'student_program_records.campus_id', '=', 'students.campus_id')
-        ->where('users.sais_id', $request->id);
-    }
-
-    public function mas() {
-        return $this->hasMany(MaStudent::class, 'sais_id', 'sais_id');
-    }
-
-    public function scopeKeywords($query, $search) {
-        // $query->select(DB::raw("faculties.sais_id AS faculty, CONCAT(users.first_name,' ',users.middle_name,' ',users.last_name) AS NAME, student_program_records.academic_program_id AS program, users.sais_id, student_program_records.status"))
-        // ->distinct()
-        // ->leftJoin('students', 'students.sais_id', '=', 'users.sais_id')
-        // ->leftJoin('student_program_records', 'student_program_records.campus_id', '=', 'students.campus_id')
-        // ->leftJoin('mentors', 'mentors.student_program_record_id', '=', 'student_program_records.student_program_record_id')
-        // ->leftJoin('faculties', 'faculties.id', '=', 'mentors.faculty_id')
-        // ->where('users.first_name', 'LIKE', "$search")
-        // ->orWhere('users.middle_name', 'LIKE', "$search")
-        // ->orWhere('users.last_name', 'LIKE', "$search");
-    
-        $query->select(DB::raw("CONCAT(users.first_name,' ',users.middle_name,' ',users.last_name) AS NAME"))
-        ->where('users.first_name', 'LIKE', "$search")
-        ->orWhere('users.middle_name', 'LIKE', "$search")
-        ->orWhere('users.last_name', 'LIKE', "$search");
-    }
 }
+
