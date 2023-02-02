@@ -84,7 +84,7 @@ class StudentMaController extends Controller
         //
     }
 
-    public function bulkUpdate(Request $request, MentorAssignmentService $bulkUpdateSaveMentor)
+    public function bulkUpdate(SubmitRequest $request, MentorAssignmentService $bulkUpdateSaveMentor)
     {
         return $bulkUpdateSaveMentor->insertDeleteSaveMentor($request);
     }
