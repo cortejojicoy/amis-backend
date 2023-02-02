@@ -27,8 +27,8 @@ class SubmitRequest extends FormRequest
     public function rules()
     {
         return [
-            'faculty_id' => ['required'],
-            'mentor_role' => ['required']
+            '*.faculty_id' => ['required'],
+            '*.mentor_role' => ['required']
         ];
     }
 }
