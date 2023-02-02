@@ -16,9 +16,9 @@ return new class extends Migration
     {
         Schema::create('mentors', function (Blueprint $table) {
             $table->integer('mentor_id')->autoIncrement();
-            $table->integer('faculty_id')->index('mentors_faculty_id');
+            $table->integer('faculty_id');
             $table->integer('student_program_record_id');
-            $table->string('uuid', 36)->index('mentors_student_uuid');
+            $table->string('uuid', 36);
             $table->integer('mentor_role');
             $table->string('field_represented', 29)->nullable();
             $table->string('status', 20)->nullable();
