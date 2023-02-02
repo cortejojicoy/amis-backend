@@ -162,15 +162,15 @@ class MentorAssignmentService {
 
             $student = Student::where('uuid', $ma->uuid)->first();
             $student_program_records = $student->program_records()->where('status', 'ACTIVE')->first();
-            $studentMentor = Mentor::where('uuid', $ma->uuid)->where('mentor_role', '=', 1)->first();
             
             $faculty = Faculty::where('faculty_id', $ma->faculty_id)->first();
             $user = User::where('uuid', $faculty->uuid)->first();
-
+            
             $mentorAssignment = MentorAssignment::where('uuid', $ma->uuid)->first();
-
+            
             //check mentor id; update status to inactive
-            $mentorId = Mentor::find($studentMentor->mentor_id);
+            $studentMentor = Mentor::where('uuid', $ma->uuid)->where('mentor_role', '=', 1)->first();
+            // $mentorId = Mentor::find($studentMentor->mentor_id);
 
             $mentorAssignmentDumpData = MentorAssignment::find($mentorAssignment->id);
             $returnedMentor = SaveMentor::find($ma->mas_id);
@@ -212,6 +212,7 @@ class MentorAssignmentService {
 
                 if($request->roles == 'admins') {
                     if($status == Ma::APPROVED) {
+
                         Mentor::create([
                             "faculty_id" => $ma->faculty_id,
                             "student_program_record_id" => $student_program_records->student_program_record_id,
@@ -222,13 +223,12 @@ class MentorAssignmentService {
                             "start_date" => Carbon::now()
                         ]);
                     }
-                    //temporay adviser will be set status to inactive
-                    if($mentorId) {
-                        $mentorId->status = 'INACTIVE';
-                        $mentorId->end_date = Carbon::now();
-                        $mentorId->save();
-                    }
-
+                    
+                    Mentor::where('mentor_id', $studentMentor->mentor_id)->update([
+                        'status' => 'INACTIVE',
+                        'end_date' => Carbon::now(),
+                    ]);
+                    
                     // update mentor-assignment dump tables
                     if($mentorAssignmentDumpData) {
                         $mentorAssignmentDumpData->mentor_faculty_id = $ma->faculty_id;
@@ -278,8 +278,7 @@ class MentorAssignmentService {
     }
 
 
-    public function insertMentorAssignment($uuid, $mentorId, $masId, $facultyId, $acadGroup, $acadOrg, $name, $program, $studentStatus, $mentor, $role, $status)
-    {
+    public function insertMentorAssignment($uuid, $mentorId, $masId, $facultyId, $acadGroup, $acadOrg, $name, $program, $studentStatus, $mentor, $role, $status) {
         MentorAssignment::create([
             "uuid" => $uuid,
             "mentor_faculty_id" => $mentorId ? $mentorId : '',
@@ -296,5 +295,4 @@ class MentorAssignmentService {
             "created_at" => Carbon::now()
         ]);
     }
-
 }
