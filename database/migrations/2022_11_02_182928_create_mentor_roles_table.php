@@ -16,6 +16,8 @@ return new class extends Migration
         Schema::create('mentor_roles', function (Blueprint $table) {
             $table->id();
             $table->string('titles', 50);
+            $table->integer('max');
+            $table->integer('min');
             $table->timestamps();
         });
     }
