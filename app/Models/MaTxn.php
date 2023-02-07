@@ -76,8 +76,8 @@ class MaTxn extends Model
 
     public function filterData($query, $filters) {
         if($filters->has('id')) {
-            if($filters->mas_id != '--') {
-                $query->where('ma.id', $filters->id);
+            if($filters->id != '--') {
+                $query->where('mas.id', $filters->id);
             }
         }
 
