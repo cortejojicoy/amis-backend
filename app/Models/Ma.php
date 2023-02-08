@@ -31,6 +31,7 @@ class Ma extends Model
 
     const ENDORSED = 'Endorsed';
     const PENDING = 'Pending';
+    const REQUESTED = 'Requested';
     const APPROVED = 'Approved';
     const DISAPPROVED = 'Disapproved';
     const RETURNED = 'Returned';
@@ -88,7 +89,7 @@ class Ma extends Model
 
         // requested mentor; advisee view
         if($filters->has('advisee')) {
-            $query->where('mas.status', '=', 'Pending');
+            $query->where('mas.status', '=', 'Requested');
 
             if($filters->has('uuid')) {
                 $query->where('uuid', $filters->uuid);

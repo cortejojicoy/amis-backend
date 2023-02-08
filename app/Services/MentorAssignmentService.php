@@ -34,14 +34,14 @@ class MentorAssignmentService {
     function submitRequestedMentor($request, $mas_id) {
         //mentor details
         $faculty = Faculty::where('faculty_id', $request['faculty_id'])->first();
-        $mentorUser = User::where('uuid', $faculty->uuid)->first();
+        // $mentorUser = User::where('uuid', $faculty->uuid)->first();
         $facultyAppointments = FacultyAppointment::where('faculty_id', $faculty->faculty_id)->first();
 
         $existRequest = Ma::where('faculty_id', $faculty->faculty_id)->where('uuid', Auth::user()->uuid)->first();
         $mentorRole = MentorRole::where('id', $request['mentor_role'])->first();
-        // instance for mentor table
+        
         $checkMentorExist = Mentor::where('uuid', Auth::user()->uuid)->where('status', '=', 'ACTIVE')->first();
-        // request mentors should active
+        
         $requestMentors = Mentor::where('uuid', Auth::user()->uuid)->where('faculty_id', $request['faculty_id'])->first();
 
         // student details
@@ -50,31 +50,36 @@ class MentorAssignmentService {
         $studentProgramRecords = $student->program_records()->where('status', '=', 'ACTIVE')->first();
 
         // count maximum number of major adviser request
-        $countMax = Ma::where('uuid', Auth::user()->uuid)->where('faculty_id', $request['faculty_id'])->get()->count();
+        $countMax = Ma::where('uuid', Auth::user()->uuid)
+                      ->where('mentor_role', $request['mentor_role'])
+                      ->get()
+                      ->count();
 
         // 2 = Major Adviser; 3 = Member
+
+        $facultyMentor = MentorRole::find($request['mentor_role']);
+
+        if($facultyMentor) {
+            if($request['mentor_role'] == 2) {
+                if($countMax == $facultyMentor->max) {
+                    return response()->json([
+                        'message' => 'You have reached maximum requirement for requesting Major Adviser'
+                    ], 400);
+                }
+            } else if($request['mentor_role'] == 3) {
+                if($countMax == $facultyMentor->max) {
+                    return response()->json([
+                        'message' => 'You have reached maximum requirement for requesting Member'
+                    ], 400);
+                }
+            }
+        }
         
         if($existRequest != null) {
             if($existRequest->status === 'Pending') {
                 return response()->json([
                     'message' => 'You have already requested '. $request['mentor_name']
                 ], 400);
-            }
-
-            if($request['mentor_role'] == 2) { //major adviser
-                if($countMax > 0) {
-                    return response()->json([
-                        'message' => 'You have reached maximum requirement for requesting Major Adviser'
-                    ], 400);
-                }
-            }
-
-            if($request['mentor_role'] == 3) {
-                if($countMax > 1) {
-                    return response()->json([
-                        'message' => 'You have reached maximum requirement for requesting Member'
-                    ], 400);
-                }
             }
         }
 
@@ -113,10 +118,10 @@ class MentorAssignmentService {
                 );
                                                             
                 // transaction_id; uuid; faculty_id; status; actions; mentor_name; mentor_role; created_at
-                $this->insertMa($mas_id, $request['uuid'], $request['faculty_id'], 'Pending', $request['actions'], $request['mentor_name'], $request['mentor_role']);
+                $this->insertMa($mas_id, $request['uuid'], $request['faculty_id'], 'Requested', $request['actions'], $request['mentor_name'], $request['mentor_role']);
 
                 // transasction_id; status, remarks
-                $this->insertMaTxn($mas_id, 'Pending', 'None');
+                $this->insertMaTxn($mas_id, 'Requested', $request['remarks']);
 
                 
                 DB::commit();
@@ -151,6 +156,8 @@ class MentorAssignmentService {
             $status = Ma::PENDING;
         } else if($request->type == 'approved') {
             $status = Ma::APPROVED;
+        } else if($request->type == 'requested') {
+            $status = Ma::REQUESTED;
         }
         // else if($request->type == 'disapproved') {
         //     $status = Ma::DISAPPROVED;
@@ -173,7 +180,7 @@ class MentorAssignmentService {
             // $mentorId = Mentor::find($studentMentor->mentor_id);
 
             $mentorAssignmentDumpData = MentorAssignment::find($mentorAssignment->id);
-            $returnedMentor = SaveMentor::find($ma->mas_id);
+            $saveMentor = SaveMentor::find($ma->mas_id);
 
             DB::beginTransaction();
 
@@ -187,14 +194,14 @@ class MentorAssignmentService {
                         // $ma->mentor_name = $returnedMentor->mentor_name,
                     }
 
-                    if($returnedMentor) {
+                    if($saveMentor) {
                         // $returnedMentor->mentor_name = 
-                        $returnedMentor->actions_status = 'submitted';
-                        $returnedMentor->save();
+                        $saveMentor->actions_status = 'submitted';
+                        $saveMentor->save();
                     }
                 } 
                 
-                if($request->roles == 'faculties') {
+                if($request->roles === 'faculties') {
                     if($status == Ma::RETURNED) {
                         SaveMentor::create([
                             "mas_id" => $ma->id,
@@ -209,8 +216,7 @@ class MentorAssignmentService {
                     }
                 }
 
-
-                if($request->roles == 'admins') {
+                if($request->roles === 'admins') {
                     if($status == Ma::APPROVED) {
 
                         Mentor::create([
@@ -228,7 +234,7 @@ class MentorAssignmentService {
                         'status' => 'INACTIVE',
                         'end_date' => Carbon::now(),
                     ]);
-                    
+
                     // update mentor-assignment dump tables
                     if($mentorAssignmentDumpData) {
                         $mentorAssignmentDumpData->mentor_faculty_id = $ma->faculty_id;
@@ -272,7 +278,7 @@ class MentorAssignmentService {
             "mas_id" => $mas_id,
             "action" => $status,
             "committed_by" => Auth::user()->uuid,
-            "note" => $remarks ? $remarks : 'None',
+            "note" => $remarks ? $remarks : "None",
             "created_at" => Carbon::now()
         ]);
     }

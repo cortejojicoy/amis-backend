@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Requests\MentorAssignment\SubmitRequest;
+use App\Http\Requests\MentorAssignment\SaveRequest;
 use App\Services\MentorAssignmentService;
 use App\Models\StudentProgramRecord;
 use App\Http\Controllers\Controller;
@@ -84,7 +85,7 @@ class StudentMaController extends Controller
         //
     }
 
-    public function bulkUpdate(SubmitRequest $request, MentorAssignmentService $bulkUpdateSaveMentor)
+    public function bulkUpdate(Request $request, MentorAssignmentService $bulkUpdateSaveMentor)
     {
         return $bulkUpdateSaveMentor->insertDeleteSaveMentor($request);
     }
