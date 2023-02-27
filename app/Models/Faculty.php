@@ -51,7 +51,7 @@ class Faculty extends Model
         }
 
         if($filters->has('faculty_list')) {
-            $query->with(['user', 'appointment']);
+            $query->with(['uuid', 'appointment']);
         }
 
         //select fields
