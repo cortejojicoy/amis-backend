@@ -31,37 +31,44 @@ class MentorAssignmentService {
     }
 
 
-    function submitRequestedMentor($request, $index, $mas_id, $facultyId) {
+    function submitRequestedMentor($request, $index, $mas_id) {
+
+        // return $reqCount;
 
         $faculty = Faculty::where('faculty_id', $request['faculty_id'])->first();
         //if the user is not existed on mentors table; it will return atleast they have temporary adviser
-        $checkMentorExist = Mentor::where('uuid', Auth::user()->uuid)
-                                    ->where('status', '=', 'ACTIVE')
-                                    ->first();
+        $checkMentorExist = Mentor::where('uuid', Auth::user()->uuid)->where('status', '=', 'ACTIVE')->first();
         //if the user request a mentor; mentor should active
-        // $requestMentors = Mentor::where('uuid', Auth::user()->uuid)
-        //                         ->where('faculty_id', $faculty->faculty_id)
-        //                         ->where('status', '!=', 'ACTIVE')
-        //                         ->first();
+        $requestMentors = Mentor::where('uuid', Auth::user()->uuid)->where('faculty_id', $faculty->faculty_id)->where('status', '!=', 'ACTIVE')->first();
         //this will get student details
         $studentUser = User::where('uuid', Auth::user()->uuid)->first();
 
         $student = Student::where('uuid', Auth::user()->uuid)->first();
-        $studentProgramRecords = $student->program_records()
-                                            ->where('status', '=', 'ACTIVE')
-                                            ->first();
+        $studentProgramRecords = $student->program_records()->where('status', '=', 'ACTIVE')->first();
         
         $facultyMentor = MentorRole::find($request['mentor_role']);
         
         $errMsg = [];
+        // $errCount = 0;
         if($facultyMentor->id == 2) { //requesting for a mjor adviser
             $role[$index] = $facultyMentor->id;
             $countMax = Ma::where('uuid', Auth::user()->uuid)
                             ->where('mentor_role', $facultyMentor->id)
                             ->get()->count();
 
-            if($countMax > 0 || $countMax + count($role)) {
-                $errMsg[] = "You have reached maximum requirement for requesting a Major Adviser";
+            if($countMax > 0) {
+                if($countMax + count($role) > 0) {
+                    $errMsg[] = "You have reached maximum requirement for requesting a Major Adviser";
+                }
+            } else {
+                //count exist major adviser + request major adviser; return if hit the requirement needed
+                $countExists = Mentor::where('uuid', Auth::user()->uuid)
+                            ->where('mentor_role', $facultyMentor->id)
+                            ->where('status', '=', 'ACTIVE')
+                            ->get()->count();
+                if($countExists > 0 || $countExists + count($role) > 0) {
+                    $errMsg[] = "You already have an active Major Adviser and exceeded maximum requirement";
+                }
             }
 
         } else if($facultyMentor->id == 3) { //requesting for a member
@@ -69,32 +76,48 @@ class MentorAssignmentService {
             $countMax = Ma::where('uuid', Auth::user()->uuid)
                             ->where('mentor_role', $facultyMentor->id)
                             ->get()->count();
-            if($countMax > 2 || $countMax + count($role)) {
-                $errMsg[] = "You have reached maximum requirement for requesting a Member";
+                            
+            if($countMax > 2) {
+                if($countMax + count($role) > 2) {
+                    $errMsg[] = "You have reached maximum requirement for requesting a Member";
+                }
+            } else {
+                //count exist member + request member; return if hit the requirement needed
+                $countExists = Mentor::where('uuid', Auth::user()->uuid)
+                    ->where('mentor_role', $facultyMentor->id)
+                    ->where('status', '=', 'ACTIVE')
+                    ->get()->count();
+
+                if($countExists > 2 || $countExists + count($role) > 2) {
+                    $errMsg[] = "You already have an active Member and exceeded maximum requirement";
+                }
             }
         } 
 
         //return existing mentor request
-        $existRequest = Ma::whereIn('faculty_id', $facultyId)->where('uuid', Auth::user()->uuid)->where('status', '=', 'Requested')->get();
-        foreach($existRequest as $name) {
-            $errMsg[] = "You have already requested " . $name->mentor_name;
+        // $existRequest[] = Ma::whereIn('faculty_id', $facultyId)->where('uuid', Auth::user()->uuid)->where('status', '=', 'Requested')->get();
+        $existRequest = Ma::where('faculty_id', $request['faculty_id'])->where('uuid', Auth::user()->uuid)->where('status', '=', 'Requested')->first();
+        
+        if(!empty($existRequest)) {
+            $errMsg[] = "You have already requested " . $request['mentor_name'];
         }
 
-        // if($requestMentors != '') {
-        //     $errMsg[] = "You have requested INACTIVE faculty";
-        // }
+        if($requestMentors != '') {
+            $errMsg[] = "You have requested INACTIVE faculty";
+        }
 
-        if($errMsg != '') {
+        // return $errMsg;
+        if(!empty($errMsg)) {
             return response()->json([
                 'errors' => array($errMsg)
-            ], 422);
+            ], 422); 
         } else {
             if($checkMentorExist != '') {
                 DB::beginTransaction();
                 try {
                     // update status; from saved to submitted
                     SaveMentor::where('uuid', $request['uuid'])->update(['actions_status' => 'submitted']);
-
+        
                     //insert to mentors dump data
                     $this->insertMentorAssignment(
                         Auth::user()->uuid,
@@ -107,7 +130,7 @@ class MentorAssignmentService {
                         $studentUser->last_name ." ". $studentUser->first_name,
                         $studentProgramRecords->academic_program_id,
                         $studentProgramRecords->status,
-
+    
                         //mentors informations
                         "UNASSIGNED",
                         "UNASSIGNED",
@@ -115,12 +138,12 @@ class MentorAssignmentService {
                     );
                                                                 
                     // transaction_id; uuid; faculty_id; status; actions; mentor_name; mentor_role; created_at
-                    $this->insertMa($mas_id, $request['uuid'], $request['faculty_id'], 'Requested', $request['actions'], $request['mentor_name'], $request['mentor_role']);
-
+                    $this->insertMa($mas_id[$index], $request['uuid'], $request['faculty_id'], 'Requested', $request['actions'], $request['mentor_name'], $request['mentor_role']);
+    
                     // transasction_id; status, remarks
-                    $this->insertMaTxn($mas_id, 'Requested', $request['remarks']);
-
-                    
+                    $this->insertMaTxn($mas_id[$index], 'Requested', $request['remarks']);
+    
+    
                     DB::commit();
                     return response()->json([
                         'message' => 'Successfully submitted',
@@ -228,10 +251,12 @@ class MentorAssignmentService {
                         ]);
                     }
                     
-                    Mentor::where('mentor_id', $studentMentor->mentor_id)->update([
-                        'status' => 'INACTIVE',
-                        'end_date' => Carbon::now(),
-                    ]);
+                    if($studentMentor) {
+                        Mentor::where('mentor_id', $studentMentor->mentor_id)->update([
+                            'status' => 'INACTIVE',
+                            'end_date' => Carbon::now(),
+                        ]);
+                    }
 
                     // update mentor-assignment dump tables
                     if($mentorAssignmentDumpData) {

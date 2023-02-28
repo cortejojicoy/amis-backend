@@ -46,8 +46,7 @@ class StudentMaController extends Controller
     {
         foreach($request->input() as $keys => $data) {
             $mas_id[$keys] = $this->generateTxnID("MAS");   
-            $facultyId[] = $data['faculty_id'];   
-            $loop = $service->submitRequestedMentor($data, $keys, $mas_id, $facultyId);
+            $loop = $service->submitRequestedMentor($data, $keys, $mas_id);
         }
         return $loop;
     }
