@@ -28,7 +28,8 @@ class SubmitRequest extends FormRequest
     {
         return [
             '*.faculty_id' => ['required'],
-            '*.mentor_role' => ['required']
+            '*.mentor_role' => ['required'],
+            '*.remarks' => ['required']
         ];
     }
 }
