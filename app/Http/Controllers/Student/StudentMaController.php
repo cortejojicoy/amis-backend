@@ -45,8 +45,9 @@ class StudentMaController extends Controller
     public function store(SubmitRequest $request, MentorAssignmentService $service)
     {
         foreach($request->input() as $keys => $data) {
-            $mas_id[$keys] = $this->generateTxnID("MAS");   
-            $loop = $service->submitRequestedMentor($data, $keys, $mas_id);
+            $mas_id[$keys] = $this->generateTxnID("MAS");
+            $mentor_role[] = $data['mentor_role'];
+            $loop = $service->submitRequestedMentor($data, $keys, $mentor_role, $mas_id);
         }
         return $loop;
     }

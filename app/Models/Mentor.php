@@ -70,11 +70,12 @@ class Mentor extends Model
             }
         }
 
-
-        // if($filters->has('adviser_table')) {
-        //     $query->with(['mentor_assignment']);
-        // }
-
+        if($filters->has('admin')) {
+            $query->distinct('uuid')->with(['faculty.uuid', 'mentor_role', 'student_uuid.student_user', 'student_uuid.program_records' => function($query) {
+                $query->where('student_program_records.status', '=', 'ACTIVE');
+            }]);
+        }
+        
         $query = $this->filterData($query, $filters);
     }
 

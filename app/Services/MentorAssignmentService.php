@@ -31,13 +31,20 @@ class MentorAssignmentService {
     }
 
 
-    function submitRequestedMentor($request, $index, $mas_id) {
+    function submitRequestedMentor($request, $index, $mentor_role, $mas_id) {
 
-        // return $reqCount;
+        // return $mentor_role[$index];
+        // $faculty = Faculty::where('faculty_id', $request['faculty_id'])->get();
 
+        // return $faculty;
         $faculty = Faculty::where('faculty_id', $request['faculty_id'])->first();
         //if the user is not existed on mentors table; it will return atleast they have temporary adviser
-        $checkMentorExist = Mentor::where('uuid', Auth::user()->uuid)->where('status', '=', 'ACTIVE')->first();
+
+        $checkMentorExist = Mentor::where('uuid', Auth::user()->uuid)->where('status', '=', 'ACTIVE')->get();
+        // return $checkMentorExist;
+        // $checkMentorExist = Mentor::where('uuid', Auth::user()->uuid)->where('status', '=', 'ACTIVE')->first();
+        // $checkMentorExist = Mentor::find(Auth::user()->uuid);
+        
         //if the user request a mentor; mentor should active
         $requestMentors = Mentor::where('uuid', Auth::user()->uuid)->where('faculty_id', $faculty->faculty_id)->where('status', '!=', 'ACTIVE')->first();
         //this will get student details
@@ -47,59 +54,71 @@ class MentorAssignmentService {
         $studentProgramRecords = $student->program_records()->where('status', '=', 'ACTIVE')->first();
         
         $facultyMentor = MentorRole::find($request['mentor_role']);
+        // $facultyMentor[] = MentorRole::whereIn('id', $mentor_role[$index]);
         
+
+        // return $facultyMentor;
+
+        // return $checkMentorExist;
+
+        
+
         $errMsg = [];
         // $errCount = 0;
-        if($facultyMentor->id == 2) { //requesting for a mjor adviser
-            $role[$index] = $facultyMentor->id;
-            $countMax = Ma::where('uuid', Auth::user()->uuid)
-                            ->where('mentor_role', $facultyMentor->id)
-                            ->get()->count();
+        // if(count($checkMentorExist) > )
 
-            if($countMax > 0) {
-                if($countMax + count($role) > 0) {
-                    $errMsg[] = "You have reached maximum requirement for requesting a Major Adviser";
-                }
-            } else {
-                //count exist major adviser + request major adviser; return if hit the requirement needed
-                $countExists = Mentor::where('uuid', Auth::user()->uuid)
-                            ->where('mentor_role', $facultyMentor->id)
-                            ->where('status', '=', 'ACTIVE')
-                            ->get()->count();
-                if($countExists > 0 || $countExists + count($role) > 0) {
-                    $errMsg[] = "You already have an active Major Adviser and exceeded maximum requirement";
-                }
-            }
+        // if($checkMentorExist != 1) { //validation will run if not temporary adviser
+            if($facultyMentor->id == 2) { //requesting for a mjor adviser
+                $countMax = Ma::where('uuid', Auth::user()->uuid)
+                                ->where('mentor_role', $facultyMentor->id)
+                                ->get()->count();
 
-        } else if($facultyMentor->id == 3) { //requesting for a member
-            $role[$index] = $facultyMentor->id;
-            $countMax = Ma::where('uuid', Auth::user()->uuid)
-                            ->where('mentor_role', $facultyMentor->id)
-                            ->get()->count();
-                            
-            if($countMax > 2) {
-                if($countMax + count($role) > 2) {
-                    $errMsg[] = "You have reached maximum requirement for requesting a Member";
+                if($countMax > 0) {
+                    if($countMax + count($mentor_role) > 0) {
+                        $errMsg[] = "You have reached maximum requirement for requesting a Major Adviser";
+                    }
+                } else {
+                    //count exist major adviser + request major adviser; return if hit the requirement needed
+                    $countExists = Mentor::where('uuid', Auth::user()->uuid)
+                                ->where('mentor_role', $facultyMentor->id)
+                                ->where('status', '=', 'ACTIVE')
+                                ->get()->count();
+                                
+                    // if($countExists > 0 || $countExists + count($mentor_role) > 0) {
+                    if($countExists > 0) {
+                        $errMsg[] = "You already have an active Major Adviser and exceeded maximum requirement";
+                    }
                 }
-            } else {
-                //count exist member + request member; return if hit the requirement needed
-                $countExists = Mentor::where('uuid', Auth::user()->uuid)
-                    ->where('mentor_role', $facultyMentor->id)
-                    ->where('status', '=', 'ACTIVE')
-                    ->get()->count();
-
-                if($countExists > 2 || $countExists + count($role) > 2) {
-                    $errMsg[] = "You already have an active Member and exceeded maximum requirement";
+    
+            } else if($facultyMentor->id == 3) { //requesting for a member
+                $countMax = Ma::where('uuid', Auth::user()->uuid)
+                                ->where('mentor_role', $facultyMentor->id)
+                                ->get()->count();
+                                
+                if($countMax > 2) {
+                    if($countMax + count($mentor_role) > 2) {
+                        $errMsg[] = "You have reached maximum requirement for requesting a Member";
+                    }
+                } else {
+                    //count exist member + request member; return if hit the requirement needed
+                    $countExists = Mentor::where('uuid', Auth::user()->uuid)
+                        ->where('mentor_role', $facultyMentor->id)
+                        ->where('status', '=', 'ACTIVE')
+                        ->get()->count();
+    
+                    if($countExists > 2 || $countExists + count($mentor_role) > 2) {
+                        $errMsg[] = "You already have an active Member and exceeded maximum requirement";
+                    }
                 }
-            }
-        } 
+            } 
+        // }
 
         //return existing mentor request
         // $existRequest[] = Ma::whereIn('faculty_id', $facultyId)->where('uuid', Auth::user()->uuid)->where('status', '=', 'Requested')->get();
-        $existRequest = Ma::where('faculty_id', $request['faculty_id'])->where('uuid', Auth::user()->uuid)->where('status', '=', 'Requested')->first();
+        // $existRequest = Ma::where('faculty_id', $request['faculty_id'])->where('uuid', Auth::user()->uuid)->where('status', '=', 'Requested')->first();
         
         if(!empty($existRequest)) {
-            $errMsg[] = "You have already requested " . $request['mentor_name'];
+            $errMsg[] = "You have already requested " . $request['name'];
         }
 
         if($requestMentors != '') {
@@ -112,18 +131,14 @@ class MentorAssignmentService {
                 'errors' => array($errMsg)
             ], 422); 
         } else {
-            if($checkMentorExist != '') {
-                DB::beginTransaction();
-                try {
-                    // update status; from saved to submitted
-                    SaveMentor::where('uuid', $request['uuid'])->update(['actions_status' => 'submitted']);
-        
-                    //insert to mentors dump data
+            if(!empty($checkMentorExist)) {
+                foreach($checkMentorExist as $value) {
                     $this->insertMentorAssignment(
                         Auth::user()->uuid,
-                        $checkMentorExist->faculty_id, //active mentor faculty_id
-                        $checkMentorExist ? '' : $mas_id,
-                        $faculty->faculty_id, // request mentor faculty_id
+                        $value["faculty_id"], //active mentor faculty_id
+                        '',
+                        $request['faculty_id'],
+                        //$faculty->faculty_id, // request mentor faculty_id
                         $studentProgramRecords->acad_group,
                         "",
                         // student informations
@@ -135,15 +150,23 @@ class MentorAssignmentService {
                         "UNASSIGNED",
                         "UNASSIGNED",
                         "UNASSIGNED"
-                    );
-                                                                
+                    );  
+                }
+                DB::beginTransaction();
+                try { 
+                    // update status; from saved to submitted
+                    SaveMentor::where('uuid', $request['uuid'])->update(['actions_status' => 'submitted']);
+                    
+                    // return $value['mas_id'];
+                    
+
                     // transaction_id; uuid; faculty_id; status; actions; mentor_name; mentor_role; created_at
-                    $this->insertMa($mas_id[$index], $request['uuid'], $request['faculty_id'], 'Requested', $request['actions'], $request['mentor_name'], $request['mentor_role']);
-    
+                    $this->insertMa($mas_id[$index], $request['uuid'], $request['faculty_id'], 'Requested', $request['actions'], $request['name'], $request['mentor_role']);
+
                     // transasction_id; status, remarks
                     $this->insertMaTxn($mas_id[$index], 'Requested', $request['remarks']);
-    
-    
+
+
                     DB::commit();
                     return response()->json([
                         'message' => 'Successfully submitted',
@@ -154,7 +177,6 @@ class MentorAssignmentService {
                     return response()->json(['message' => $ex->getMessage()], 500);
                 }
             } else {
-                // if mentors is empty they cannot request
                 return response()->json([
                     'message' => 'You cannot request a mentor without atleast a temporary adviser'
                 ], 400);
