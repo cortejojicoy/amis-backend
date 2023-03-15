@@ -46,9 +46,9 @@ class MaTxn extends Model
                         ->join('mentor_roles as mr', 'mr.id', '=', 'ma.mentor_role');
             }
             
-            // if($filters->mentor->faculty_id != '') {
-            //     $query->where('ma.faculty_id', $filters->mentor->faculty_id);
-            // }
+            if($filters->mentor->faculty_id != '') {
+                $query->where('ma.faculty_id', $filters->mentor->faculty_id);
+            }
 
         } else if ($role == 'admins') {
             if($filters->has('txn_history')) {

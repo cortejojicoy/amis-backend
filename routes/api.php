@@ -26,6 +26,7 @@ use App\Http\Controllers\Admin\PrerogController as AdminPrerogController;
 use App\Http\Controllers\Admin\PrerogTxnController as AdminPrerogTxnController;
 use App\Http\Controllers\Admin\AdminMaTxnController;
 use App\Http\Controllers\Admin\AdminMaController;
+use App\Http\Controllers\Admin\ImportController;
 
 use App\Http\Controllers\SuperAdmin\DownloadController;
 use App\Http\Controllers\SuperAdmin\CourseOfferingController as SuperAdminCourseOfferingController;
@@ -101,6 +102,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin'],'prefix'=>'admins',
     Route::apiResource('check-tags', TagController::class);
     Route::apiResource('matxns', AdminMaTxnController::class);
     Route::apiResource('admin-ma', AdminMaController::class);
+    Route::apiResource('import', ImportController::class);
 });
 
 Route::group(['middleware' => ['auth:sanctum', 'role:super_admin'],'prefix'=>'super_admins', 'as' => 'super_admins.'], function () {
