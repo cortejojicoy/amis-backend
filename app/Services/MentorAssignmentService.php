@@ -35,9 +35,9 @@ class MentorAssignmentService {
 
         // return $mentor_role[$index];
         // $faculty = Faculty::where('faculty_id', $request['faculty_id'])->get();
-
-        // return $faculty;
+        $mentorRole = MentorRole::where('id', $request['mentor_role'])->first();
         $faculty = Faculty::where('faculty_id', $request['faculty_id'])->first();
+        $user = User::where('uuid', $faculty->uuid)->first();
         //if the user is not existed on mentors table; it will return atleast they have temporary adviser
 
         $checkMentorExist = Mentor::where('uuid', Auth::user()->uuid)->where('status', '=', 'ACTIVE')->get();
@@ -71,6 +71,7 @@ class MentorAssignmentService {
             if($facultyMentor->id == 2) { //requesting for a mjor adviser
                 $countMax = Ma::where('uuid', Auth::user()->uuid)
                                 ->where('mentor_role', $facultyMentor->id)
+                                ->where('status', '!=', 'Disapproved')
                                 ->get()->count();
 
                 if($countMax > 0) {
@@ -136,7 +137,7 @@ class MentorAssignmentService {
                     $this->insertMentorAssignment(
                         Auth::user()->uuid,
                         $value["faculty_id"], //active mentor faculty_id
-                        '',
+                        $mas_id[$index],
                         $request['faculty_id'],
                         //$faculty->faculty_id, // request mentor faculty_id
                         $studentProgramRecords->acad_group,
@@ -147,9 +148,12 @@ class MentorAssignmentService {
                         $studentProgramRecords->status,
     
                         //mentors informations
-                        "UNASSIGNED",
-                        "UNASSIGNED",
-                        "UNASSIGNED"
+                        $user->first_name ." ".$user->last_name,
+                        $mentorRole->titles,
+                        "Requested"
+                        // $mas->status,
+                        // "UNASSIGNED", 
+                        // "UNASSIGNED",
                     );  
                 }
                 DB::beginTransaction();
@@ -238,25 +242,17 @@ class MentorAssignmentService {
                     }
 
                     if($saveMentor) {
-                        // $returnedMentor->mentor_name = 
                         $saveMentor->actions_status = 'submitted';
                         $saveMentor->save();
                     }
                 } 
                 
                 if($request->roles === 'faculties') {
-                    if($status == Ma::RETURNED) {
-                        SaveMentor::create([
-                            "mas_id" => $ma->id,
-                            "actions" => $ma->actions,
-                            "mentor_name" => $ma->mentor_name, 
-                            "mentor_role" => $ma->mentor_role,
-                            "uuid" => $ma->uuid,
-                            "faculty_id" => $ma->faculty_id,
-                            "actions_status" => "saved",
-                            "status" => "returned"
-                        ]);
-                    }
+
+                    
+                    MentorAssignment::where('mas_id', $request->masId)->update([
+                        'status' => 'Endorsed'
+                    ]);
                 }
 
                 if($request->roles === 'admins') {
